@@ -1,0 +1,32 @@
+## Ignore arquivos de build
+bin/
+obj/
+
+## Ignore arquivos do usuário do Visual Studio
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs
+
+## Ignore pacotes
+*.nupkg
+*.snupkg
+packages/
+*.symbols.nupkg
+
+## Ignore configurações de IDE
+.vscode/
+.idea/
+*.code-workspace
+
+## Ignore diretórios do sistema
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Arquivos do Rider
+*.sln.iml
+
+## Dotnet secrets
+secrets.json
