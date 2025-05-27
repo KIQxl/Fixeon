@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>81c2920e-2ba1-437a-b59c-d7860602f6f4</UserSecretsId>
+    <UserSecretsId>eab75737-88ef-4e05-9d1f-cb7affe02a09</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\services\Fixeon.Auth.Infraestructure\Fixeon.Auth.Infraestructure.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Domain.Infraestructure\Fixeon.Domain.Infraestructure.csproj" />
+    <ProjectReference Include="..\..\services\Fixeon.Shared\Fixeon.Shared.csproj" />
   </ItemGroup>
 
 </Project>

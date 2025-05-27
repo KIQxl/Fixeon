@@ -1,5 +1,6 @@
 ﻿using Fixeon.Auth.Application.Dtos;
 using Fixeon.Auth.Application.Interfaces;
+using Fixeon.Shared.Interfaces;
 
 namespace Fixeon.Auth.Application.Services
 {
@@ -7,11 +8,13 @@ namespace Fixeon.Auth.Application.Services
     {
         private readonly IAuthRepository _rep;
         private readonly ITokenGeneratorService _tokenService;
+        private readonly IEmailQueueServices _emailQueue;
 
-        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService)
+        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IEmailQueueServices emailQueue)
         {
             _rep = services;
             _tokenService = tokenService;
+            _emailQueue = emailQueue;
         }
 
         public async Task<Response<LoginResponse>> Login(LoginRequest request)
@@ -40,10 +43,12 @@ namespace Fixeon.Auth.Application.Services
 
             var appUser = await _rep.CreateAccount(request);
 
-            if (appUser is null)
-                return new Response<LoginResponse>("Não foi possivel criar o usuário");
+            if (appUser is null || appUser.Errors.Any())
+                return new Response<LoginResponse>(appUser.Errors);
 
             var token = _tokenService.GenerateToken(appUser);
+
+            await _emailQueue.EnqueueEmailAsync(new Shared.Models.EmailMessage { To = appUser.Email, Subject = "Boas vindas", Body = "Cadastro completo."});
 
             return new Response<LoginResponse>(new LoginResponse { Id = appUser.Id, Email = appUser.Email, Username = appUser.Username, Token = token });
         }

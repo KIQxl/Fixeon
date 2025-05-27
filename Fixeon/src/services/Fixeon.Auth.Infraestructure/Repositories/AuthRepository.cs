@@ -30,16 +30,12 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
+                var roles = await _userManager.GetRolesAsync(user);
 
-                return new ApplicationUser
-                {
-                    Id = user.Id,
-                    Username = user.UserName,
-                    Email = user.Email
-                };
+                return new ApplicationUser(user.Id, user.UserName, user.Email, roles);
             }
 
-            return null;
+            return new ApplicationUser(result.Errors.Select(e => e.Description).ToList());
         }
 
         public async Task<ApplicationUser> Login(string email, string password)
@@ -52,13 +48,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                return new ApplicationUser
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Username = user.UserName,
-                    Roles = roles
-                };
+                return new ApplicationUser(user.Id, user.UserName, user.Email, roles);
             }
 
             return null;

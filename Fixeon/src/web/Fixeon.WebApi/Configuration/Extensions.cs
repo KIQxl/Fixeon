@@ -2,7 +2,11 @@
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;
+using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Services;
+using Fixeon.WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 using System.Text.Json.Serialization;
 
 namespace Fixeon.WebApi.Configuration
@@ -35,7 +39,19 @@ namespace Fixeon.WebApi.Configuration
                 .RegisterDomainContext(configuration)
                 .RegisterIdentityAuthentication(jwtSettings)
                 .RegisterDI()
-                .RegisterDomainDI();
+                .RegisterDomainDI()
+                .RegisterBackgroundServices();
+
+            return services;
+        }
+
+        public static IServiceCollection RegisterBackgroundServices(this IServiceCollection services)
+        {
+            services.AddHostedService<EmailBackgroundService>();
+
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
+            services.AddSingleton<IEmailQueueServices, EmailQueueServices>();
+            services.AddSingleton<IEmailServices, EmailService>();
 
             return services;
         }
