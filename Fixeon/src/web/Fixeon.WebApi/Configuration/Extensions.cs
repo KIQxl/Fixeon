@@ -1,12 +1,12 @@
-﻿using Fixeon.Auth.Infraestructure.Configuration;
+﻿using Fixeon.Auth.Application.Interfaces;
+using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;
-using Fixeon.Shared.Interfaces;
-using Fixeon.Shared.Services;
 using Fixeon.WebApi.Services;
+using Hangfire;
+using Hangfire.Redis.StackExchange;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 using System.Text.Json.Serialization;
 
 namespace Fixeon.WebApi.Configuration
@@ -47,17 +47,24 @@ namespace Fixeon.WebApi.Configuration
 
         public static IServiceCollection RegisterBackgroundServices(this IServiceCollection services)
         {
-            services.AddHostedService<EmailBackgroundService>();
+            //services.AddHostedService<EmailBackgroundService>();
 
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
-            services.AddSingleton<IEmailQueueServices, EmailQueueServices>();
-            services.AddSingleton<IEmailServices, EmailService>();
+            //services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
+            //services.AddSingleton<IEmailQueueServices, EmailQueueServices>();
+            //services.AddSingleton<IEmailServices, EmailService>();
+
+            services.AddScoped<IBackgroundEmailJobWrapper, HangfireWrapper>();
+
+            services.AddHangfire(config => config.UseRedisStorage("localhost:6379"));
+            services.AddHangfireServer();
 
             return services;
         }
 
         public static IApplicationBuilder RegisterApp (this IApplicationBuilder app)
         {
+            app.UseHangfireDashboard("/hangfire");
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();

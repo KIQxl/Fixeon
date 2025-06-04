@@ -8,13 +8,15 @@ namespace Fixeon.Auth.Application.Services
     {
         private readonly IAuthRepository _rep;
         private readonly ITokenGeneratorService _tokenService;
-        private readonly IEmailQueueServices _emailQueue;
+        //private readonly IEmailQueueServices _emailQueue;
+        private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
 
-        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IEmailQueueServices emailQueue)
+        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IEmailQueueServices emailQueue, IBackgroundEmailJobWrapper backgroundEmailJobWrapper)
         {
             _rep = services;
             _tokenService = tokenService;
-            _emailQueue = emailQueue;
+            //_emailQueue = emailQueue;
+            _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
         }
 
         public async Task<Response<LoginResponse>> Login(LoginRequest request)
@@ -48,7 +50,8 @@ namespace Fixeon.Auth.Application.Services
 
             var token = _tokenService.GenerateToken(appUser);
 
-            await _emailQueue.EnqueueEmailAsync(new Shared.Models.EmailMessage { To = appUser.Email, Subject = "Boas vindas", Body = "Cadastro completo."});
+            //await _emailQueue.EnqueueEmailAsync(new Shared.Models.EmailMessage { To = appUser.Email, Subject = "Boas vindas", Body = "Cadastro completo."});
+            _backgroundEmailJobWrapper.SendWelcomeEmail(new Shared.Models.EmailMessage { To = appUser.Email, Subject = "Boas vindas", Body = "Cadastro completo." });
 
             return new Response<LoginResponse>(new LoginResponse { Id = appUser.Id, Email = appUser.Email, Username = appUser.Username, Token = token });
         }
