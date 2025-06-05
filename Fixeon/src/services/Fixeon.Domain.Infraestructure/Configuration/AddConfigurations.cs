@@ -1,6 +1,5 @@
 ﻿using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Application.Services;
-using Fixeon.Domain.Core.Interfaces;
 using Fixeon.Domain.Infraestructure.Data;
 using Fixeon.Domain.Infraestructure.Repositories;
 using Microsoft.EntityFrameworkCore;

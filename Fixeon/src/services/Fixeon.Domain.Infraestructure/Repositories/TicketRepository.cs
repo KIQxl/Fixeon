@@ -1,7 +1,6 @@
-﻿using Fixeon.Domain.Core.Entities;
+﻿using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
-using Fixeon.Domain.Core.Interfaces;
-using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 

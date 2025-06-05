@@ -1,7 +1,7 @@
 ﻿using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 
-namespace Fixeon.Domain.Core.Interfaces
+namespace Fixeon.Domain.Application.Interfaces
 {
     public interface ITicketRepository
     {

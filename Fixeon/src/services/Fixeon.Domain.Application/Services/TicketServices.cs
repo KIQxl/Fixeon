@@ -5,7 +5,6 @@ using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
-using Fixeon.Domain.Core.Interfaces;
 using Fixeon.Domain.Core.ValueObjects;
 
 namespace Fixeon.Domain.Application.Services
