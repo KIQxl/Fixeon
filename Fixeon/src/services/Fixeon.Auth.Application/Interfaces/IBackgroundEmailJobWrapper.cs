@@ -9,6 +9,6 @@ namespace Fixeon.Auth.Application.Interfaces
 {
     public interface IBackgroundEmailJobWrapper
     {
-        public void SendWelcomeEmail(EmailMessage email);
+        public void SendEmail(EmailMessage email);
     }
 }

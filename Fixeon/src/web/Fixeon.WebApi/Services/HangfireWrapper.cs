@@ -2,6 +2,8 @@
 using Fixeon.Shared.Interfaces;
 using Fixeon.Shared.Models;
 using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
 
 namespace Fixeon.WebApi.Services
 {
@@ -14,10 +16,15 @@ namespace Fixeon.WebApi.Services
             _emailServices = emailServices;
         }
 
-        public void SendWelcomeEmail(EmailMessage email)
+        public void SendEmail(EmailMessage email)
         {
-            BackgroundJob.Enqueue(() => 
-                _emailServices.SendEmail(email.To, email.Subject, email.Body));
+            var client = new BackgroundJobClient();
+
+            client.Create(
+                Job.FromExpression(() => _emailServices.SendEmail(email)), 
+                new EnqueuedState("email")
+            );
         }
+
     }
 }

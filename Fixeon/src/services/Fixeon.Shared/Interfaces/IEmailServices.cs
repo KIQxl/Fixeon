@@ -1,7 +1,9 @@
-﻿namespace Fixeon.Shared.Interfaces
+﻿using Fixeon.Shared.Models;
+
+namespace Fixeon.Shared.Interfaces
 {
     public interface IEmailServices
     {
-        public Task SendEmail(string to, string subject, string body);
+        public Task SendEmail(EmailMessage email);
     }
 }

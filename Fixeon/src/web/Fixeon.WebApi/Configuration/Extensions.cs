@@ -3,6 +3,9 @@ using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;
+using Fixeon.Shared.Configuration;
+using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Services;
 using Fixeon.WebApi.Services;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
@@ -21,7 +24,7 @@ namespace Fixeon.WebApi.Configuration
             });
 
             services.AddControllers()
-                .AddJsonOptions( options =>
+                .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                     options.JsonSerializerOptions.WriteIndented = true;
@@ -35,33 +38,36 @@ namespace Fixeon.WebApi.Configuration
 
             var jwtSettings = jwtSection.Get<JwtSettings>();
 
+            var smtpSection = configuration.GetSection("SmtpSettings");
+            services.Configure<SmtpSettings>(smtpSection);
+
+            var smtpSettings = smtpSection.Get<SmtpSettings>();
+
             services.RegisterIdentityConfigs(configuration)
                 .RegisterDomainContext(configuration)
                 .RegisterIdentityAuthentication(jwtSettings)
                 .RegisterDI()
                 .RegisterDomainDI()
-                .RegisterBackgroundServices();
+                .RegisterBackgroundServices(configuration);
 
             return services;
         }
 
-        public static IServiceCollection RegisterBackgroundServices(this IServiceCollection services)
+        public static IServiceCollection RegisterBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddHostedService<EmailBackgroundService>();
-
-            //services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
-            //services.AddSingleton<IEmailQueueServices, EmailQueueServices>();
-            //services.AddSingleton<IEmailServices, EmailService>();
-
+            services.AddScoped<IEmailServices, EmailService>();
             services.AddScoped<IBackgroundEmailJobWrapper, HangfireWrapper>();
 
             services.AddHangfire(config => config.UseRedisStorage("localhost:6379"));
-            services.AddHangfireServer();
+            services.AddHangfireServer(opts =>
+            {
+                opts.Queues = new[] { "email", "default" };
+            });
 
             return services;
         }
 
-        public static IApplicationBuilder RegisterApp (this IApplicationBuilder app)
+        public static IApplicationBuilder RegisterApp(this IApplicationBuilder app)
         {
             app.UseHangfireDashboard("/hangfire");
 
