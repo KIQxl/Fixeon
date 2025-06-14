@@ -34,21 +34,9 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .HasColumnName("username");
             });
 
-            builder.OwnsOne(i => i.Attachments, attachment =>
-            {
-                attachment.Property(a => a.FirstAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("FirstAttachment");
-
-                attachment.Property(a => a.SecondAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("SecondAttachment");
-
-
-                attachment.Property(a => a.ThirdAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("ThirdAttachment");
-            });
+            builder.HasMany(i => i.Attachments)
+                .WithOne(a => a.Interaction)
+                .HasForeignKey(a => a.InteractionId);
         }
     }
 }

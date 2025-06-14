@@ -20,6 +20,9 @@ namespace Fixeon.Domain.Application.Validations
             RuleFor(x => x.Message)
                 .NotEmpty().WithMessage("Mensagem não pode ser vazia.")
                 .MinimumLength(8).WithMessage("Mensagem deve conter no mínimo 8 caracteres.");
+
+            RuleFor(x => x.Attachments.Count)
+                .LessThanOrEqualTo(3).WithMessage("O limite máximo de arquivos é 3.");
         }
     }
 }

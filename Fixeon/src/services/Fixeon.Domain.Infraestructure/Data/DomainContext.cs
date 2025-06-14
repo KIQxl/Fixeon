@@ -10,6 +10,7 @@ namespace Fixeon.Domain.Infraestructure.Data
 
         public DbSet<Ticket> tickets { get; set; }
         public DbSet<Interaction> interactions { get; set; }
+        public DbSet<Attachment> attachments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

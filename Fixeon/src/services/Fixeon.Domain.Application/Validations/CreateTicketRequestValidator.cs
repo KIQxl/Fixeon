@@ -28,6 +28,9 @@ namespace Fixeon.Domain.Application.Validations
 
             RuleFor(x => x.CreateByUsername)
                 .NotEmpty().WithMessage("O campo usuário de criação não pode ser vazio.");
+
+            RuleFor(x => x.Attachments.Count)
+                .LessThanOrEqualTo(3).WithMessage("O limite máximo de arquivos é 3.");
         }
     }
 }

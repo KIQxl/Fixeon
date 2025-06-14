@@ -6,6 +6,11 @@ namespace Fixon.Tests.MockRepository
 {
     public class FakeTicketRepository : ITicketRepository
     {
+        public async Task<bool> CreateAttachment(List<Attachment> attachments)
+        {
+            return true;
+        }
+
         public Task CreateInteraction(Interaction interaction)
         {
             return Task.CompletedTask;
@@ -29,7 +34,7 @@ namespace Fixon.Tests.MockRepository
         public async Task<Ticket> GetTicketByIdAsync(Guid id)
         {
             if (id.ToString().Equals("e7b7f8e4-6d99-4f3e-99aa-f5a7b87b9e71"))
-                return new Ticket("Titulo do Ticket", "AAAAAAAAAAAAA", "Geral", new Fixeon.Domain.Core.ValueObjects.User { UserId = "e7b7f8e4-6d99-4f3e-99aa-f5a7b87b9e71", UserName = "Lojista" }, EPriority.Low, new Fixeon.Domain.Core.ValueObjects.Attachment {FirstAttachment = null, SecondAttachment = null, ThirdAttachment = null });
+                return new Ticket("Titulo do Ticket", "AAAAAAAAAAAAA", "Geral", new Fixeon.Domain.Core.ValueObjects.User { UserId = "e7b7f8e4-6d99-4f3e-99aa-f5a7b87b9e71", UserName = "Lojista" }, EPriority.Low);
 
             return null;
         }

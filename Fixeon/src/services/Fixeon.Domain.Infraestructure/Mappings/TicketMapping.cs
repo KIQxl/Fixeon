@@ -59,24 +59,13 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             builder.Property(t => t.ResolvedAt)
                 .HasColumnType("datetime");
 
-            builder.OwnsOne(t => t.Attachments, attachment =>
-            {
-                attachment.Property(a => a.FirstAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("FirstAttachment");
-
-                attachment.Property(a => a.SecondAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("SecondAttachment");
-
-
-                attachment.Property(a => a.ThirdAttachment)
-                .HasColumnType("varchar(250)")
-                .HasColumnName("ThirdAttachment");
-            });
-
             builder.HasMany(t => t.Interactions)
-                .WithOne(i => i.Ticket);
+                .WithOne(i => i.Ticket)
+                .HasForeignKey(i => i.TicketId);
+
+            builder.HasMany(t => t.Attachments)
+                .WithOne(a => a.Ticket)
+                .HasForeignKey(a => a.TicketId);
         }
     }
 }

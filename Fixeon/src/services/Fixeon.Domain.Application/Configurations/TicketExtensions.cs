@@ -1,7 +1,5 @@
-﻿using Fixeon.Domain.Application.Dtos.Requests;
-using Fixeon.Domain.Application.Dtos.Responses;
+﻿using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
-using Fixeon.Domain.Application.Validations;
 using Fixeon.Domain.Core.Entities;
 using FluentValidation;
 using FluentValidation.Results;

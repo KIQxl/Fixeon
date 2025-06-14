@@ -16,5 +16,7 @@ namespace Fixeon.Domain.Application.Interfaces
 
         public Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId);
         public Task CreateInteraction(Interaction interaction);
+
+        public Task<bool> CreateAttachment(List<Attachment> attachments);
     }
 }

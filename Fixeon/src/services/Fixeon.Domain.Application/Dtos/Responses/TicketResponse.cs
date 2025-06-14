@@ -1,5 +1,4 @@
 ﻿using Fixeon.Domain.Core.Entities;
-using Fixeon.Domain.Core.ValueObjects;
 
 namespace Fixeon.Domain.Application.Dtos.Responses
 {
@@ -19,6 +18,6 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public List<Interaction>? Interactions { get; set; }
         public string DurationFormat { get; set; }
         public TimeSpan? Duration { get; set; }
-        public Attachment? Attachments { get; set; }
+        public List<Attachment> Attachments { get; set; } = new List<Attachment>();
     }
 }

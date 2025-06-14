@@ -1,6 +1,7 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.WebApi.Configuration;
+using Fixeon.WebApi.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.WebApi.Controllers
@@ -89,9 +90,11 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-ticket")]
-        public async Task<IActionResult> CreateTicket([FromBody] CreateTicketRequest request)
+        public async Task<IActionResult> CreateTicket([FromForm] CreateTicketRequestDto request)
         {
-            var response = await _ticketServices.CreateTicket(request);
+            var requestAdapt = request.ToApplicationRequest();
+
+            var response = await _ticketServices.CreateTicket(requestAdapt);
 
             if (response.Success)
                 return Ok(response);

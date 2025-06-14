@@ -138,5 +138,18 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
             }
         }
+
+        public async Task<bool> CreateAttachment(List<Attachment> attachments)
+        {
+            try
+            {
+                await _ctx.attachments.AddRangeAsync(attachments);
+                return await _ctx.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
     }
 }

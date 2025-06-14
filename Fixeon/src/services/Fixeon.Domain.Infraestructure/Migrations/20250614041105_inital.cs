@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class inital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,9 +19,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     Title = table.Column<string>(type: "varchar(100)", nullable: false),
                     Description = table.Column<string>(type: "varchar(400)", nullable: false),
                     Category = table.Column<string>(type: "varchar(50)", nullable: false),
-                    FirstAttachment = table.Column<string>(type: "varchar(250)", nullable: true),
-                    SecondAttachment = table.Column<string>(type: "varchar(250)", nullable: true),
-                    ThirdAttachment = table.Column<string>(type: "varchar(250)", nullable: true),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
                     username = table.Column<string>(type: "varchar(100)", nullable: false),
                     analistId = table.Column<string>(type: "varchar(36)", nullable: true),
@@ -59,6 +56,44 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "attachments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    filename = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Extension = table.Column<string>(type: "varchar(6)", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    SenderId = table.Column<string>(type: "varchar(36)", nullable: false),
+                    TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    InteractionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_attachments", x => x.Id);
+                    table.CheckConstraint("CK_Attachment_Ticket_Or_Interaction", "(TicketId IS NOT NULL AND InteractionId IS NULL) OR (TicketId IS NULL AND InteractionId IS NOT NULL)");
+                    table.ForeignKey(
+                        name: "FK_attachments_interactions_InteractionId",
+                        column: x => x.InteractionId,
+                        principalTable: "interactions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_attachments_tickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "tickets",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_attachments_InteractionId",
+                table: "attachments",
+                column: "InteractionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_attachments_TicketId",
+                table: "attachments",
+                column: "TicketId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_interactions_TicketId",
                 table: "interactions",
@@ -68,6 +103,9 @@ namespace Fixeon.Domain.Infraestructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "attachments");
+
             migrationBuilder.DropTable(
                 name: "interactions");
 

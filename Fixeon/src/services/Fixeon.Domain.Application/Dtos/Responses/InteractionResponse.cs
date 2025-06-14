@@ -1,4 +1,4 @@
-﻿using Fixeon.Domain.Core.ValueObjects;
+﻿using Fixeon.Domain.Core.Entities;
 
 namespace Fixeon.Domain.Application.Dtos.Responses
 {

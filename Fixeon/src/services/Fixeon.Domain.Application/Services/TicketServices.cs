@@ -12,10 +12,12 @@ namespace Fixeon.Domain.Application.Services
     public class TicketServices : ITicketServices
     {
         private readonly ITicketRepository _ticketRepository;
+        private readonly IFileServices _fileServices;
 
-        public TicketServices(ITicketRepository ticketRepository)
+        public TicketServices(ITicketRepository ticketRepository, IFileServices fileServices)
         {
             _ticketRepository = ticketRepository;
+            _fileServices = fileServices;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -30,8 +32,15 @@ namespace Fixeon.Domain.Application.Services
                 request.Description,
                 request.Category,
                 new User { UserId = request.CreateByUserId, UserName = request.CreateByUsername },
-                request.Priority,
-                new Attachment { FirstAttachment = request.FirstAttachment, SecondAttachment = request.SecondAttachment, ThirdAttachment = request.ThirdAttachment });
+                request.Priority);
+
+            foreach(var file in request.Attachments)
+            {
+                await _fileServices.SaveFile(file);
+
+                var attachment = file.ToAttachment(Guid.Parse(ticket.CreatedByUser.UserId), ticket.Id, null);
+                ticket.AddAttachment(attachment);
+            }
 
             try
             {
@@ -61,10 +70,18 @@ namespace Fixeon.Domain.Application.Services
             if (ticket is null)
                 return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
+            if(ticket.Status.Equals(ETicketStatus.Canceled))
+                return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
+
             var interaction = new Interaction(request.TicketId, request.Message, new InteractionUser { UserId = request.CreatedByUserId, UserName = request.CreatedByUserName });
 
-            if(!ticket.NewInteraction(interaction))
-                return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
+            foreach(var file in request.Attachments)
+            {
+                await _fileServices.SaveFile(file);
+
+                var attachment = file.ToAttachment(Guid.Parse(interaction.CreatedBy.UserId), null, interaction.Id);
+                interaction.AddAttachment(attachment);
+            }
 
             try
             {

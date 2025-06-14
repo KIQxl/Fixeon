@@ -1,4 +1,5 @@
-﻿using Fixeon.Domain.Application.Dtos.Requests;
+﻿using Fixeon.Domain.Application.Dtos;
+using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Services;
 using Fixon.Tests.MockRepository;
 
@@ -11,12 +12,36 @@ namespace Fixon.Tests.Domain.Tests
 
         public TicketTests()
         {
-            _services = new TicketServices(new FakeTicketRepository());
+            _services = new TicketServices(new FakeTicketRepository(), new FakeFileService());
         }
 
         [TestMethod]
         public async Task WhenValidCreateTicketRequestReturnTrue()
         {
+            var attachments = new List<FormFileAdapterDto>{
+                new FormFileAdapterDto
+                {
+                    FileName = "file",
+                    ContentType = "text/plain",
+                    Length = 10 * 1024 * 1024,
+                    Content = null
+                },
+                new FormFileAdapterDto
+                {
+                    FileName = "file2",
+                    ContentType = "text/plain",
+                    Length = 10 * 1024 * 1024,
+                    Content = null
+                },
+                new FormFileAdapterDto
+                {
+                    FileName = "file3",
+                    ContentType = "text/plain",
+                    Length = 10 * 1024 * 1024,
+                    Content = null
+                }
+            };
+
             var request = new CreateTicketRequest
             {
                 Title = "Primeiro chamado",
@@ -25,7 +50,7 @@ namespace Fixon.Tests.Domain.Tests
                 CreateByUserId = "e7b7f8e4-6d99-4f3e-99aa-f5a7b87b9e71",
                 CreateByUsername = "Kaique",
                 Priority = Fixeon.Domain.Core.Enums.EPriority.High,
-                SecondAttachment = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                Attachments = attachments
             };
 
             var response = await _services.CreateTicket(request);

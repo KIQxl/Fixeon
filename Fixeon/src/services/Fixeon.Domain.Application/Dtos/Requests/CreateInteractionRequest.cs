@@ -8,8 +8,6 @@ namespace Fixeon.Domain.Application.Dtos.Requests
         public string CreatedByUserId { get; set; }
         public string CreatedByUserName { get; set; }
         public string Message { get; set; }
-        public string? FirstAttachment { get; set; }
-        public string? SecondAttachment { get; set; }
-        public string? ThirdAttachment { get; set; }
+        public List<FormFileAdapterDto> Attachments { get; set; } = new List<FormFileAdapterDto>();
     }
 }

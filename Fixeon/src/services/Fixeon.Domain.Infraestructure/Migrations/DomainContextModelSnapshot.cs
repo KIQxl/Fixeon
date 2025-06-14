@@ -22,6 +22,46 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.Attachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<Guid?>("InteractionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("filename");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<Guid?>("TicketId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InteractionId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("attachments", t =>
+                        {
+                            t.HasCheckConstraint("CK_Attachment_Ticket_Or_Interaction", "(TicketId IS NOT NULL AND InteractionId IS NULL) OR (TicketId IS NULL AND InteractionId IS NOT NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Interaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -83,6 +123,21 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.ToTable("tickets");
                 });
 
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.Attachment", b =>
+                {
+                    b.HasOne("Fixeon.Domain.Core.Entities.Interaction", "Interaction")
+                        .WithMany("Attachments")
+                        .HasForeignKey("InteractionId");
+
+                    b.HasOne("Fixeon.Domain.Core.Entities.Ticket", "Ticket")
+                        .WithMany("Attachments")
+                        .HasForeignKey("TicketId");
+
+                    b.Navigation("Interaction");
+
+                    b.Navigation("Ticket");
+                });
+
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Interaction", b =>
                 {
                     b.HasOne("Fixeon.Domain.Core.Entities.Ticket", "Ticket")
@@ -90,31 +145,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Attachment", "Attachments", b1 =>
-                        {
-                            b1.Property<Guid>("InteractionId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("FirstAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("FirstAttachment");
-
-                            b1.Property<string>("SecondAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("SecondAttachment");
-
-                            b1.Property<string>("ThirdAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("ThirdAttachment");
-
-                            b1.HasKey("InteractionId");
-
-                            b1.ToTable("interactions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("InteractionId");
-                        });
 
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.InteractionUser", "CreatedBy", b1 =>
                         {
@@ -139,9 +169,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                                 .HasForeignKey("InteractionId");
                         });
 
-                    b.Navigation("Attachments")
-                        .IsRequired();
-
                     b.Navigation("CreatedBy")
                         .IsRequired();
 
@@ -150,31 +177,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Ticket", b =>
                 {
-                    b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Attachment", "Attachments", b1 =>
-                        {
-                            b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("FirstAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("FirstAttachment");
-
-                            b1.Property<string>("SecondAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("SecondAttachment");
-
-                            b1.Property<string>("ThirdAttachment")
-                                .HasColumnType("varchar(250)")
-                                .HasColumnName("ThirdAttachment");
-
-                            b1.HasKey("TicketId");
-
-                            b1.ToTable("tickets");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TicketId");
-                        });
-
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Analist", "AssignedTo", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
@@ -223,15 +225,19 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Navigation("AssignedTo");
 
-                    b.Navigation("Attachments")
-                        .IsRequired();
-
                     b.Navigation("CreatedByUser")
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.Interaction", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Ticket", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Interactions");
                 });
 #pragma warning restore 612, 618

@@ -6,7 +6,7 @@ namespace Fixeon.Domain.Core.Entities
     public class Ticket : Entity
     {
         private Ticket() { }
-        public Ticket(string title, string description, string category, User createdByUser, EPriority priority, Attachment attachments)
+        public Ticket(string title, string description, string category, User createdByUser, EPriority priority)
         {
             Title = title;
             Description = description;
@@ -15,13 +15,12 @@ namespace Fixeon.Domain.Core.Entities
             CreateAt = DateTime.UtcNow;
             Status = ETicketStatus.Pending;
             Priority = priority;
-            Attachments = attachments;
         }
 
         public string Title { get; private set; }
         public string Description { get; private set; }
         public string Category { get; private set; }
-        public Attachment Attachments {  get; private set; }
+        public List<Attachment> Attachments {  get; private set; } = new List<Attachment>();
         public User CreatedByUser { get; private set; }
         public Analist? AssignedTo { get; private set; }
         public DateTime CreateAt { get; private set; }
@@ -92,6 +91,15 @@ namespace Fixeon.Domain.Core.Entities
         public List<Interaction> ListInteractions()
         {
             return this.Interactions;
+        }
+
+        public bool AddAttachment(Attachment attachments)
+        {
+            if (Attachments.Count > 3)
+                return false;
+
+            this.Attachments.Add(attachments);
+            return true;
         }
     }
 }
