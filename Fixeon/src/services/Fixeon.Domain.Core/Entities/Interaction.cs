@@ -15,7 +15,7 @@ namespace Fixeon.Domain.Core.Entities
 
         public Guid TicketId { get; set; }
         public string Message { get; set; }
-        public List<Attachment> Attachments { get; set; }
+        public List<Attachment> Attachments { get; set; } = new List<Attachment>();
         public DateTime CreatedAt { get; set; }
         public InteractionUser CreatedBy { get; set; }
 

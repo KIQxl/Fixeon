@@ -45,7 +45,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Include(t => t.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Include(t => t.Interactions).Include(t => t.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {

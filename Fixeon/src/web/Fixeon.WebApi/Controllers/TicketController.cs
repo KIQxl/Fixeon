@@ -104,9 +104,11 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-interaction")]
-        public async Task<IActionResult> CreateInteraction([FromBody] CreateInteractionRequest request)
+        public async Task<IActionResult> CreateInteraction([FromForm] CreateInteractionRequestDto request)
         {
-            var response = await _ticketServices.CreateTicketInteraction(request);
+            var requestAdapt = request.ToApplicationRequest();
+
+            var response = await _ticketServices.CreateTicketInteraction(requestAdapt);
 
             if (response.Success)
                 return Ok(response);

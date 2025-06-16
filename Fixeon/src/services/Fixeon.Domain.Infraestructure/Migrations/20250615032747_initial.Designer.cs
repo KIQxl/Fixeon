@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250614041105_inital")]
-    partial class inital
+    [Migration("20250615032747_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,8 +40,8 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("filename");
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("Filename");
 
                     b.Property<string>("SenderId")
                         .IsRequired()

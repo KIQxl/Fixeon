@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -61,7 +61,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    filename = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Filename = table.Column<string>(type: "varchar(200)", nullable: false),
                     Extension = table.Column<string>(type: "varchar(6)", nullable: false),
                     UploadedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     SenderId = table.Column<string>(type: "varchar(36)", nullable: false),

@@ -37,8 +37,8 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("filename");
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("Filename");
 
                     b.Property<string>("SenderId")
                         .IsRequired()

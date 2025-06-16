@@ -13,8 +13,8 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(a => a.Name)
                 .IsRequired()
-                .HasColumnType("varchar(50)")
-                .HasColumnName("filename");
+                .HasColumnType("varchar(200)")
+                .HasColumnName("Filename");
 
             builder.Property(a => a.Extension)
                 .IsRequired()

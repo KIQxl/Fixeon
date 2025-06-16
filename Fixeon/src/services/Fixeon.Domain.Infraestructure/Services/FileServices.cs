@@ -7,7 +7,7 @@ namespace Fixeon.Domain.Infraestructure.Services
     {
         public Task SaveFile(FormFileAdapterDto file)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
