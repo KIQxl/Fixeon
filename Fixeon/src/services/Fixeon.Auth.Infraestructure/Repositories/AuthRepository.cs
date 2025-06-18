@@ -1,4 +1,5 @@
-﻿using Fixeon.Auth.Application.Dtos;
+﻿using Fixeon.Auth.Application.Dtos.Requests;
+using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -48,14 +49,15 @@ namespace Fixeon.Auth.Infraestructure.Repositories
 
                 var appUsers = new List<ApplicationUser>();
 
-                foreach(var u in users)
+                foreach (var u in users)
                 {
                     var roles = await _userManager.GetRolesAsync(u);
 
                     var appUser = new ApplicationUser(u.Id, u.UserName, u.Email, roles);
 
                     appUsers.Add(appUser);
-                };
+                }
+                ;
 
 
                 return appUsers;
@@ -115,7 +117,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
                     await _roleManager.CreateAsync(new IdentityRole(role));
                     return true;
                 }
-                
+
                 return false;
             }
             catch (Exception ex)
@@ -130,7 +132,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             {
                 var user = await _userManager.FindByIdAsync(userId);
 
-                if(user != null)
+                if (user != null)
                 {
                     var roleExists = await _roleManager.RoleExistsAsync(role);
                     if (roleExists)
@@ -167,6 +169,30 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<string> GenerateResetPasswordToken(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            return token;
+        }
+
+        public async Task<ApplicationUser> ResetPassword(ResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (result.Succeeded)
+                return new ApplicationUser(user.Id, user.UserName, user.Email, new List<string>());
+
+            return new ApplicationUser(result
+                .Errors
+                .Select(e => e.Description)
+                .ToList());
         }
     }
 }

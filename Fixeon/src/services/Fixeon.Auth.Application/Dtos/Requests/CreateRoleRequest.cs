@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Fixeon.Auth.Application.Dtos
+namespace Fixeon.Auth.Application.Dtos.Requests
 {
     public class CreateRoleRequest
     {

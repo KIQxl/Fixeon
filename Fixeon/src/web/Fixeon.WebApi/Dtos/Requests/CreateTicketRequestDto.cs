@@ -2,7 +2,7 @@
 using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Core.Enums;
 
-namespace Fixeon.WebApi.Dtos
+namespace Fixeon.WebApi.Dtos.Requests
 {
     public class CreateTicketRequestDto
     {

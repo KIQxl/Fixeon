@@ -1,5 +1,8 @@
 ﻿using Fixeon.Auth.Application.Dtos;
+using Fixeon.Auth.Application.Dtos.Requests;
+using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
+using Fixeon.WebApi.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.WebApi.Controllers
@@ -110,6 +113,30 @@ namespace Fixeon.WebApi.Controllers
             var response = await _services.GetAllUsersAsync();
 
             if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [Route("recovery-password")]
+        public async Task<IActionResult> SendRecoveryPasswordLink([FromBody] RecoveryEmailDto request)
+        {
+            var response = await _services.SendRecoveryPasswordLink(request.Email);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPut]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var response = await _services.ResetPassword(request);
+
+            if(response.Success)
                 return Ok(response);
 
             return BadRequest(response);

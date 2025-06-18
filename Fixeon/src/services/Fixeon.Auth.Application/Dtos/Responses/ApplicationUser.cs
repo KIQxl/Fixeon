@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Auth.Application.Dtos
+﻿namespace Fixeon.Auth.Application.Dtos.Responses
 {
     public class ApplicationUser
     {

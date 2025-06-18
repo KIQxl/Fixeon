@@ -1,6 +1,6 @@
 ﻿using Fixeon.Auth.Application.Interfaces;
 
-namespace Fixeon.Auth.Application.Dtos
+namespace Fixeon.Auth.Application.Dtos.Responses
 {
     public class Response<T> : IResponse
     {

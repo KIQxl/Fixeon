@@ -1,4 +1,4 @@
-﻿using Fixeon.Auth.Application.Dtos;
+﻿using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
 using Fixeon.Auth.Infraestructure.Configuration;
 using Microsoft.Extensions.Options;

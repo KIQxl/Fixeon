@@ -1,4 +1,5 @@
-﻿using Fixeon.Auth.Application.Dtos;
+﻿using Fixeon.Auth.Application.Dtos.Requests;
+using Fixeon.Auth.Application.Dtos.Responses;
 
 namespace Fixeon.Auth.Application.Interfaces
 {
@@ -11,5 +12,7 @@ namespace Fixeon.Auth.Application.Interfaces
         Task<ApplicationUser> AssociateRole(string userId, string role);
         Task<List<ApplicationUser>> GetAllUsers();
         Task<ApplicationUser> GetUser(string email);
+        public Task<string> GenerateResetPasswordToken(string email);
+        public Task<ApplicationUser> ResetPassword(ResetPasswordRequest request);
     }
 }

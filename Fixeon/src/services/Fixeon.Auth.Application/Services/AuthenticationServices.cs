@@ -1,4 +1,5 @@
-﻿using Fixeon.Auth.Application.Dtos;
+﻿using Fixeon.Auth.Application.Dtos.Requests;
+using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
 using Fixeon.Shared.Configuration;
 using Fixeon.Shared.Interfaces;
@@ -10,12 +11,14 @@ namespace Fixeon.Auth.Application.Services
         private readonly IAuthRepository _rep;
         private readonly ITokenGeneratorService _tokenService;
         private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
+        private readonly IUrlEncoder _urlEncoder;
 
-        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IBackgroundEmailJobWrapper backgroundEmailJobWrapper)
+        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder)
         {
             _rep = services;
             _tokenService = tokenService;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
+            _urlEncoder = urlEncoder;
         }
 
         public async Task<Response<LoginResponse>> Login(LoginRequest request)
@@ -92,6 +95,33 @@ namespace Fixeon.Auth.Application.Services
                 return new Response<List<ApplicationUser>>("Nenhum usuário encontrado");
 
             return new Response<List<ApplicationUser>>(users);
+        }
+
+        public async Task<Response<bool>> SendRecoveryPasswordLink(string email)
+        {
+            var user = await _rep.GetUser(email);
+
+            if(user is null)
+                return new Response<bool>("Usuário não encontrado");
+
+            var token = await _rep.GenerateResetPasswordToken(email);
+            var encodedToken = $"?recovery-token={_urlEncoder.Encode(token)}";
+
+            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
+
+            return new Response<bool>(true);
+        }
+
+        public async Task<Response<ApplicationUser>> ResetPassword(ResetPasswordRequest request)
+        {
+            request.Token = _urlEncoder.Decode(request.Token);
+
+            var result = await _rep.ResetPassword(request);
+
+            if (!result.Errors.Any())
+                return new Response<ApplicationUser>(result);
+
+            return new Response<ApplicationUser>(result.Errors);
         }
     }
 }

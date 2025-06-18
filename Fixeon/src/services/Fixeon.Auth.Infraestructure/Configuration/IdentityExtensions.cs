@@ -66,6 +66,7 @@ namespace Fixeon.Auth.Infraestructure.Configuration
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddTransient<IAuthenticationServices, AuthenticationServices>();
+            services.AddScoped<IUrlEncoder, UrlEncoder>();
 
             return services;
         }

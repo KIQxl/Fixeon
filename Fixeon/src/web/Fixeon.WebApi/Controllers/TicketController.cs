@@ -1,7 +1,7 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.WebApi.Configuration;
-using Fixeon.WebApi.Dtos;
+using Fixeon.WebApi.Dtos.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.WebApi.Controllers
