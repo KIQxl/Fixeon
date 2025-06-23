@@ -13,11 +13,13 @@ namespace Fixeon.Domain.Application.Services
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly IFileServices _fileServices;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TicketServices(ITicketRepository ticketRepository, IFileServices fileServices)
+        public TicketServices(ITicketRepository ticketRepository, IFileServices fileServices, IUnitOfWork unitOfWork)
         {
             _ticketRepository = ticketRepository;
             _fileServices = fileServices;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -44,9 +46,11 @@ namespace Fixeon.Domain.Application.Services
 
             try
             {
-                var resultDB = await _ticketRepository.CreateTicket(ticket);
+                await _ticketRepository.CreateTicket(ticket);
 
-                if (!resultDB)
+                var result = await _unitOfWork.Commit();
+
+                if(!result)
                     return new Response<TicketResponse>("Não foi possível realizar a abertura do chamado.", EErrorType.ServerError);
 
                 return new Response<TicketResponse>(ticket.ToResponse());
@@ -86,8 +90,11 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 await _ticketRepository.CreateInteraction(interaction);
-                var resultDB = await _ticketRepository.UpdateTicket(ticket);
-                if (resultDB)
+                await _ticketRepository.UpdateTicket(ticket);
+
+                var result = await _unitOfWork.Commit();
+
+                if (result)
                 {
                     return new Response<TicketResponse>(ticket.ToResponse());
                 }
@@ -251,9 +258,11 @@ namespace Fixeon.Domain.Application.Services
                 if(!ticket.AssignTicketToAnalist(new Analist { AnalistId = request.AnalistId, AnalistName = request.AnalistName }))
                     return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
-                var resultDB = await _ticketRepository.UpdateTicket(ticket);
+                await _ticketRepository.UpdateTicket(ticket);
 
-                if (resultDB)
+                var result = await _unitOfWork.Commit();
+
+                if (result)
                     return new Response<TicketResponse>(ticket.ToResponse());
 
                 return new Response<TicketResponse>($"Não foi possível atribuir o ticket {ticket.Id} ao Analista {request.AnalistName} - {request.AnalistId}.", EErrorType.ServerError);
@@ -294,6 +303,10 @@ namespace Fixeon.Domain.Application.Services
                 }
 
                 await _ticketRepository.UpdateTicket(ticket);
+                var result = await _unitOfWork.Commit();
+
+                if (!result)
+                    return new Response<TicketResponse>("Não foi possível realizar a operação.", EErrorType.ServerError);
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }

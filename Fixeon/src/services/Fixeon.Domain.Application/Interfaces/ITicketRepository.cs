@@ -11,12 +11,12 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<IEnumerable<Ticket>> GetTicketsByPriorityAsync(EPriority priority);
         public Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(string userId);
         public Task<IEnumerable<Ticket>> GetTicketsByAnalistIdAsync(string analistId);
-        public Task<bool> CreateTicket(Ticket ticket);
-        public Task<bool> UpdateTicket(Ticket ticket);
+        public Task CreateTicket(Ticket ticket);
+        public Task UpdateTicket(Ticket ticket);
 
         public Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId);
         public Task CreateInteraction(Interaction interaction);
 
-        public Task<bool> CreateAttachment(List<Attachment> attachments);
+        public Task CreateAttachment(List<Attachment> attachments);
     }
 }

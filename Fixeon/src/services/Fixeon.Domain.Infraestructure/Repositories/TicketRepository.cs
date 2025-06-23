@@ -20,7 +20,6 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             try
             {
                 await _ctx.interactions.AddAsync(interaction);
-                await _ctx.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -28,12 +27,11 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<bool> CreateTicket(Ticket ticket)
+        public async Task CreateTicket(Ticket ticket)
         {
             try
             {
                 await _ctx.tickets.AddAsync(ticket);
-                return await _ctx.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
@@ -125,13 +123,12 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<bool> UpdateTicket(Ticket ticket)
+        public async Task UpdateTicket(Ticket ticket)
         {
             try
             {
                 _ctx.Attach(ticket);
                 _ctx.Entry(ticket).State = EntityState.Modified;
-                return await _ctx.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
@@ -139,12 +136,11 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<bool> CreateAttachment(List<Attachment> attachments)
+        public async Task CreateAttachment(List<Attachment> attachments)
         {
             try
             {
                 await _ctx.attachments.AddRangeAsync(attachments);
-                return await _ctx.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
