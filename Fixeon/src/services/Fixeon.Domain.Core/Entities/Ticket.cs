@@ -1,9 +1,10 @@
 ﻿using Fixeon.Domain.Core.Enums;
+using Fixeon.Domain.Core.Interfaces;
 using Fixeon.Domain.Core.ValueObjects;
 
 namespace Fixeon.Domain.Core.Entities
 {
-    public class Ticket : Entity
+    public class Ticket : Entity, ITenantEntity
     {
         private Ticket() { }
         public Ticket(string title, string description, string category, string departament, User createdByUser, string priority)
@@ -32,6 +33,8 @@ namespace Fixeon.Domain.Core.Entities
         public string Priority { get; private set; }
         public List<Interaction> Interactions { get; private set; } = new List<Interaction>();
         public TimeSpan? Duration => ResolvedAt.HasValue ? ResolvedAt.Value - CreateAt : null;
+
+        public Guid CompanyId { get; private set; }
 
         public void ResolveTicket()
         {

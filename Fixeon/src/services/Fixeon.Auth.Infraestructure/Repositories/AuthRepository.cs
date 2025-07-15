@@ -15,24 +15,22 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _context;
-        private readonly ITenantProvider _tenantProvider;
+        private readonly ITenantContext _tenantContext;
 
-        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, ITenantProvider tenantProvider, DataContext context)
+        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, DataContext context, ITenantContext tenantContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _tenantProvider = tenantProvider;
             _context = context;
+            _tenantContext = tenantContext;
         }
 
         public async Task<ApplicationUserResponse> GetUser(string email)
         {
             try
             {
-                var tenantId = _tenantProvider.GetTenantId();
-
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Email.Equals(email) && x.CompanyId.Equals(tenantId));
+                var user = await _context.users.FirstOrDefaultAsync(x => x.Email.Equals(email));
 
                 if (user == null)
                     return new ApplicationUserResponse(new List<string> { "Usuário não encontrado." });
@@ -51,9 +49,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var tenantId = _tenantProvider.GetTenantId();
-
-                var users = await _context.users.Where(x => x.CompanyId == tenantId).ToListAsync();
+                var users = await _context.users.ToListAsync();
 
                 if (users == null)
                     return null;
@@ -81,7 +77,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
 
         public async Task<ApplicationUserResponse> CreateAccount(CreateAccountRequest request)
         {
-            var tenantId = _tenantProvider.GetTenantId();
+            var tenantId = _tenantContext.TenantId;
 
             var IdentityUser = new ApplicationUser
             {
@@ -106,9 +102,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
 
         public async Task<ApplicationUserResponse> Login(string email, string password)
         {
-            var tenantId = _tenantProvider.GetTenantId();
-
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email && x.CompanyId == tenantId);
+            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
 
             var loginResult = await _signInManager.PasswordSignInAsync(user, password, true, true);
 
@@ -146,9 +140,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var tenantId = _tenantProvider.GetTenantId();
-
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Id == userId && x.CompanyId == tenantId);
+                var user = await _context.users.FirstOrDefaultAsync(x => x.Id == userId);
 
                 if (user != null)
                 {
@@ -176,9 +168,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var tenantId = _tenantProvider.GetTenantId();
-
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email && x.CompanyId == tenantId);
+                var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
 
                 if (user is null)
                     return false;
@@ -193,9 +183,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
 
         public async Task<string> GenerateResetPasswordToken(string email)
         {
-            var tenantId = _tenantProvider.GetTenantId();
-
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email && x.CompanyId == tenantId);
+            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -204,9 +192,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
 
         public async Task<ApplicationUserResponse> ResetPassword(ResetPasswordRequest request)
         {
-            var tenantId = _tenantProvider.GetTenantId();
-
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == request.Email && x.CompanyId == tenantId);
+            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == request.Email);
 
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
@@ -223,8 +209,6 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var tenantId = _tenantProvider.GetTenantId();
-
                 var users = await _userManager.GetUsersInRoleAsync(roleName);
 
                 if (users == null)

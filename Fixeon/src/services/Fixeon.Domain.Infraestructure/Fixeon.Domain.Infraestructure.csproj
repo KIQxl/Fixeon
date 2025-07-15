@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fixeon.Domain.Application\Fixeon.Domain.Application.csproj" />
+    <ProjectReference Include="..\Fixeon.Shared\Fixeon.Shared.csproj" />
   </ItemGroup>
 
 </Project>

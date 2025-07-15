@@ -13,7 +13,12 @@ namespace Fixeon.Domain.Infraestructure.Configuration
     {
         public static IServiceCollection RegisterDomainContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DomainContext>(opts => opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<DomainContext>((serviceProvider, opts) =>
+            {
+                opts
+                .UseSqlServer(configuration["ConnectionStrings:DefaultConnection"])
+                .AddInterceptors(serviceProvider.GetRequiredService<TenantSaveChangesInterceptor>());
+            });
 
             return services;
         }
@@ -24,6 +29,7 @@ namespace Fixeon.Domain.Infraestructure.Configuration
             services.AddScoped<ITicketRepository, TicketRepository>();
             services.AddScoped<IFileServices, FileServices>();
             services.AddScoped<IUnitOfWork, UnitOfWOrk>();
+            services.AddScoped<TenantSaveChangesInterceptor>();
 
             return services;
         }

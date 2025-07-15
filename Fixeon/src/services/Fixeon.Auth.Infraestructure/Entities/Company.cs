@@ -14,6 +14,6 @@
         public string Name { get; set; }
         public string CNPJ { get; set; }
         public DateTime CreatedAt { get; set; }
-        public List<ApplicationUser> Users { get; set; }
+        public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 }

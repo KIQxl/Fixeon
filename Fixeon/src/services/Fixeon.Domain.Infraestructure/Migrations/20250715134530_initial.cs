@@ -19,15 +19,17 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     Title = table.Column<string>(type: "varchar(100)", nullable: false),
                     Description = table.Column<string>(type: "varchar(2500)", nullable: false),
                     Category = table.Column<string>(type: "varchar(50)", nullable: false),
+                    Departament = table.Column<string>(type: "varchar(50)", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
                     username = table.Column<string>(type: "varchar(100)", nullable: false),
                     analistId = table.Column<string>(type: "varchar(36)", nullable: true),
                     analistName = table.Column<string>(type: "varchar(100)", nullable: true),
                     CreateAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "varchar(30)", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime", nullable: true),
                     ResolvedAt = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Priority = table.Column<int>(type: "int", nullable: false)
+                    Priority = table.Column<string>(type: "varchar(20)", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

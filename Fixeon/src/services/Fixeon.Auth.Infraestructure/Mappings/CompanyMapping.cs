@@ -21,6 +21,8 @@ namespace Fixeon.Auth.Infraestructure.Mappings
             builder.HasMany(x => x.Users)
                 .WithOne(x => x.Company)
                 .HasForeignKey(x => x.CompanyId);
+
+            builder.HasIndex(x => x.CNPJ).IsUnique();
         }
     }
 }

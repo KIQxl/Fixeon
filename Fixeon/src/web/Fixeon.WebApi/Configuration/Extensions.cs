@@ -5,6 +5,7 @@ using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;
 using Fixeon.Shared.Configuration;
 using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Models;
 using Fixeon.Shared.Services;
 using Fixeon.WebApi.Middlewares;
 using Fixeon.WebApi.Services;
@@ -81,7 +82,7 @@ namespace Fixeon.WebApi.Configuration
                 .RegisterBackgroundServices(configuration);
 
             services.AddHttpContextAccessor();
-            services.AddScoped<ITenantProvider, HttpContextTenantProvider>();
+            services.AddScoped<ITenantContext, TenantContext>();
 
             return services;
         }

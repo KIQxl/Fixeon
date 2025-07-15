@@ -14,7 +14,6 @@ namespace Fixeon.Domain.Application.Services
         private readonly ITicketRepository _ticketRepository;
         private readonly IFileServices _fileServices;
         private readonly IUnitOfWork _unitOfWork;
-
         public TicketServices(ITicketRepository ticketRepository, IFileServices fileServices, IUnitOfWork unitOfWork)
         {
             _ticketRepository = ticketRepository;

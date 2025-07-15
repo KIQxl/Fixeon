@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250705040912_initial")]
+    [Migration("20250715134530_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -98,8 +98,15 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Departament")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -108,14 +115,16 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
 
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("Title")
                         .IsRequired()

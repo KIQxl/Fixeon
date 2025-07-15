@@ -2,6 +2,7 @@
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Infraestructure.Data;
+using Fixeon.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fixeon.Domain.Infraestructure.Repositories
