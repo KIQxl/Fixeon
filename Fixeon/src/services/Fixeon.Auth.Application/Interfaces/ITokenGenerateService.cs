@@ -4,6 +4,6 @@ namespace Fixeon.Auth.Application.Interfaces
 {
     public interface ITokenGeneratorService
     {
-        public string GenerateToken(ApplicationUser user);
+        public string GenerateToken(ApplicationUserResponse user);
     }
 }

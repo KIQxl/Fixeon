@@ -23,6 +23,7 @@ namespace Fixeon.Domain.Infraestructure.Configuration
             services.AddScoped<ITicketServices, TicketServices>();
             services.AddScoped<ITicketRepository, TicketRepository>();
             services.AddScoped<IFileServices, FileServices>();
+            services.AddScoped<IUnitOfWork, UnitOfWOrk>();
 
             return services;
         }

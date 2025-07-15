@@ -12,7 +12,7 @@ namespace Fixon.Tests.Domain.Tests
 
         public TicketTests()
         {
-            _services = new TicketServices(new FakeTicketRepository(), new FakeFileService());
+            _services = new TicketServices(new FakeTicketRepository(), new FakeFileService(), new FakeUnitOfWork());
         }
 
         [TestMethod]

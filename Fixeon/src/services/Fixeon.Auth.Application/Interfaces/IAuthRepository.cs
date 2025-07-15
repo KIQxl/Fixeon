@@ -5,14 +5,15 @@ namespace Fixeon.Auth.Application.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<ApplicationUser> CreateAccount(CreateAccountRequest request);
-        Task<ApplicationUser> Login(string email, string password);
+        Task<ApplicationUserResponse> CreateAccount(CreateAccountRequest request);
+        Task<ApplicationUserResponse> Login(string email, string password);
         Task<bool> FindByEmail(string email);
         Task<bool> CreateRole(string role);
-        Task<ApplicationUser> AssociateRole(string userId, string role);
-        Task<List<ApplicationUser>> GetAllUsers();
-        Task<ApplicationUser> GetUser(string email);
+        Task<ApplicationUserResponse> AssociateRole(string userId, string role);
+        Task<List<ApplicationUserResponse>> GetAllUsers();
+        Task<ApplicationUserResponse> GetUser(string email);
         public Task<string> GenerateResetPasswordToken(string email);
-        public Task<ApplicationUser> ResetPassword(ResetPasswordRequest request);
+        public Task<ApplicationUserResponse> ResetPassword(ResetPasswordRequest request);
+        public Task<List<ApplicationUserResponse>> GetUsersByRoleName(string roleName);
     }
 }

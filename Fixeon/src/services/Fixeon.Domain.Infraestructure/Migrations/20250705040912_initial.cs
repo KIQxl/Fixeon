@@ -17,7 +17,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "varchar(100)", nullable: false),
-                    Description = table.Column<string>(type: "varchar(400)", nullable: false),
+                    Description = table.Column<string>(type: "varchar(2500)", nullable: false),
                     Category = table.Column<string>(type: "varchar(50)", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
                     username = table.Column<string>(type: "varchar(100)", nullable: false),

@@ -9,6 +9,7 @@ namespace Fixeon.WebApi.Dtos.Requests
         public string Title { get; set; }
         public string Description { get; set; }
         public string Category { get; set; }
+        public string Departament { get; set; }
         public string CreateByUserId { get; set; }
         public string CreateByUsername { get; set; }
         public EPriority Priority { get; set; }
@@ -29,6 +30,7 @@ namespace Fixeon.WebApi.Dtos.Requests
                 Title = Title,
                 Description = Description,
                 Category = Category,
+                Departament = Departament,
                 CreateByUserId = CreateByUserId,
                 CreateByUsername = CreateByUsername,
                 Priority = Priority,

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250615032747_initial")]
+    [Migration("20250705040912_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -103,7 +103,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("varchar(400)");
+                        .HasColumnType("varchar(2500)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime");

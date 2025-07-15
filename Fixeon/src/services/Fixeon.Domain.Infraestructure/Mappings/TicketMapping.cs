@@ -16,11 +16,23 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(t => t.Description)
                 .IsRequired()
-                .HasColumnType("varchar(400)");
+                .HasColumnType("varchar(2500)");
 
             builder.Property(t => t.Category)
                 .IsRequired()
                 .HasColumnType("varchar(50)");
+
+            builder.Property(t => t.Departament)
+                .IsRequired()
+                .HasColumnType("varchar(50)");
+
+            builder.Property(t => t.Priority)
+                .IsRequired()
+                .HasColumnType("varchar(20)");
+
+            builder.Property(t => t.Status)
+                .IsRequired()
+                .HasColumnType("varchar(30)");
 
             builder.OwnsOne(t => t.CreatedByUser, user =>
             {

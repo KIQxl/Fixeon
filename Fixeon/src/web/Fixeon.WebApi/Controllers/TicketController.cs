@@ -2,12 +2,14 @@
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.WebApi.Configuration;
 using Fixeon.WebApi.Dtos.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.WebApi.Controllers
 {
     [ApiController]
     [Route("tickets")]
+    [Authorize]
     public class TicketController : ControllerBase
     {
         private readonly ITicketServices _ticketServices;
@@ -53,7 +55,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("gey-by-analist-id/{analist}")]
+        [Route("get-by-analist-id/{analist}")]
         public async Task<IActionResult> GetTicketsByAnalist([FromRoute] string analist)
         {
             var response = await _ticketServices.GetTicketsByAnalistIdAsync(analist);
@@ -65,7 +67,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("gey-by-user-id/{user}")]
+        [Route("get-by-user-id/{user}")]
         public async Task<IActionResult> GetTicketsByUser([FromRoute] string user)
         {
             var response = await _ticketServices.GetTicketsByUserIdAsync(user);

@@ -18,7 +18,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             this._jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(ApplicationUser user)
+        public string GenerateToken(ApplicationUserResponse user)
         {
             var claims = new List<Claim>();
 

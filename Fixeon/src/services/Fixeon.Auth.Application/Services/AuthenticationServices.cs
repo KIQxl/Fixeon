@@ -2,7 +2,6 @@
 using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
 using Fixeon.Shared.Configuration;
-using Fixeon.Shared.Interfaces;
 
 namespace Fixeon.Auth.Application.Services
 {
@@ -77,24 +76,24 @@ namespace Fixeon.Auth.Application.Services
             return new Response<LoginResponse>(new LoginResponse { Id = result.Id, Email = result.Email, Username = result.Username, Token = string.Empty, Roles = result.Roles });
         }
 
-        public async Task<Response<ApplicationUser>> GetUserEmailAsync(string userId)
+        public async Task<Response<ApplicationUserResponse>> GetUserEmailAsync(string userId)
         {
             var user = await _rep.GetUser(userId);
 
             if (user is null || user.Errors.Any())
-                return new Response<ApplicationUser>(user.Errors);
+                return new Response<ApplicationUserResponse>(user.Errors);
 
-            return new Response<ApplicationUser>(user);
+            return new Response<ApplicationUserResponse>(user);
         }
 
-        public async Task<Response<List<ApplicationUser>>> GetAllUsersAsync()
+        public async Task<Response<List<ApplicationUserResponse>>> GetAllUsersAsync()
         {
             var users = await _rep.GetAllUsers();
 
             if (users is null)
-                return new Response<List<ApplicationUser>>("Nenhum usuário encontrado");
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado");
 
-            return new Response<List<ApplicationUser>>(users);
+            return new Response<List<ApplicationUserResponse>>(users);
         }
 
         public async Task<Response<bool>> SendRecoveryPasswordLink(string email)
@@ -112,16 +111,18 @@ namespace Fixeon.Auth.Application.Services
             return new Response<bool>(true);
         }
 
-        public async Task<Response<ApplicationUser>> ResetPassword(ResetPasswordRequest request)
+        public async Task<Response<ApplicationUserResponse>> ResetPassword(ResetPasswordRequest request)
         {
             request.Token = _urlEncoder.Decode(request.Token);
 
             var result = await _rep.ResetPassword(request);
 
             if (!result.Errors.Any())
-                return new Response<ApplicationUser>(result);
+                return new Response<ApplicationUserResponse>(result);
 
-            return new Response<ApplicationUser>(result.Errors);
+            return new Response<ApplicationUserResponse>(result.Errors);
         }
+
+
     }
 }

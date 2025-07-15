@@ -1,18 +1,18 @@
 ﻿namespace Fixeon.Auth.Application.Dtos.Responses
 {
-    public class ApplicationUser
+    public class ApplicationUserResponse
     {
-        public ApplicationUser()
+        public ApplicationUserResponse()
         {
             
         }
 
-        public ApplicationUser(List<string> errors)
+        public ApplicationUserResponse(List<string> errors)
         {
             Errors = errors;
         }
 
-        public ApplicationUser(string id, string username, string email, IList<string> roles)
+        public ApplicationUserResponse(string id, string username, string email, IList<string> roles)
         {
             Id = id;
             Username = username;

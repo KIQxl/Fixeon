@@ -30,3 +30,5 @@ Desktop.ini
 
 ## Dotnet secrets
 secrets.json
+
+src/Fixeon.tests/

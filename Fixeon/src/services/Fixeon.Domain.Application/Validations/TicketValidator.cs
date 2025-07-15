@@ -18,9 +18,11 @@ namespace Fixeon.Domain.Application.Validations
             RuleFor(x => x.Category)
                 .NotEmpty().WithMessage("O campo Categoria não pode ser vazio");
 
+            RuleFor(x => x.Departament)
+                .NotEmpty().WithMessage("O campo Departamento não pode ser vazio");
+
             RuleFor(x => x.Priority)
-                .NotEmpty().WithMessage("O campo Prioridade não pode ser vazio")
-                .IsInEnum().WithMessage("Valor inválido para Prioridade");
+                .NotEmpty().WithMessage("O campo Prioridade não pode ser vazio");
         }
     }
 }

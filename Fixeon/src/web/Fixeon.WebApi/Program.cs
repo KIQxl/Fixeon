@@ -11,11 +11,15 @@ builder.Services.RegisterServices(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.AllowAnyHeader();
+    c.AllowAnyMethod();
+    c.AllowAnyOrigin();
+});
 
 app.RegisterApp();
 

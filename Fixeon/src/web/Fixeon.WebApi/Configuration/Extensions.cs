@@ -6,6 +6,7 @@ using Fixeon.Domain.Infraestructure.Configuration;
 using Fixeon.Shared.Configuration;
 using Fixeon.Shared.Interfaces;
 using Fixeon.Shared.Services;
+using Fixeon.WebApi.Middlewares;
 using Fixeon.WebApi.Services;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
@@ -31,7 +32,36 @@ namespace Fixeon.WebApi.Configuration
                 });
 
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new() { Title = "Fixeon API", Version = "v1" });
+
+                // Configuração do JWT no Swagger
+                c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Insira o token JWT no formato: Bearer {seu token}"
+                });
+
+                c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
 
             var jwtSection = configuration.GetSection("JwtSection");
             services.Configure<JwtSettings>(jwtSection);
@@ -50,6 +80,9 @@ namespace Fixeon.WebApi.Configuration
                 .RegisterDomainDI()
                 .RegisterBackgroundServices(configuration);
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<ITenantProvider, HttpContextTenantProvider>();
+
             return services;
         }
 
@@ -58,7 +91,10 @@ namespace Fixeon.WebApi.Configuration
             services.AddScoped<IEmailServices, EmailService>();
             services.AddScoped<IBackgroundEmailJobWrapper, HangfireWrapper>();
 
-            services.AddHangfire(config => config.UseRedisStorage("localhost:6379"));
+            var redisConnection = configuration.GetConnectionString("Redis")
+                          ?? throw new InvalidOperationException("Redis connection string is missing");
+
+            services.AddHangfire(config => config.UseRedisStorage(redisConnection));
             services.AddHangfireServer(opts =>
             {
                 opts.Queues = new[] { "email", "default" };
@@ -74,6 +110,7 @@ namespace Fixeon.WebApi.Configuration
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
+            app.UseMiddleware<TenantMiddleware>();
             app.UseAuthorization();
 
             return app;

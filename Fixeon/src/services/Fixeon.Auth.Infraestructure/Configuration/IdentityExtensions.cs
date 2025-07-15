@@ -1,6 +1,7 @@
 ﻿using Fixeon.Auth.Application.Interfaces;
 using Fixeon.Auth.Application.Services;
 using Fixeon.Auth.Infraestructure.Data;
+using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Repositories;
 using Fixeon.Auth.Infraestructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,7 +20,7 @@ namespace Fixeon.Auth.Infraestructure.Configuration
         {
             services.AddDbContext<DataContext>(opts => opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
 

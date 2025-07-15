@@ -6,44 +6,46 @@ namespace Fixeon.Domain.Core.Entities
     public class Ticket : Entity
     {
         private Ticket() { }
-        public Ticket(string title, string description, string category, User createdByUser, EPriority priority)
+        public Ticket(string title, string description, string category, string departament, User createdByUser, string priority)
         {
             Title = title;
             Description = description;
             Category = category;
+            Departament = departament;
             CreatedByUser = createdByUser;
             CreateAt = DateTime.UtcNow;
-            Status = ETicketStatus.Pending;
+            Status = ETicketStatus.Pending.ToString();
             Priority = priority;
         }
 
         public string Title { get; private set; }
         public string Description { get; private set; }
         public string Category { get; private set; }
+        public string Departament { get; private set; }
         public List<Attachment> Attachments {  get; private set; } = new List<Attachment>();
         public User CreatedByUser { get; private set; }
         public Analist? AssignedTo { get; private set; }
         public DateTime CreateAt { get; private set; }
-        public ETicketStatus Status { get; private set; }
+        public string Status { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
         public DateTime? ResolvedAt { get; private set; }
-        public EPriority Priority { get; private set; }
+        public string Priority { get; private set; }
         public List<Interaction> Interactions { get; private set; } = new List<Interaction>();
         public TimeSpan? Duration => ResolvedAt.HasValue ? ResolvedAt.Value - CreateAt : null;
 
         public void ResolveTicket()
         {
-            this.Status = ETicketStatus.Resolved;
+            this.Status = ETicketStatus.Resolved.ToString();
             this.ResolvedAt = DateTime.UtcNow;
         }
 
         public bool AssignTicketToAnalist(Analist assignTo)
         {
-            if (this.Status == ETicketStatus.Canceled)
+            if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
 
             this.AssignedTo = assignTo;
-            this.Status = ETicketStatus.InProgress;
+            this.Status = ETicketStatus.InProgress.ToString();
             this.ModifiedAt = DateTime.UtcNow;
 
             return true;
@@ -51,16 +53,16 @@ namespace Fixeon.Domain.Core.Entities
 
         public void CancelTicket()
         {
-            this.Status = ETicketStatus.Canceled;
+            this.Status = ETicketStatus.Canceled.ToString();
             this.ModifiedAt = DateTime.UtcNow;
         }
 
         public bool ReOpenTicket()
         {
-            if (this.Status == ETicketStatus.Canceled)
+            if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
 
-            this.Status = ETicketStatus.Reopened;
+            this.Status = ETicketStatus.Reopened.ToString();
             this.ModifiedAt = DateTime.UtcNow;
 
             return true;
@@ -68,7 +70,7 @@ namespace Fixeon.Domain.Core.Entities
 
         public bool NewInteraction(Interaction interaction)
         {
-            if (this.Status == ETicketStatus.Canceled)
+            if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
 
             this.Interactions.Add(interaction);
@@ -79,7 +81,7 @@ namespace Fixeon.Domain.Core.Entities
 
         public bool TransferTicket(Analist assignTo)
         {
-            if (this.Status == ETicketStatus.Canceled)
+            if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
 
             this.AssignedTo = assignTo;

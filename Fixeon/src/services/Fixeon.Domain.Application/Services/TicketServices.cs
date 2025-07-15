@@ -33,8 +33,9 @@ namespace Fixeon.Domain.Application.Services
                 request.Title,
                 request.Description,
                 request.Category,
+                request.Departament,
                 new User { UserId = request.CreateByUserId, UserName = request.CreateByUsername },
-                request.Priority);
+                request.Priority.ToString());
 
             foreach(var file in request.Attachments)
             {
