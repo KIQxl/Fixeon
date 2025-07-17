@@ -2,6 +2,7 @@
 using Fixeon.Auth.Application.Services;
 using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Auth.Infraestructure.Repositories;
 using Fixeon.Auth.Infraestructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -18,7 +19,11 @@ namespace Fixeon.Auth.Infraestructure.Configuration
     {
         public static IServiceCollection RegisterIdentityConfigs(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DataContext>(opts => opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<DataContext>((serviceProvider, opts) =>
+            {
+                opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"])
+                .AddInterceptors(serviceProvider.GetRequiredService<TenantSaveChangesInterceptor>());
+            });
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
@@ -64,10 +69,12 @@ namespace Fixeon.Auth.Infraestructure.Configuration
 
         public static IServiceCollection RegisterDI(this IServiceCollection services)
         {
-            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IIdentityRepository, AuthRepository>();
+            services.AddScoped<IIdentityServices, IdentityServices>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddTransient<IAuthenticationServices, AuthenticationServices>();
             services.AddScoped<IUrlEncoder, UrlEncoder>();
+            services.AddScoped<TenantSaveChangesInterceptor>();
 
             return services;
         }

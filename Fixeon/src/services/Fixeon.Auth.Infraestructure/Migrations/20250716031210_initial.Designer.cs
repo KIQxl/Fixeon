@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Auth.Infraestructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250715023152_initial")]
+    [Migration("20250716031210_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -113,6 +113,9 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CNPJ")
+                        .IsUnique();
 
                     b.ToTable("companies");
                 });

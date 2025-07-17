@@ -220,6 +220,12 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_companies_CNPJ",
+                table: "companies",
+                column: "CNPJ",
+                unique: true);
         }
 
         /// <inheritdoc />

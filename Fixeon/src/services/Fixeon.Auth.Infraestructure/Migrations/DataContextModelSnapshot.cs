@@ -111,6 +111,9 @@ namespace Fixeon.Auth.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CNPJ")
+                        .IsUnique();
+
                     b.ToTable("companies");
                 });
 

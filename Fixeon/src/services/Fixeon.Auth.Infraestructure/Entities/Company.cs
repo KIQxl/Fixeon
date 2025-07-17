@@ -2,7 +2,7 @@
 {
     public class Company
     {
-        private Company() { }
+        protected Company() { }
         public Company(string name, string cNPJ)
         {
             Id = Guid.NewGuid();
@@ -14,6 +14,6 @@
         public string Name { get; set; }
         public string CNPJ { get; set; }
         public DateTime CreatedAt { get; set; }
-        public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+        public List<ApplicationUser> Users { get; set; }
     }
 }

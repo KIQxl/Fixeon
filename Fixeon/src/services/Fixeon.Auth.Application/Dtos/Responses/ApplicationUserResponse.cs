@@ -12,6 +12,11 @@
             Errors = errors;
         }
 
+        public ApplicationUserResponse(string error)
+        {
+            this.Errors.Add(error);
+        }
+
         public ApplicationUserResponse(string id, string username, string email, IList<string> roles)
         {
             Id = id;

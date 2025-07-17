@@ -7,30 +7,30 @@ namespace Fixeon.Auth.Application.Services
 {
     public class AuthenticationServices : IAuthenticationServices
     {
-        private readonly IAuthRepository _rep;
         private readonly ITokenGeneratorService _tokenService;
         private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
         private readonly IUrlEncoder _urlEncoder;
+        private readonly IIdentityServices _identityUserServices;
 
-        public AuthenticationServices(IAuthRepository services, ITokenGeneratorService tokenService, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder)
+        public AuthenticationServices(ITokenGeneratorService tokenService, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, IIdentityServices identityUserServices)
         {
-            _rep = services;
             _tokenService = tokenService;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
             _urlEncoder = urlEncoder;
+            _identityUserServices = identityUserServices;
         }
 
         public async Task<Response<LoginResponse>> Login(LoginRequest request)
         {
-            var emailExists = await _rep.FindByEmail(request.Email);
+            var emailExists = await _identityUserServices.FindUserByEmail(request.Email);
 
             if (!emailExists)
-                return new Response<LoginResponse>("Usuário não encontrado");
+                return new Response<LoginResponse>("Usuário não encontrado.");
 
-            var appUser = await _rep.Login(request.Email, request.Password);
+            var appUser = await _identityUserServices.Login(request.Email, request.Password);
 
-            if (appUser is null)
-                return new Response<LoginResponse>("Credenciais inválidas");
+            if (appUser.Errors.Any())
+                return new Response<LoginResponse>(appUser.Errors);
 
             var token = _tokenService.GenerateToken(appUser);
 
@@ -39,12 +39,12 @@ namespace Fixeon.Auth.Application.Services
 
         public async Task<Response<LoginResponse>> CreateAccount(CreateAccountRequest request)
         {
-            var emailExists = await _rep.FindByEmail(request.Email);
+            var emailExists = await _identityUserServices.FindUserByEmail(request.Email);
 
             if (emailExists)
-                return new Response<LoginResponse>("Email já cadastrado na base");
+                return new Response<LoginResponse>("Email já cadastrado na base.");
 
-            var appUser = await _rep.CreateAccount(request);
+            var appUser = await _identityUserServices.CreateIdentityUser(request);
 
             if (appUser is null || appUser.Errors.Any())
                 return new Response<LoginResponse>(appUser.Errors);
@@ -58,27 +58,27 @@ namespace Fixeon.Auth.Application.Services
 
         public async Task<Response<bool>> CreateRole(string request)
         {
-            var result = await _rep.CreateRole(request);
+            var result = await _identityUserServices.CreateRole(request);
 
             if (result)
                 return new Response<bool>(result);
 
-            return new Response<bool>("Não foi possivel cadastrar o novo perfil");
+            return new Response<bool>("Não foi possivel cadastrar o novo perfil.");
         }
 
-        public async Task<Response<LoginResponse>> AssociateRole(string userId, string role)
+        public async Task<Response<ApplicationUserResponse>> AssociateRole(string email, string role)
         {
-            var result = await _rep.AssociateRole(userId, role);
+            var result = await _identityUserServices.AssociateRole(email, role);
 
             if (result.Errors.Any())
-                return new Response<LoginResponse>(result.Errors);
+                return new Response<ApplicationUserResponse>(result.Errors);
 
-            return new Response<LoginResponse>(new LoginResponse { Id = result.Id, Email = result.Email, Username = result.Username, Token = string.Empty, Roles = result.Roles });
+            return new Response<ApplicationUserResponse>(result);
         }
 
-        public async Task<Response<ApplicationUserResponse>> GetUserEmailAsync(string userId)
+        public async Task<Response<ApplicationUserResponse>> GetUserByIdAsync(string userId)
         {
-            var user = await _rep.GetUser(userId);
+            var user = await _identityUserServices.GetuserById(userId);
 
             if (user is null || user.Errors.Any())
                 return new Response<ApplicationUserResponse>(user.Errors);
@@ -88,25 +88,24 @@ namespace Fixeon.Auth.Application.Services
 
         public async Task<Response<List<ApplicationUserResponse>>> GetAllUsersAsync()
         {
-            var users = await _rep.GetAllUsers();
+            var users = await _identityUserServices.GetAllUsers();
 
             if (users is null)
-                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado");
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
             return new Response<List<ApplicationUserResponse>>(users);
         }
 
         public async Task<Response<bool>> SendRecoveryPasswordLink(string email)
         {
-            var user = await _rep.GetUser(email);
+            var token = await _identityUserServices.GenerateResetPasswordToken(email);
 
-            if(user is null)
-                return new Response<bool>("Usuário não encontrado");
+            if (token is null)
+                return new Response<bool>("Não foi possivel gerar o código de recuperação.");
 
-            var token = await _rep.GenerateResetPasswordToken(email);
             var encodedToken = $"?recovery-token={_urlEncoder.Encode(token)}";
 
-            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
+            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
 
             return new Response<bool>(true);
         }
@@ -115,14 +114,12 @@ namespace Fixeon.Auth.Application.Services
         {
             request.Token = _urlEncoder.Decode(request.Token);
 
-            var result = await _rep.ResetPassword(request);
+            var result = await _identityUserServices.ResetPassword(request);
 
             if (!result.Errors.Any())
                 return new Response<ApplicationUserResponse>(result);
 
             return new Response<ApplicationUserResponse>(result.Errors);
         }
-
-
     }
 }

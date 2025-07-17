@@ -1,231 +1,151 @@
-﻿using Fixeon.Auth.Application.Dtos.Requests;
-using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Application.Interfaces;
-using Fixeon.Auth.Infraestructure.Data;
+﻿using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Shared.Interfaces;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fixeon.Auth.Infraestructure.Repositories
 {
-    public class AuthRepository : IAuthRepository
+    public class AuthRepository : IIdentityRepository
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly DataContext _context;
-        private readonly ITenantContext _tenantContext;
 
-        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, DataContext context, ITenantContext tenantContext)
+        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _context = context;
-            _tenantContext = tenantContext;
         }
 
-        public async Task<ApplicationUserResponse> GetUser(string email)
+        public async Task<IdentityResult> AssociateRole(ApplicationUser user, string roleName)
         {
             try
             {
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Email.Equals(email));
+                var result = await _userManager.AddToRoleAsync(user, roleName);
 
-                if (user == null)
-                    return new ApplicationUserResponse(new List<string> { "Usuário não encontrado." });
-
-                var roles = await _userManager.GetRolesAsync(user);
-
-                return new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles);
+                return result;
             }
             catch (Exception ex)
             {
-                return new ApplicationUserResponse(new List<string> { $"Ocorreu um erro ao buscar pelo usuário.", $"{ex.Message}." });
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<List<ApplicationUserResponse>> GetAllUsers()
+        public async Task<IdentityResult> CreateAccount(ApplicationUser request, string password)
         {
             try
             {
-                var users = await _context.users.ToListAsync();
-
-                if (users == null)
-                    return null;
-
-                var appUsers = new List<ApplicationUserResponse>();
-
-                foreach (var u in users)
-                {
-                    var roles = await _userManager.GetRolesAsync(u);
-
-                    var appUser = new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles);
-
-                    appUsers.Add(appUser);
-                }
-                ;
-
-
-                return appUsers;
+                return await _userManager.CreateAsync(request, password);
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<ApplicationUserResponse> CreateAccount(CreateAccountRequest request)
-        {
-            var tenantId = _tenantContext.TenantId;
-
-            var IdentityUser = new ApplicationUser
-            {
-                UserName = request.Username,
-                Email = request.Email,
-                EmailConfirmed = true,
-                CompanyId = tenantId
-            };
-
-            var result = await _userManager.CreateAsync(IdentityUser, request.Password);
-
-            if (result.Succeeded)
-            {
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Email == request.Email && x.CompanyId == tenantId);
-                var roles = await _userManager.GetRolesAsync(user);
-
-                return new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles);
-            }
-
-            return new ApplicationUserResponse(result.Errors.Select(e => e.Description).ToList());
-        }
-
-        public async Task<ApplicationUserResponse> Login(string email, string password)
-        {
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
-
-            var loginResult = await _signInManager.PasswordSignInAsync(user, password, true, true);
-
-            if (loginResult.Succeeded)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                return new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles);
-            }
-
-            return null;
-        }
-
-        public async Task<bool> CreateRole(string role)
+        public async Task<IdentityResult> CreateRole(string roleName)
         {
             try
             {
-                var exists = await _roleManager.RoleExistsAsync(role);
-
-                if (!exists)
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
-                    return true;
-                }
-
-                return false;
+                return await _roleManager.CreateAsync(new IdentityRole(roleName));
             }
             catch (Exception ex)
             {
-                return false;
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<ApplicationUserResponse> AssociateRole(string userId, string role)
+        public async Task<ApplicationUser> FindByEmail(string email)
         {
             try
             {
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Id == userId);
+                var user = await _userManager.FindByEmailAsync(email);
 
-                if (user != null)
-                {
-                    var roleExists = await _roleManager.RoleExistsAsync(role);
-                    if (roleExists)
-                    {
-                        await _userManager.AddToRoleAsync(user, role);
-                        var userRoles = await _userManager.GetRolesAsync(user);
-
-                        return new ApplicationUserResponse(user.Id, user.UserName, user.Email, userRoles);
-                    }
-
-                    return new ApplicationUserResponse(new List<string> { $"O perfil informado não existe." });
-                }
-
-                return new ApplicationUserResponse(new List<string> { $"Não foi possivel associar o perfil: {role} ao usuário.", "Usuário não encontrado." });
+                return user;
             }
             catch (Exception ex)
             {
-                return new ApplicationUserResponse(new List<string> { $"Ocorreu um erro ao associar o perfil ao usuário.", $"{ex.Message}." });
+                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<bool> FindByEmail(string email)
+        public async Task<string> GenerateResetPasswordToken(ApplicationUser user)
         {
-            try
-            {
-                var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
-
-                if (user is null)
-                    return false;
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public async Task<string> GenerateResetPasswordToken(string email)
-        {
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == email);
-
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             return token;
         }
 
-        public async Task<ApplicationUserResponse> ResetPassword(ResetPasswordRequest request)
+        public async Task<List<ApplicationUser>> GetAllUsers()
         {
-            var user = await _context.users.FirstOrDefaultAsync(x => x.Email == request.Email);
-
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
-
-            if (result.Succeeded)
-                return new ApplicationUserResponse(user.Id, user.UserName, user.Email, new List<string>());
-
-            return new ApplicationUserResponse(result
-                .Errors
-                .Select(e => e.Description)
-                .ToList());
+            return await _userManager.Users.AsNoTracking().ToListAsync();
         }
 
-        public async Task<List<ApplicationUserResponse>> GetUsersByRoleName(string roleName)
+        public async Task<ApplicationUser> GetUser(string email)
+        {
+            return await FindByEmail(email);
+        }
+
+        public async Task<List<ApplicationUser>> GetUsersByRoleName(string roleName)
+        {
+            var result = await _userManager.GetUsersInRoleAsync(roleName);
+
+            return result.ToList();
+        }
+
+        public async Task<SignInResult> Login(ApplicationUser user, string password)
         {
             try
             {
-                var users = await _userManager.GetUsersInRoleAsync(roleName);
+                var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
-                if (users == null)
-                    return null;
-
-                var appUsers = await Task.WhenAll(users.Select(async u =>
-                {
-                    var roles = await _userManager.GetRolesAsync(u);
-
-                    return new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles);
-                }));
-                
-                return appUsers.ToList();
+                return result;
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<IdentityResult> ResetPassword(ApplicationUser user, string token, string newPassword)
+        {
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result;
+        }
+
+        public async Task<List<string>> GetRolesByUser(ApplicationUser user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return roles.ToList();
+        }
+
+        public async Task<IdentityRole> GetRole(string roleName)
+        {
+            try
+            {
+                return await _roleManager.FindByNameAsync(roleName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ApplicationUser> FindById(string id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

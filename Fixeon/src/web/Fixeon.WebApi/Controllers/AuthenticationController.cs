@@ -1,5 +1,4 @@
-﻿using Fixeon.Auth.Application.Dtos;
-using Fixeon.Auth.Application.Dtos.Requests;
+﻿using Fixeon.Auth.Application.Dtos.Requests;
 using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Application.Interfaces;
 using Fixeon.WebApi.Dtos.Responses;
@@ -95,10 +94,10 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("get-user-by-id/{userEmail}")]
-        public async Task<IActionResult> GetUserEmailId([FromRoute] string userEmail)
+        [Route("get-user-by-id/{id}")]
+        public async Task<IActionResult> GetUserEmailId([FromRoute] string id)
         {
-            var response = await _services.GetUserEmailAsync(userEmail);
+            var response = await _services.GetUserByIdAsync(id);
 
             if (response.Success)
                 return Ok(response);
