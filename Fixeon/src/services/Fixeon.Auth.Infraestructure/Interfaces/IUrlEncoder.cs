@@ -1,4 +1,6 @@
-﻿namespace Fixeon.Auth.Application.Interfaces
+﻿using System.Web;
+
+namespace Fixeon.Auth.Infraestructure.Interfaces
 {
     public interface IUrlEncoder
     {

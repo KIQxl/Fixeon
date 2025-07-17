@@ -1,4 +1,4 @@
-﻿using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Infraestructure.Interfaces;
 using System.Web;
 
 namespace Fixeon.Auth.Infraestructure.Services

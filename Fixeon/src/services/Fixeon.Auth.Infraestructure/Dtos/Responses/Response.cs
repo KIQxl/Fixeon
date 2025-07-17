@@ -1,4 +1,4 @@
-﻿using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Infraestructure.Interfaces;
 
 namespace Fixeon.Auth.Application.Dtos.Responses
 {

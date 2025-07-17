@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Auth.Application.Dtos.Responses
+﻿namespace Fixeon.Auth.Infraestructure.Dtos.Responses
 {
     public class CompanyResponse
     {

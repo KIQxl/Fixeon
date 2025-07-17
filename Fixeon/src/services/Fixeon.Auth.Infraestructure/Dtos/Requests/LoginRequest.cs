@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Auth.Application.Dtos.Requests
+﻿namespace Fixeon.Auth.Infraestructure.Dtos.Requests
 {
     public record LoginRequest
     {

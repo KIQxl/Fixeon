@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fixeon.Domain", "Fixeon.Dom
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Auth.Infraestructure", "src\services\Fixeon.Auth.Infraestructure\Fixeon.Auth.Infraestructure.csproj", "{7FC5B3FB-D759-4F08-B2AC-8DCD98FB5C2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Auth.Application", "src\services\Fixeon.Auth.Application\Fixeon.Auth.Application.csproj", "{23BE133B-A72F-4A97-92FC-118D2BDE2F1C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Domain.Core", "src\services\Fixeon.Domain.Core\Fixeon.Domain.Core.csproj", "{BBE02FC9-3F41-423B-92C6-AA6F923BCF28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Domain.Infraestructure", "src\services\Fixeon.Domain.Infraestructure\Fixeon.Domain.Infraestructure.csproj", "{4BF498BE-D777-42D9-9E61-B94D1B243058}"
@@ -29,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixon.Tests", "src\Fixon.Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fixeon.Shared", "Fixeon.Shared", "{30528FBF-9FD8-4023-92E3-EAD5611FF603}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixeon.Shared", "src\services\Fixeon.Shared\Fixeon.Shared.csproj", "{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Shared", "src\services\Fixeon.Shared\Fixeon.Shared.csproj", "{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{7FC5B3FB-D759-4F08-B2AC-8DCD98FB5C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FC5B3FB-D759-4F08-B2AC-8DCD98FB5C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FC5B3FB-D759-4F08-B2AC-8DCD98FB5C2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23BE133B-A72F-4A97-92FC-118D2BDE2F1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23BE133B-A72F-4A97-92FC-118D2BDE2F1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23BE133B-A72F-4A97-92FC-118D2BDE2F1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23BE133B-A72F-4A97-92FC-118D2BDE2F1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBE02FC9-3F41-423B-92C6-AA6F923BCF28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBE02FC9-3F41-423B-92C6-AA6F923BCF28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBE02FC9-3F41-423B-92C6-AA6F923BCF28}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,7 +71,6 @@ Global
 		{49B07613-7650-4117-A147-6E675461F8E6} = {2863EAE5-A94D-44E6-863F-33333B250B3B}
 		{20398122-C9ED-4188-A326-525AC2413B69} = {2863EAE5-A94D-44E6-863F-33333B250B3B}
 		{7FC5B3FB-D759-4F08-B2AC-8DCD98FB5C2B} = {49B07613-7650-4117-A147-6E675461F8E6}
-		{23BE133B-A72F-4A97-92FC-118D2BDE2F1C} = {49B07613-7650-4117-A147-6E675461F8E6}
 		{BBE02FC9-3F41-423B-92C6-AA6F923BCF28} = {20398122-C9ED-4188-A326-525AC2413B69}
 		{4BF498BE-D777-42D9-9E61-B94D1B243058} = {20398122-C9ED-4188-A326-525AC2413B69}
 		{E560EC34-D1E1-4063-A9AB-46DADCBD49D0} = {20398122-C9ED-4188-A326-525AC2413B69}

@@ -1,5 +1,5 @@
-﻿using Fixeon.Auth.Application.Interfaces;
-using Fixeon.Auth.Infraestructure.Configuration;
+﻿using Fixeon.Auth.Infraestructure.Configuration;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;

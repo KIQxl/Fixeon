@@ -1,12 +1,12 @@
-﻿using Fixeon.Auth.Application.Dtos.Requests;
-using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Application.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Dtos.Requests;
+using Fixeon.Auth.Infraestructure.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 
 namespace Fixeon.Auth.Infraestructure.Services
 {
-    public class CompanyServices : ICompanyService
+    public class CompanyServices : ICompanyServices
     {
         private readonly ICompanyRepository _repository;
 
@@ -15,7 +15,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             _repository = repository;
         }
 
-        public async Task<CompanyResponse> CreateCompany(CreateCompanyRequest request)
+        public async Task<Response<CompanyResponse>> CreateCompany(CreateCompanyRequest request)
         {
             try
             {
@@ -23,25 +23,28 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 await _repository.CreateCompany(company);
 
-                return new CompanyResponse(company.Id, company.Name, company.CNPJ);
+                return new Response<CompanyResponse>(new CompanyResponse(company.Id, company.Name, company.CNPJ));
             }
             catch (Exception ex)
             {
-                return new CompanyResponse(ex.Message);
+                return new Response<CompanyResponse>(ex.Message);
             }
         }
 
-        public async Task<List<CompanyResponse>> GetAllCompanies()
+        public async Task<Response<List<CompanyResponse>>> GetAllCompanies()
         {
             try
             {
                 var companies = await _repository.GetAllCompanies();
 
-                return companies.Select(x => new CompanyResponse(x.Id, x.Name, x.CNPJ)).ToList();
+                var result = companies.Select(c => new CompanyResponse(c.Id, c.Name, c.CNPJ)).ToList();
+
+                return new Response<List<CompanyResponse>>(result);
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                return new Response<List<CompanyResponse>>(ex.Message);
+
             }
         }
     }

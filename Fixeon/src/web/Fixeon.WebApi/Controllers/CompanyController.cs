@@ -1,5 +1,5 @@
-﻿using Fixeon.Auth.Application.Dtos.Requests;
-using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Infraestructure.Dtos.Requests;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace Fixeon.WebApi.Controllers
     [Authorize]
     public class CompanyController : ControllerBase
     {
-        private readonly ICompanyApplicationServices _companyApplicationServices;
+        private readonly ICompanyServices _companyApplicationServices;
 
-        public CompanyController(ICompanyApplicationServices companyApplicationServices)
+        public CompanyController(ICompanyServices companyApplicationServices)
         {
             _companyApplicationServices = companyApplicationServices;
         }

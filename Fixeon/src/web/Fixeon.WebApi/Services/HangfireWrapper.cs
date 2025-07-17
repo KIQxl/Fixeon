@@ -1,4 +1,4 @@
-﻿using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Shared.Interfaces;
 using Fixeon.Shared.Models;
 using Hangfire;
@@ -21,7 +21,7 @@ namespace Fixeon.WebApi.Services
             var client = new BackgroundJobClient();
 
             client.Create(
-                Job.FromExpression(() => _emailServices.SendEmail(email)), 
+                Job.FromExpression(() => _emailServices.SendEmail(email)),
                 new EnqueuedState("email")
             );
         }

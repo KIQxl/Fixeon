@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Fixeon.Auth.Application\Fixeon.Auth.Application.csproj" />
+    <ProjectReference Include="..\Fixeon.Shared\Fixeon.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Application.Interfaces;
 using Fixeon.Auth.Infraestructure.Configuration;
+using Fixeon.Auth.Infraestructure.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Shared.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

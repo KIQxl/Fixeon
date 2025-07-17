@@ -1,6 +1,7 @@
-﻿using Fixeon.Auth.Application.Dtos.Requests;
-using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Application.Interfaces;
+﻿using Fixeon.Auth.Application.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Dtos.Requests;
+using Fixeon.Auth.Infraestructure.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.WebApi.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,9 @@ namespace Fixeon.WebApi.Controllers
     [Route("auth")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly IAuthenticationServices _services;
+        private readonly IIdentityServices _services;
 
-        public AuthenticationController(IAuthenticationServices services)
+        public AuthenticationController(IIdentityServices services)
         {
             _services = services;
         }
@@ -28,7 +29,7 @@ namespace Fixeon.WebApi.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList()));
 
-            var response = await _services.CreateAccount(request);
+            var response = await _services.CreateIdentityUser(request);
 
             if(response.Success)
                 return Ok(response);
@@ -47,7 +48,7 @@ namespace Fixeon.WebApi.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList()));
 
-            var response = await _services.Login(request);
+            var response = await _services.Login(request.Email, request.Password);
 
             if (response.Success)
                 return Ok(response);
@@ -95,9 +96,9 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-user-by-id/{id}")]
-        public async Task<IActionResult> GetUserEmailId([FromRoute] string id)
+        public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
-            var response = await _services.GetUserByIdAsync(id);
+            var response = await _services.GetuserById(id);
 
             if (response.Success)
                 return Ok(response);
@@ -109,7 +110,7 @@ namespace Fixeon.WebApi.Controllers
         [Route("get-all-users")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var response = await _services.GetAllUsersAsync();
+            var response = await _services.GetAllUsers();
 
             if (response.Success)
                 return Ok(response);
@@ -121,7 +122,7 @@ namespace Fixeon.WebApi.Controllers
         [Route("recovery-password")]
         public async Task<IActionResult> SendRecoveryPasswordLink([FromBody] RecoveryEmailDto request)
         {
-            var response = await _services.SendRecoveryPasswordLink(request.Email);
+            var response = await _services.GenerateResetPasswordToken(request.Email);
 
             if (response.Success)
                 return Ok(response);

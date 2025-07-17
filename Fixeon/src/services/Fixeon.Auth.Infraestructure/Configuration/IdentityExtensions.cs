@@ -1,6 +1,4 @@
-﻿using Fixeon.Auth.Application.Interfaces;
-using Fixeon.Auth.Application.Services;
-using Fixeon.Auth.Infraestructure.Data;
+﻿using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Auth.Infraestructure.Repositories;
@@ -72,7 +70,6 @@ namespace Fixeon.Auth.Infraestructure.Configuration
             services.AddScoped<IIdentityRepository, AuthRepository>();
             services.AddScoped<IIdentityServices, IdentityServices>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
-            services.AddTransient<IAuthenticationServices, AuthenticationServices>();
             services.AddScoped<IUrlEncoder, UrlEncoder>();
             services.AddScoped<TenantSaveChangesInterceptor>();
 

@@ -1,6 +1,7 @@
 ﻿using Fixeon.Auth.Application.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Dtos.Responses;
 
-namespace Fixeon.Auth.Application.Interfaces
+namespace Fixeon.Auth.Infraestructure.Interfaces
 {
     public interface ITokenGeneratorService
     {
