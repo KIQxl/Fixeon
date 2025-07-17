@@ -6,5 +6,6 @@ namespace Fixeon.Auth.Application.Interfaces
     public interface ICompanyService
     {
         public Task<CompanyResponse> CreateCompany(CreateCompanyRequest request);
+        public Task<List<CompanyResponse>> GetAllCompanies();
     }
 }

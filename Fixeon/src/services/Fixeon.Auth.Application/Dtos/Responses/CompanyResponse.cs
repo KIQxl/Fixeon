@@ -9,8 +9,19 @@
             CNPJ = cNPJ;
         }
 
+        public CompanyResponse(List<string> errors)
+        {
+            Errors = errors;
+        }
+
+        public CompanyResponse(string error)
+        {
+            this.Errors.Add(error);
+        }
+
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string CNPJ { get; set; }
+        public List<string> Errors { get; set; } = new List<string>();
     }
 }

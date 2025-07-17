@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fixeon.Auth.Application\Fixeon.Auth.Application.csproj" />
-    <ProjectReference Include="..\Fixeon.Auth.Domain\Fixeon.Auth.Domain.csproj" />
   </ItemGroup>
 
 </Project>
