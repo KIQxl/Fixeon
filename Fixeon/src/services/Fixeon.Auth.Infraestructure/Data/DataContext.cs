@@ -8,6 +8,9 @@ namespace Fixeon.Auth.Infraestructure.Data
     public class DataContext : IdentityDbContext<ApplicationUser>
     {
         private readonly ITenantContext _tenantContext;
+        public Guid CurrentTenant => _tenantContext.TenantId;
+
+        public bool IgnoreTenantInterceptor { get; set; } = false;
         public DataContext(DbContextOptions<DataContext> opts, ITenantContext tenantContext)
             : base(opts)
         {
@@ -21,10 +24,8 @@ namespace Fixeon.Auth.Infraestructure.Data
         {
             builder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
 
-            var _currentTenant = _tenantContext.TenantId;
-
             builder.Entity<ApplicationUser>()
-                .HasQueryFilter(u => u.CompanyId == _currentTenant);
+                .HasQueryFilter(u => u.CompanyId == CurrentTenant);
 
             base.OnModelCreating(builder);
         }

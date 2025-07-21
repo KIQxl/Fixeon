@@ -1,6 +1,7 @@
 ﻿using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Auth.Infraestructure.Dtos.Responses;
+using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Shared.Interfaces;
 using Microsoft.Extensions.Options;
@@ -14,27 +15,23 @@ namespace Fixeon.Auth.Infraestructure.Services
     public class TokenGeneratorService : ITokenGeneratorService
     {
         private readonly JwtSettings _jwtSettings;
-        private readonly ITenantContext _tenantContext;
 
         public TokenGeneratorService(IOptions<JwtSettings> jwtSettings, ITenantContext tenantContext)
         {
             this._jwtSettings = jwtSettings.Value;
-            _tenantContext = tenantContext;
         }
 
-        public string GenerateToken(ApplicationUserResponse user)
+        public string GenerateToken(ApplicationUser user, List<string> roles)
         {
-            var tenantId = _tenantContext.TenantId;
-
             var claims = new List<Claim>();
 
             claims.Add(new Claim("Id", user.Id));
-            claims.Add(new Claim("Username", user.Username));
+            claims.Add(new Claim("Username", user.UserName));
             claims.Add(new Claim("Email", user.Email));
-            claims.Add(new Claim("CompanyId", tenantId.ToString()));
+            claims.Add(new Claim("CompanyId", user.CompanyId.ToString()));
 
-            if(user.Roles != null)
-                foreach (var role in user.Roles)
+            if(roles != null)
+                foreach (var role in roles)
                 {
                     claims.Add(new Claim("Role", role));
                 }

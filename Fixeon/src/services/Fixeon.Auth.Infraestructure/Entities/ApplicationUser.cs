@@ -15,5 +15,7 @@ namespace Fixeon.Auth.Infraestructure.Entities
         public Company Company { get; set; }
 
         public Guid CompanyId {  get; private set; }
+
+        public void AssignCompany(Guid companyId) => CompanyId = companyId;
     }
 }

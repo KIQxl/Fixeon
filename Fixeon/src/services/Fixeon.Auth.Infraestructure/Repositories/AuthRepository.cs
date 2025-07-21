@@ -11,12 +11,14 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DataContext _dataContext;
 
-        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, DataContext dataContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _dataContext = dataContext;
         }
 
         public async Task<IdentityResult> AssociateRole(ApplicationUser user, string roleName)
@@ -33,10 +35,13 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             }
         }
 
-        public async Task<IdentityResult> CreateAccount(ApplicationUser request, string password)
+        public async Task<IdentityResult> CreateAccount(ApplicationUser request, string password, bool ignoreTenantInterceptor = false)
         {
             try
             {
+                if (ignoreTenantInterceptor)
+                    _dataContext.IgnoreTenantInterceptor = true;
+
                 return await _userManager.CreateAsync(request, password);
             }
             catch (Exception ex)
@@ -61,7 +66,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(email);
+                var user = await _userManager.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
 
                 return user;
             }
@@ -140,6 +145,20 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             try
             {
                 var user = await _userManager.FindByIdAsync(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ApplicationUser> FindByEmailWithoutFilter(string email)
+        {
+            try
+            {
+                var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
 
                 return user;
             }

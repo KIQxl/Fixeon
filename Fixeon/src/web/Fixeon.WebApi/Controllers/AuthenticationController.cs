@@ -141,5 +141,17 @@ namespace Fixeon.WebApi.Controllers
 
             return BadRequest(response);
         }
+
+        [HttpPost]
+        [Route("setup")]
+        public async Task<IActionResult> CreateFirstUserForCompany([FromBody] CreateAccountRequest request)
+        {
+            var response = await _services.CreateFirstForCompany(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
     }
 }

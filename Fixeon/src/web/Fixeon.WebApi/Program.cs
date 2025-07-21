@@ -1,3 +1,4 @@
+using Fixeon.Auth.Infraestructure.Services;
 using Fixeon.WebApi.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,11 @@ if (builder.Environment.IsDevelopment())
 builder.Services.RegisterServices(builder.Configuration);
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await SeedMasterData.SeedData(scope.ServiceProvider);
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

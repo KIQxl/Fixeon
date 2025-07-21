@@ -18,6 +18,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             try
             {
                 await _context.companies.AddAsync(request);
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {

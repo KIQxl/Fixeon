@@ -13,11 +13,11 @@ namespace Fixeon.WebApi.Middlewares
 
         public async Task Invoke(HttpContext context, ITenantContext tenantContext)
         {
-            var companyClaim = context.User.FindFirst("companyId");
+            var companyClaim = context.User.FindFirst("CompanyId");
 
             if (companyClaim != null && Guid.TryParse(companyClaim.Value, out var companyId))
             {
-                context.Items["companyId"] = companyId;
+                context.Items["CompanyId"] = companyId;
                 tenantContext.TenantId = companyId;
             }
 

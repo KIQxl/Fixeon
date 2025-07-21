@@ -5,7 +5,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
 {
     public interface IIdentityRepository
     {
-        Task<IdentityResult> CreateAccount(ApplicationUser request, string password);
+        Task<IdentityResult> CreateAccount(ApplicationUser request, string password, bool ignoreTenantInterceptor);
         Task<SignInResult> Login(ApplicationUser user, string password);
         Task<ApplicationUser> FindByEmail(string email);
         Task<ApplicationUser> FindById(string id);
@@ -18,5 +18,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<List<ApplicationUser>> GetUsersByRoleName(string roleName);
         public Task<List<string>> GetRolesByUser(ApplicationUser user);
         public Task<IdentityRole> GetRole(string roleName);
+        public Task<ApplicationUser> FindByEmailWithoutFilter(string email);
+
     }
 }

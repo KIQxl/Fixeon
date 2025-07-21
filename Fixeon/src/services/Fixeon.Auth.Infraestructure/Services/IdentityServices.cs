@@ -47,19 +47,28 @@ namespace Fixeon.Auth.Infraestructure.Services
 
         public async Task<Response<ApplicationUserResponse>> CreateIdentityUser(CreateAccountRequest request)
         {
-            var applicationUser = new ApplicationUser(request.Email, request.Username);
-
-            var result = await _authRepository.CreateAccount(applicationUser, request.Password);
-
-            if (result.Succeeded)
+            try
             {
-                var user = await _authRepository.FindByEmail(request.Email);
-                var roles = await _authRepository.GetRolesByUser(user);
+                var applicationUser = new ApplicationUser(request.Email, request.Username);
 
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                var result = await _authRepository.CreateAccount(applicationUser, request.Password, false);
+
+                if (result.Succeeded)
+                {
+                    var user = await _authRepository.FindByEmail(request.Email);
+                    var roles = await _authRepository.GetRolesByUser(user);
+
+                    _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
+
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                }
+
+                return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
             }
-
-            return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+            catch (Exception ex)
+            {
+                return new Response<ApplicationUserResponse>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
+            }
         }
 
         public async Task<Response<bool>> CreateRole(string request)
@@ -108,15 +117,15 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
-            var response = users.Select(async u =>
+            var response = new List<ApplicationUserResponse>();
+
+            foreach(var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                return new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles);
-            });
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
+            }
 
-            var userResponse = await Task.WhenAll(response);
-
-            return new Response<List<ApplicationUserResponse>>(userResponse.ToList());
+            return new Response<List<ApplicationUserResponse>>(response);
         }
 
         public async Task<Response<ApplicationUserResponse>> GetuserById(string id)
@@ -133,14 +142,18 @@ namespace Fixeon.Auth.Infraestructure.Services
 
         public async Task<Response<LoginResponse>> Login(string email, string password)
         {
-            var user = await _authRepository.FindByEmail(email);
+            var user = await _authRepository.FindByEmailWithoutFilter(email);
+
+            if (user is null)
+                return new Response<LoginResponse>("Usuário não encotrado.");
+
             var result = await _authRepository.Login(user, password);
 
             if (result.Succeeded)
             {
                 var roles = await _authRepository.GetRolesByUser(user);
 
-                var token = _tokenGeneratorService.GenerateToken(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                var token = _tokenGeneratorService.GenerateToken(user, roles);
 
                 return new Response<LoginResponse>(new LoginResponse(user.Id, user.UserName, user.Email, token, roles));
             }
@@ -161,6 +174,33 @@ namespace Fixeon.Auth.Infraestructure.Services
                 return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null));
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<Response<ApplicationUserResponse>> CreateFirstForCompany(CreateAccountRequest request)
+        {
+            try
+            {
+                var applicationUser = new ApplicationUser(request.Email, request.Username);
+                applicationUser.AssignCompany(request.CompanyId.Value);
+
+                var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
+
+                if (result.Succeeded)
+                {
+                    var user = await _authRepository.FindByEmailWithoutFilter(request.Email);
+                    var roles = await _authRepository.GetRolesByUser(user);
+
+                    _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
+
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                }
+
+                return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<ApplicationUserResponse>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
+            }
         }
     }
 }

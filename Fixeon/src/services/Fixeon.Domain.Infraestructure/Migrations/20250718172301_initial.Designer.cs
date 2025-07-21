@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250716031115_initial")]
+    [Migration("20250718172301_initial")]
     partial class initial
     {
         /// <inheritdoc />

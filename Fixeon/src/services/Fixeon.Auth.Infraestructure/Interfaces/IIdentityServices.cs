@@ -15,5 +15,6 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<Response<ApplicationUserResponse>> GetuserById(string id);
         public Task<Response<LoginResponse>> Login(string email, string password);
         public Task<Response<ApplicationUserResponse>> ResetPassword(ResetPasswordRequest request);
+        public Task<Response<ApplicationUserResponse>> CreateFirstForCompany(CreateAccountRequest request);
     }
 }

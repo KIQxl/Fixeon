@@ -14,9 +14,12 @@ namespace Fixeon.Auth.Infraestructure.Data
 
         public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
         {
-            var tenantId = _tenantContext.TenantId;
+            var context = eventData.Context as DataContext;
 
-            var context = eventData.Context;
+            if (context == null || context.IgnoreTenantInterceptor)
+                return base.SavingChangesAsync(eventData, result, cancellationToken);
+
+            var tenantId = _tenantContext.TenantId;
 
             if (context != null)
             {
