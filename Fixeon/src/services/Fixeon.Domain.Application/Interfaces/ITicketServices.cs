@@ -17,5 +17,6 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<Response<IEnumerable<InteractionResponse>>> GetInteractionsByTicketIdAsync(Guid ticketId);
         public Task<Response<TicketResponse>> AssignTicketTo(CreateAssignTicketRequest request);
         public Task<Response<TicketResponse>> ChangeTicketStatus(ChangeTicketStatusRequest request);
+        public Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analist);
     }
 }

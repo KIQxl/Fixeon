@@ -316,5 +316,25 @@ namespace Fixeon.Domain.Application.Services
                 return new Response<TicketResponse>($"{message}", EErrorType.ServerError);
             }
         }
+
+        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analist)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.GetAllTicketsFilterAsync(category, status, priority, analist);
+
+                if (tickets is null)
+                    return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
+
+                var responses = tickets.Select(x => x.ToResponse());
+
+                return new Response<IEnumerable<TicketResponse>>(responses);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return new Response<IEnumerable<TicketResponse>>($"{message}", EErrorType.ServerError);
+            }
+        }
     }
 }

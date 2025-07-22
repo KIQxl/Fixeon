@@ -141,5 +141,17 @@ namespace Fixeon.WebApi.Controllers
 
             return this.ReturnResponseWithStatusCode(response);
         }
+
+        [HttpGet]
+        [Route("get-tickets/filter")]
+        public async Task<IActionResult> GetTIcketsFilter([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analist)
+        {
+            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analist);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
     }
 }

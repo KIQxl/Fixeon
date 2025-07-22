@@ -148,5 +148,31 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
             }
         }
+
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category,string? status, string? priority, Guid? analist)
+        {
+            try
+            {
+                var query = _ctx.tickets.AsQueryable();
+
+                if (!string.IsNullOrEmpty(category))
+                    query = query.Where(t => t.Category == category);
+
+                if (!string.IsNullOrEmpty(status))
+                    query = query.Where(t => t.Status == status);
+
+                if (!string.IsNullOrEmpty(priority))
+                    query = query.Where(t => t.Priority == priority);
+
+                if (analist.HasValue)
+                    query = query.Where(t => t.AssignedTo.AnalistId == analist.ToString());
+
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
     }
 }
