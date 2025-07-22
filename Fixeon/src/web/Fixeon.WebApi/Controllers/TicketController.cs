@@ -55,10 +55,10 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("get-by-analist-id/{analist}")]
-        public async Task<IActionResult> GetTicketsByAnalist([FromRoute] string analist)
+        [Route("get-by-analyst-id/{analyst}")]
+        public async Task<IActionResult> GetTicketsByAnalyst([FromRoute] string analyst)
         {
-            var response = await _ticketServices.GetTicketsByAnalistIdAsync(analist);
+            var response = await _ticketServices.GetTicketsByAnalystIdAsync(analyst);
 
             if (response.Success)
                 return Ok(response);
@@ -120,7 +120,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("assign-ticket")]
-        public async Task<IActionResult> AssignTicketToAnalist([FromBody] CreateAssignTicketRequest request)
+        public async Task<IActionResult> AssignTicketToAnalyst([FromBody] CreateAssignTicketRequest request)
         {
             var response = await _ticketServices.AssignTicketTo(request);
 
@@ -144,9 +144,21 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-tickets/filter")]
-        public async Task<IActionResult> GetTIcketsFilter([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analist)
+        public async Task<IActionResult> GetTIcketsFilter([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst)
         {
-            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analist);
+            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpGet]
+        [Route("get-tickets/analysis")]
+        public async Task<IActionResult> GetTIcketsAnalysis()
+        {
+            var response = await _ticketServices.GetDashboardTickets();
 
             if (response.Success)
                 return Ok(response);

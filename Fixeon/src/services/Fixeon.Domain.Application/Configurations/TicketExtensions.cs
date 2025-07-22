@@ -19,7 +19,7 @@ namespace Fixeon.Domain.Application.Configurations
                 ModifiedAt = ticket.ModifiedAt,
                 ResolvedAt = ticket.ResolvedAt,
                 CreatedBy = ticket.CreatedByUser.UserName,
-                AssignedTo = ticket.AssignedTo?.AnalistName,
+                AssignedTo = ticket.AssignedTo?.AnalystName,
                 Category = ticket.Category,
                 Departament = ticket.Departament,
                 Priority = ticket.Priority,

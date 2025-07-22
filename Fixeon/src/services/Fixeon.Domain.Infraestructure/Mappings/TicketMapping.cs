@@ -48,17 +48,17 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             });
 
-            builder.OwnsOne(t => t.AssignedTo, analist =>
+            builder.OwnsOne(t => t.AssignedTo, analyst =>
             {
-                analist.Property(u => u.AnalistId)
+                analyst.Property(u => u.AnalystId)
                     .IsRequired()
                     .HasColumnType("varchar(36)")
-                    .HasColumnName("analistId");
+                    .HasColumnName("analystId");
 
-                analist.Property(u => u.AnalistName)
+                analyst.Property(u => u.AnalystName)
                     .IsRequired()
                     .HasColumnType("varchar(100)")
-                    .HasColumnName("analistName");
+                    .HasColumnName("analystName");
             });
 
             builder.Property(t => t.CreateAt)

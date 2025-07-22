@@ -206,11 +206,11 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<IEnumerable<TicketResponse>>> GetTicketsByAnalistIdAsync(string analistId)
+        public async Task<Response<IEnumerable<TicketResponse>>> GetTicketsByAnalystIdAsync(string analystId)
         {
             try
             {
-                var tickets = await _ticketRepository.GetTicketsByAnalistIdAsync(analistId);
+                var tickets = await _ticketRepository.GetTicketsByAnalystIdAsync(analystId);
 
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
@@ -255,7 +255,7 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
-                if(!ticket.AssignTicketToAnalist(new Analist { AnalistId = request.AnalistId, AnalistName = request.AnalistName }))
+                if(!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystName = request.AnalystName }))
                     return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
                 await _ticketRepository.UpdateTicket(ticket);
@@ -265,7 +265,7 @@ namespace Fixeon.Domain.Application.Services
                 if (result)
                     return new Response<TicketResponse>(ticket.ToResponse());
 
-                return new Response<TicketResponse>($"Não foi possível atribuir o ticket {ticket.Id} ao Analista {request.AnalistName} - {request.AnalistId}.", EErrorType.ServerError);
+                return new Response<TicketResponse>($"Não foi possível atribuir o ticket {ticket.Id} ao Analista {request.AnalystName} - {request.AnalystId}.", EErrorType.ServerError);
             }
             catch (Exception ex)
             {
@@ -317,11 +317,11 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analist)
+        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst)
         {
             try
             {
-                var tickets = await _ticketRepository.GetAllTicketsFilterAsync(category, status, priority, analist);
+                var tickets = await _ticketRepository.GetAllTicketsFilterAsync(category, status, priority, analyst);
 
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
@@ -334,6 +334,32 @@ namespace Fixeon.Domain.Application.Services
             {
                 var message = ex.InnerException?.Message ?? ex.Message;
                 return new Response<IEnumerable<TicketResponse>>($"{message}", EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<TicketDashboardResponse>> GetDashboardTickets()
+        {
+            try
+            {
+                var ticketAnalysis = await _ticketRepository.GetTicketsAnalysis();
+
+                var analystTicketAnalysis = await _ticketRepository.GetAnalystTicketsAnalysis();
+
+                var topAnalystAnalysis = await _ticketRepository.GetTopAnalyst();
+
+                var result = new TicketDashboardResponse
+                {
+                    TicketAnalysisResponse = ticketAnalysis,
+                    analystTicketsAnalyses = analystTicketAnalysis,
+                    TopAnalystResponse = topAnalystAnalysis
+                };
+
+                return new Response<TicketDashboardResponse>(result);
+            }
+            catch (Exception ex)
+            {
+                return new Response<TicketDashboardResponse>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
+
             }
         }
     }

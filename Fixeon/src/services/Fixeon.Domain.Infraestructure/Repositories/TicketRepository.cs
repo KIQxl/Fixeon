@@ -1,8 +1,8 @@
-﻿using Fixeon.Domain.Application.Interfaces;
+﻿using Fixeon.Domain.Application.Dtos.Responses;
+using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Infraestructure.Data;
-using Fixeon.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fixeon.Domain.Infraestructure.Repositories
@@ -76,11 +76,11 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Ticket>> GetTicketsByAnalistIdAsync(string analistId)
+        public async Task<IEnumerable<Ticket>> GetTicketsByAnalystIdAsync(string analystId)
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.AssignedTo.AnalistId.Equals(analistId)).Include(i => i.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(t => t.AssignedTo.AnalystId.Equals(analystId)).Include(i => i.Interactions).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -149,7 +149,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category,string? status, string? priority, Guid? analist)
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst)
         {
             try
             {
@@ -164,8 +164,8 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 if (!string.IsNullOrEmpty(priority))
                     query = query.Where(t => t.Priority == priority);
 
-                if (analist.HasValue)
-                    query = query.Where(t => t.AssignedTo.AnalistId == analist.ToString());
+                if (analyst.HasValue)
+                    query = query.Where(t => t.AssignedTo.AnalystId == analyst.ToString());
 
                 return await query.ToListAsync();
             }
@@ -173,6 +173,96 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             {
                 throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
             }
+        }
+
+        public async Task<TicketAnalysisResponse> GetTicketsAnalysis()
+        {
+            try
+            {
+                var analysis = await _ctx.tickets.GroupBy(x => 1)
+                    .Select(x => new TicketAnalysisResponse
+                    {
+                        Pending = x.Count(t => t.Status == ETicketStatus.Pending.ToString()),
+                        InProgress = x.Count(t => t.Status == ETicketStatus.InProgress.ToString()),
+                        Resolved = x.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
+                        Canceled = x.Count(t => t.Status == ETicketStatus.Canceled.ToString()),
+                        ReOpened = x.Count(t => t.Status == ETicketStatus.Reopened.ToString())
+                    }
+                ).FirstOrDefaultAsync() ?? new TicketAnalysisResponse();
+
+                return analysis;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<AnalystTicketsAnalysis>> GetAnalystTicketsAnalysis()
+        {
+            try
+            {
+                var analysis = _ctx.tickets.Where(x => x.AssignedTo != null).GroupBy(x => new { analystId = x.AssignedTo.AnalystId , analystName = x.AssignedTo.AnalystName})
+                    .Select(x => new AnalystTicketsAnalysis
+                    {
+                        AnalystId = x.Key.analystId,
+                        AnalystName = x.Key.analystName,
+                        PendingTickets = x.Count(t => t.Status == ETicketStatus.Pending.ToString()),
+                        ResolvedTickets = x.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
+                        TicketsTotal = x.Count(t => t.AssignedTo.AnalystId == x.Key.analystId),
+                        AverageResolutionTimeInHours = ConvertInHours(x.Where(t => t.Duration.HasValue)
+                                                            .Select(t => t.Duration.Value.TotalHours)
+                                                            .DefaultIfEmpty(0)
+                                                            .Average())
+                    }).ToList() ?? new List<AnalystTicketsAnalysis>();
+
+                return analysis;
+            }
+            catch(Exception ex) 
+            { 
+                throw new Exception(ex.Message); 
+            }
+        }
+
+        public async Task<List<TopAnalystResponse>> GetTopAnalyst()
+        {
+            try
+            {
+                var analysis = await _ctx.tickets
+                                        .Where(x => x.AssignedTo != null)
+                                        .GroupBy(x => new
+                                        {
+                                            analystId = x.AssignedTo.AnalystId,
+                                            analystName = x.AssignedTo.AnalystName
+                                        })
+                                        .Select(x => new TopAnalystResponse
+                                        {
+                                            AnalystName = x.Key.analystName,
+                                            TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.Now.AddDays(-30)),
+                                            AverageTime = ConvertInHours(x.Where(t => t.Duration.HasValue)
+                                                            .Select(t => t.Duration.Value.TotalHours)
+                                                            .DefaultIfEmpty(0)
+                                                            .Average())
+                                        })
+                                        .OrderByDescending(x => x.TicketsLast30Days)
+                                        .ThenBy(x => x.AverageTime)
+                                        .Take(3)
+                                        .ToListAsync()
+                                        ?? new List<TopAnalystResponse>();
+
+                return analysis;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private string ConvertInHours(double average)
+        {
+            var avgTime = TimeSpan.FromHours(average);
+
+            return $"{(int)avgTime.TotalHours}h{(int)avgTime.TotalMinutes}m";
         }
     }
 }

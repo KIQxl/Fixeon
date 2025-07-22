@@ -1,4 +1,5 @@
-﻿using Fixeon.Domain.Core.Entities;
+﻿using Fixeon.Domain.Application.Dtos.Responses;
+using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 
 namespace Fixeon.Domain.Application.Interfaces
@@ -10,10 +11,14 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<IEnumerable<Ticket>> GetTicketsByCategoryAsync(string category);
         public Task<IEnumerable<Ticket>> GetTicketsByPriorityAsync(EPriority priority);
         public Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(string userId);
-        public Task<IEnumerable<Ticket>> GetTicketsByAnalistIdAsync(string analistId);
-        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analist);
+        public Task<IEnumerable<Ticket>> GetTicketsByAnalystIdAsync(string analystId);
+        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst);
         public Task CreateTicket(Ticket ticket);
         public Task UpdateTicket(Ticket ticket);
+
+        public Task<TicketAnalysisResponse> GetTicketsAnalysis();
+        public Task<List<AnalystTicketsAnalysis>> GetAnalystTicketsAnalysis();
+        public Task<List<TopAnalystResponse>> GetTopAnalyst();
 
         public Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId);
         public Task CreateInteraction(Interaction interaction);

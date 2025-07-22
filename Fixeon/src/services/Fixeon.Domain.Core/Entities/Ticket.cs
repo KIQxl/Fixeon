@@ -25,7 +25,7 @@ namespace Fixeon.Domain.Core.Entities
         public string Departament { get; private set; }
         public List<Attachment> Attachments {  get; private set; } = new List<Attachment>();
         public User CreatedByUser { get; private set; }
-        public Analist? AssignedTo { get; private set; }
+        public Analyst? AssignedTo { get; private set; }
         public DateTime CreateAt { get; private set; }
         public string Status { get; private set; }
         public DateTime? ModifiedAt { get; private set; }
@@ -42,7 +42,7 @@ namespace Fixeon.Domain.Core.Entities
             this.ResolvedAt = DateTime.UtcNow;
         }
 
-        public bool AssignTicketToAnalist(Analist assignTo)
+        public bool AssignTicketToAnalyst(Analyst assignTo)
         {
             if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
@@ -82,7 +82,7 @@ namespace Fixeon.Domain.Core.Entities
             return true;
         }
 
-        public bool TransferTicket(Analist assignTo)
+        public bool TransferTicket(Analyst assignTo)
         {
             if (this.Status == ETicketStatus.Canceled.ToString())
                 return false;
