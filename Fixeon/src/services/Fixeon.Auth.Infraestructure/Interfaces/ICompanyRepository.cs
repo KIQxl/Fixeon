@@ -6,5 +6,6 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
     {
         public Task CreateCompany(Company request);
         public Task<List<Company>> GetAllCompanies();
+        public Task<Company> GetCompanyById(Guid companyId);
     }
 }

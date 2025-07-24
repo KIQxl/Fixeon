@@ -37,5 +37,10 @@ namespace Fixeon.Auth.Infraestructure.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<Company> GetCompanyById(Guid companyId)
+        {
+            return await _context.companies.AsNoTracking().FirstOrDefaultAsync(x => x.Id == companyId);
+        }
     }
 }

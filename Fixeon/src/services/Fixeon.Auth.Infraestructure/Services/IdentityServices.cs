@@ -13,38 +13,54 @@ namespace Fixeon.Auth.Infraestructure.Services
         private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
         private readonly IUrlEncoder _urlEncoder;
         private readonly ITokenGeneratorService _tokenGeneratorService;
+        private readonly ICompanyRepository _companyRepository;
 
-        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService)
+        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, ICompanyRepository companyRepository)
         {
             _authRepository = authRepository;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
             _urlEncoder = urlEncoder;
             _tokenGeneratorService = tokenGeneratorService;
+            _companyRepository = companyRepository;
         }
 
-        public async Task<Response<ApplicationUserResponse>> AssociateRole(string userId, string roleName)
+        // GET
+        public async Task<Response<List<ApplicationUserResponse>>> GetAllUsers()
         {
-            var user = await _authRepository.FindById(userId);
+            var users = await _authRepository.GetAllUsers(false);
 
-            if (user is null)
-                return new Response<ApplicationUserResponse>("Usuário não encotrado.");
+            if (users is null)
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
-            var role = await _authRepository.GetRole(roleName);
+            var response = new List<ApplicationUserResponse>();
 
-            if (role is null)
-                return new Response<ApplicationUserResponse>("Perfil não encontrado.");
-
-            var result = await _authRepository.AssociateRole(user, role.Name);
-
-            if (result.Succeeded)
+            foreach (var u in users)
             {
-                var roles = await _authRepository.GetRolesByUser(user);
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                var roles = await _authRepository.GetRolesByUser(u);
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
             }
 
-            return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+            return new Response<List<ApplicationUserResponse>>(response);
         }
 
+        public async Task<Response<ApplicationUserResponse>> GetuserById(string id)
+        {
+            var user = await _authRepository.FindById(id);
+
+            if (user is null)
+                return new Response<ApplicationUserResponse>("Usuário não encontrado.");
+
+            var roles = await _authRepository.GetRolesByUser(user);
+
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+        }
+
+        public async Task<bool> FindUserByEmail(string email)
+        {
+            return await _authRepository.FindByEmail(email) is null;
+        }
+
+        // CREATE
         public async Task<Response<ApplicationUserResponse>> CreateIdentityUser(CreateAccountRequest request)
         {
             try
@@ -86,60 +102,8 @@ namespace Fixeon.Auth.Infraestructure.Services
             return new Response<bool>(result.Errors.Select(e => e.Description).ToList());
         }
 
-        public async Task<bool> FindUserByEmail(string email)
-        {
-            return await _authRepository.FindByEmail(email) is null;
-        }
 
-        public async Task<Response<bool>> GenerateResetPasswordToken(string email)
-        {
-            var applicationUser = await _authRepository.FindByEmail(email);
-
-            if (applicationUser is null)
-                return new Response<bool>("Usuário não encontrado.");
-
-            var token = await _authRepository.GenerateResetPasswordToken(applicationUser);
-
-            if (token is null)
-                return new Response<bool>("Não foi possivel gerar o código de recuperação.");
-
-            var encodedToken = $"?recovery-token={_urlEncoder.Encode(token)}";
-
-            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
-
-            return new Response<bool>(true);
-        }
-
-        public async Task<Response<List<ApplicationUserResponse>>> GetAllUsers()
-        {
-            var users = await _authRepository.GetAllUsers();
-
-            if (users is null)
-                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
-
-            var response = new List<ApplicationUserResponse>();
-
-            foreach(var u in users)
-            {
-                var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
-            }
-
-            return new Response<List<ApplicationUserResponse>>(response);
-        }
-
-        public async Task<Response<ApplicationUserResponse>> GetuserById(string id)
-        {
-            var user = await _authRepository.FindById(id);
-
-            if (user is null)
-                return new Response<ApplicationUserResponse>("Usuário não encontrado.");
-
-            var roles = await _authRepository.GetRolesByUser(user);
-
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
-        }
-
+        // AUTH CONTEXT ACTIONS
         public async Task<Response<LoginResponse>> Login(string email, string password)
         {
             var user = await _authRepository.FindByEmailWithoutFilter(email);
@@ -161,6 +125,48 @@ namespace Fixeon.Auth.Infraestructure.Services
             return new Response<LoginResponse>("Credenciais inválidas.");
         }
 
+        public async Task<Response<ApplicationUserResponse>> AssociateRole(string userId, string roleName)
+        {
+            var user = await _authRepository.FindById(userId);
+
+            if (user is null)
+                return new Response<ApplicationUserResponse>("Usuário não encotrado.");
+
+            var role = await _authRepository.GetRole(roleName);
+
+            if (role is null)
+                return new Response<ApplicationUserResponse>("Perfil não encontrado.");
+
+            var result = await _authRepository.AssociateRole(user, role.Name);
+
+            if (result.Succeeded)
+            {
+                var roles = await _authRepository.GetRolesByUser(user);
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+            }
+
+            return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        public async Task<Response<bool>> GenerateResetPasswordToken(string email)
+        {
+            var applicationUser = await _authRepository.FindByEmail(email);
+
+            if (applicationUser is null)
+                return new Response<bool>("Usuário não encontrado.");
+
+            var token = await _authRepository.GenerateResetPasswordToken(applicationUser);
+
+            if (token is null)
+                return new Response<bool>("Não foi possivel gerar o código de recuperação.");
+
+            var encodedToken = $"?recovery-token={_urlEncoder.Encode(token)}";
+
+            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
+
+            return new Response<bool>(true);
+        }
+
         public async Task<Response<ApplicationUserResponse>> ResetPassword(ResetPasswordRequest request)
         {
             var user = await _authRepository.FindByEmail(request.Email);
@@ -176,10 +182,13 @@ namespace Fixeon.Auth.Infraestructure.Services
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
         }
 
-        public async Task<Response<ApplicationUserResponse>> CreateFirstForCompany(CreateAccountRequest request)
+        //MASTER ADMIN ACTIONS
+        public async Task<Response<ApplicationUserResponse>> MasterAdminCreateFirstForCompany(CreateAccountRequest request)
         {
             try
             {
+                var company = await _companyRepository.GetCompanyById(request.CompanyId.Value);
+
                 var applicationUser = new ApplicationUser(request.Email, request.Username);
                 applicationUser.AssignCompany(request.CompanyId.Value);
 
@@ -201,6 +210,24 @@ namespace Fixeon.Auth.Infraestructure.Services
             {
                 return new Response<ApplicationUserResponse>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
             }
+        }
+
+        public async Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers()
+        {
+            var users = await _authRepository.GetAllUsers(true);
+
+            if (users is null)
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
+
+            var response = new List<ApplicationUserResponse>();
+
+            foreach (var u in users)
+            {
+                var roles = await _authRepository.GetRolesByUser(u);
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
+            }
+
+            return new Response<List<ApplicationUserResponse>>(response);
         }
     }
 }

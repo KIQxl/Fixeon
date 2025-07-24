@@ -11,7 +11,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         Task<ApplicationUser> FindById(string id);
         Task<IdentityResult> CreateRole(string roleName);
         Task<IdentityResult> AssociateRole(ApplicationUser user, string role);
-        Task<List<ApplicationUser>> GetAllUsers();
+        Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin);
         Task<ApplicationUser> GetUser(string email);
         public Task<string> GenerateResetPasswordToken(ApplicationUser user);
         public Task<IdentityResult> ResetPassword(ApplicationUser user, string token, string newPassword);

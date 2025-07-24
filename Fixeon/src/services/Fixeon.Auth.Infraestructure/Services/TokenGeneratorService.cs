@@ -1,6 +1,4 @@
-﻿using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Infraestructure.Configuration;
-using Fixeon.Auth.Infraestructure.Dtos.Responses;
+﻿using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Shared.Interfaces;
@@ -33,7 +31,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             if(roles != null)
                 foreach (var role in roles)
                 {
-                    claims.Add(new Claim("Role", role));
+                    claims.Add(new Claim("roles", role));
                 }
 
             var claimsIdentity = new ClaimsIdentity(claims);

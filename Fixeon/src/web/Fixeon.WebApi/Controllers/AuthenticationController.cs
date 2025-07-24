@@ -3,6 +3,7 @@ using Fixeon.Auth.Infraestructure.Dtos.Requests;
 using Fixeon.Auth.Infraestructure.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.WebApi.Dtos.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.WebApi.Controllers
@@ -144,9 +145,23 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("setup")]
+        [Authorize(Roles = "MasterAdmin")]
         public async Task<IActionResult> CreateFirstUserForCompany([FromBody] CreateAccountRequest request)
         {
-            var response = await _services.CreateFirstForCompany(request);
+            var response = await _services.MasterAdminCreateFirstForCompany(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpGet]
+        [Route("get-all-master")]
+        [Authorize(Roles = "MasterAdmin")]
+        public async Task<IActionResult> MasterAdminGetAllUsers()
+        {
+            var response = await _services.MasterAdminGetAllUsers();
 
             if (response.Success)
                 return Ok(response);

@@ -83,8 +83,11 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             return token;
         }
 
-        public async Task<List<ApplicationUser>> GetAllUsers()
+        public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin)
         {
+            if(masterAdmin)
+                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync();
+
             return await _userManager.Users.AsNoTracking().ToListAsync();
         }
 
