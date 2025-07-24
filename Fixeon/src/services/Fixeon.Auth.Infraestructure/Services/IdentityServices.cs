@@ -130,7 +130,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var user = await _authRepository.FindById(userId);
 
             if (user is null)
-                return new Response<ApplicationUserResponse>("Usuário não encotrado.");
+                return new Response<ApplicationUserResponse>("Usuário não encontrado.");
 
             var role = await _authRepository.GetRole(roleName);
 

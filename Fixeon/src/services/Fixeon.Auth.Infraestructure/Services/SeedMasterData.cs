@@ -8,6 +8,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 {
     public class SeedMasterData
     {
+        private static readonly List<string> _baseRoles = new List<string> { "Admin", "Analyst", "CommonUser"};
         public static async Task SeedData(IServiceProvider provider)
         {
             var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -47,6 +48,12 @@ namespace Fixeon.Auth.Infraestructure.Services
                     await userManager.AddToRoleAsync(masterUser, masterRole);
                 else
                     throw new Exception($"Erro ao criar usuário master: {string.Join(", ", createUserResult.Errors.Select(e => e.Description))}");
+            }
+
+            foreach(var role in _baseRoles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
     }

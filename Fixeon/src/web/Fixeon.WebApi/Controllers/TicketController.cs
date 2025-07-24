@@ -120,6 +120,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("assign-ticket")]
+        [Authorize(Roles = "Admin, Analyst")]
         public async Task<IActionResult> AssignTicketToAnalyst([FromBody] CreateAssignTicketRequest request)
         {
             var response = await _ticketServices.AssignTicketTo(request);
@@ -132,6 +133,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("change-ticket-status")]
+        [Authorize(Roles = "Admin, Analyst")]
         public async Task<IActionResult> ChangeTicketStatus([FromBody] ChangeTicketStatusRequest request)
         {
             var response = await _ticketServices.ChangeTicketStatus(request);
@@ -156,6 +158,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-tickets/analysis")]
+        [Authorize(Roles = "Admin, Analyst")]
         public async Task<IActionResult> GetTIcketsAnalysis()
         {
             var response = await _ticketServices.GetDashboardTickets();

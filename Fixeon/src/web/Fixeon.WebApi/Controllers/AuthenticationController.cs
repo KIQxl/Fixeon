@@ -20,25 +20,6 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("create-account")]
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new Response<LoginResponse>(
-                    ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList()));
-
-            var response = await _services.CreateIdentityUser(request);
-
-            if(response.Success)
-                return Ok(response);
-
-            return BadRequest(response);
-        }
-
-        [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -58,7 +39,28 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
+        [Route("create-account")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new Response<LoginResponse>(
+                    ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList()));
+
+            var response = await _services.CreateIdentityUser(request);
+
+            if(response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
         [Route("associate-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssociateRole([FromBody] AssociateRoleRequest request)
         {
             if (!ModelState.IsValid)
@@ -76,27 +78,9 @@ namespace Fixeon.WebApi.Controllers
             return BadRequest(response);
         }
 
-        [HttpPost]
-        [Route("create-role")]
-        public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new Response<bool>(
-                    ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList()));
-
-            var response = await _services.CreateRole(request.RoleName);
-
-            if (response.Success)
-                return Ok(response);
-
-            return BadRequest(response);
-        }
-
         [HttpGet]
         [Route("get-user-by-id/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
             var response = await _services.GetuserById(id);
@@ -109,6 +93,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all-users")]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _services.GetAllUsers();
@@ -144,7 +129,27 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("setup")]
+        [Route("create-role")]
+        [Authorize(Roles = "MasterAdmin")]
+        public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new Response<bool>(
+                    ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList()));
+
+            var response = await _services.CreateRole(request.RoleName);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [Route("create-account-master")]
         [Authorize(Roles = "MasterAdmin")]
         public async Task<IActionResult> CreateFirstUserForCompany([FromBody] CreateAccountRequest request)
         {
