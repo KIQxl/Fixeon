@@ -38,8 +38,6 @@ namespace Fixeon.Domain.Application.Services
 
             foreach(var file in request.Attachments)
             {
-                await _fileServices.SaveFile(file);
-
                 var attachment = file.ToAttachment(Guid.Parse(ticket.CreatedByUser.UserId), ticket.Id, null);
                 ticket.AddAttachment(attachment);
             }
