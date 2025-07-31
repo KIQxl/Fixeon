@@ -1,5 +1,5 @@
 ﻿using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Core.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

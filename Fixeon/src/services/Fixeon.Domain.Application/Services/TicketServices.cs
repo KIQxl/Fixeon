@@ -6,19 +6,22 @@ using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
+using Fixeon.Shared.Core.Interfaces;
 
 namespace Fixeon.Domain.Application.Services
 {
     public class TicketServices : ITicketServices
     {
         private readonly ITicketRepository _ticketRepository;
-        private readonly IFileServices _fileServices;
         private readonly IUnitOfWork _unitOfWork;
-        public TicketServices(ITicketRepository ticketRepository, IFileServices fileServices, IUnitOfWork unitOfWork)
+        private readonly IStorageServices _storageServices;
+        private readonly IBackgroundEmailJobWrapper _backgroundServices;
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices)
         {
             _ticketRepository = ticketRepository;
-            _fileServices = fileServices;
             _unitOfWork = unitOfWork;
+            _storageServices = storageServices;
+            _backgroundServices = backgroundServices;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -38,6 +41,7 @@ namespace Fixeon.Domain.Application.Services
 
             foreach(var file in request.Attachments)
             {
+                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
                 var attachment = file.ToAttachment(Guid.Parse(ticket.CreatedByUser.UserId), ticket.Id, null);
                 ticket.AddAttachment(attachment);
             }
@@ -79,7 +83,7 @@ namespace Fixeon.Domain.Application.Services
 
             foreach(var file in request.Attachments)
             {
-                await _fileServices.SaveFile(file);
+                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
 
                 var attachment = file.ToAttachment(Guid.Parse(interaction.CreatedBy.UserId), null, interaction.Id);
                 interaction.AddAttachment(attachment);

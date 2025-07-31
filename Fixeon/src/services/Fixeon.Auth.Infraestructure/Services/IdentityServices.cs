@@ -3,7 +3,8 @@ using Fixeon.Auth.Infraestructure.Dtos.Requests;
 using Fixeon.Auth.Infraestructure.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
-using Fixeon.Shared.Configuration;
+using Fixeon.Shared.Core.Interfaces;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.Auth.Infraestructure.Services
 {
@@ -74,7 +75,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     var user = await _authRepository.FindByEmail(request.Email);
                     var roles = await _authRepository.GetRolesByUser(user);
 
-                    _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
+                    _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
                     return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
                 }
@@ -162,7 +163,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var encodedToken = $"?recovery-token={_urlEncoder.Encode(token)}";
 
-            _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
+            _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = email, Subject = "Recuperação de Senha - Fixeon", Body = EmailDictionary.ResetPasswordEmail.Replace("{{reset_link}}", encodedToken) });
 
             return new Response<bool>(true);
         }
@@ -199,7 +200,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     var user = await _authRepository.FindByEmailWithoutFilter(request.Email);
                     var roles = await _authRepository.GetRolesByUser(user);
 
-                    _backgroundEmailJobWrapper.SendEmail(new Shared.Models.EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
+                    _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
                     return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
                 }

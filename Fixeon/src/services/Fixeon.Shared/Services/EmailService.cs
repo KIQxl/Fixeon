@@ -1,6 +1,6 @@
 ﻿using Fixeon.Shared.Configuration;
-using Fixeon.Shared.Interfaces;
-using Fixeon.Shared.Models;
+using Fixeon.Shared.Core.Interfaces;
+using Fixeon.Shared.Core.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;

@@ -1,9 +1,6 @@
-﻿using Fixeon.Domain.Application.Dtos;
-using Fixeon.Domain.Application.Dtos.Requests;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Services;
-using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
-using Fixeon.Domain.Core.ValueObjects;
 using Fixon.Tests.MockRepository;
 
 namespace Fixon.Tests.Domain.Tests
@@ -15,7 +12,7 @@ namespace Fixon.Tests.Domain.Tests
 
         public TicketTests()
         {
-            _services = new TicketServices(new FakeTicketRepository(), new FakeFileService(), new FakeUnitOfWork());
+            _services = new TicketServices(new FakeTicketRepository(), new FakeUnitOfWork(), new FakeStorageService(), new FakeBackgroundJob());
         }
 
         [TestMethod]

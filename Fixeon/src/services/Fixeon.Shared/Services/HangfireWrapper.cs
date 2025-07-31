@@ -1,11 +1,10 @@
-﻿using Fixeon.Auth.Infraestructure.Interfaces;
-using Fixeon.Shared.Interfaces;
-using Fixeon.Shared.Models;
+﻿using Fixeon.Shared.Core.Interfaces;
+using Fixeon.Shared.Core.Models;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 
-namespace Fixeon.WebApi.Services
+namespace Fixeon.Shared.Services
 {
     public class HangfireWrapper : IBackgroundEmailJobWrapper
     {

@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Shared.Configuration
+﻿namespace Fixeon.Shared.Core.Models
 {
     public static class EmailDictionary
     {

@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Shared.Interfaces
+﻿namespace Fixeon.Shared.Core.Interfaces
 {
     public interface ITenantContext
     {

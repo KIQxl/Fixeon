@@ -1,5 +1,5 @@
 ﻿using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Core.Interfaces;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Fixeon.Auth.Infraestructure.Data

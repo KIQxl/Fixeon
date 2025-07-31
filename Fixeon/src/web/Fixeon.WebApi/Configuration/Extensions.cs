@@ -1,14 +1,12 @@
 ﻿using Fixeon.Auth.Infraestructure.Configuration;
-using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Infraestructure.Configuration;
 using Fixeon.Shared.Configuration;
-using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Models;
 using Fixeon.Shared.Services;
 using Fixeon.WebApi.Middlewares;
-using Fixeon.WebApi.Services;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Microsoft.AspNetCore.Mvc;
@@ -69,11 +67,6 @@ namespace Fixeon.WebApi.Configuration
 
             var jwtSettings = jwtSection.Get<JwtSettings>();
 
-            var smtpSection = configuration.GetSection("SmtpSettings");
-            services.Configure<SmtpSettings>(smtpSection);
-
-            var smtpSettings = smtpSection.Get<SmtpSettings>();
-
             services.RegisterIdentityConfigs(configuration)
                 .RegisterDomainContext(configuration)
                 .RegisterIdentityAuthentication(jwtSettings)
@@ -83,6 +76,31 @@ namespace Fixeon.WebApi.Configuration
 
             services.AddHttpContextAccessor();
             services.AddScoped<ITenantContext, TenantContext>();
+
+            var smtpSection = configuration.GetSection("SmtpSettings");
+            services.Configure<SmtpSettings>(smtpSection);
+
+            var smtpSettings = smtpSection.Get<SmtpSettings>();
+
+            var storageProvider = configuration.GetValue<string>("StorageProvider");
+
+            if (storageProvider == "MinIO")
+            {
+                var minIOStorageSection = configuration.GetSection("MinIOStorage");
+                services.Configure<StorageSettings>(minIOStorageSection);
+            }
+            else
+            {
+                var S3StorageSection = configuration.GetSection("S3Storage");
+                services.Configure<StorageSettings>(S3StorageSection);
+            }
+
+            services.AddSingleton<StorageClientFactory>();
+            services.AddScoped<IStorageServices>(sp =>
+            {
+                var factory = sp.GetRequiredService<StorageClientFactory>();
+                return factory.GetService();
+            });
 
             return services;
         }

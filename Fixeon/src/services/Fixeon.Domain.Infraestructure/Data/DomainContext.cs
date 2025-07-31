@@ -1,5 +1,5 @@
 ﻿using Fixeon.Domain.Core.Entities;
-using Fixeon.Shared.Interfaces;
+using Fixeon.Shared.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fixeon.Domain.Infraestructure.Data

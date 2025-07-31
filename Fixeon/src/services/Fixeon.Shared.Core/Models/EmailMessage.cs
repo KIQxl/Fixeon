@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Shared.Models
+﻿namespace Fixeon.Shared.Core.Models
 {
     public class EmailMessage
     {

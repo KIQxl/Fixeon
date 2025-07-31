@@ -8,9 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire" Version="1.8.20" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.20" />
-    <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.12.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,6 +19,10 @@
     <ProjectReference Include="..\..\services\Fixeon.Auth.Infraestructure\Fixeon.Auth.Infraestructure.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Domain.Infraestructure\Fixeon.Domain.Infraestructure.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Shared\Fixeon.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

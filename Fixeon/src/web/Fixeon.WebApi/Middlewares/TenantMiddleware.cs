@@ -1,4 +1,4 @@
-﻿using Fixeon.Shared.Interfaces;
+﻿using Fixeon.Shared.Core.Interfaces;
 
 namespace Fixeon.WebApi.Middlewares
 {

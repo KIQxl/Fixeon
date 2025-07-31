@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fixeon.Shared", "Fixeon.Sha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Shared", "src\services\Fixeon.Shared\Fixeon.Shared.csproj", "{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixeon.Shared.Core", "src\services\Fixeon.Shared.Core\Fixeon.Shared.Core.csproj", "{3388EAD4-8112-4D88-A7AD-1C104B4B6409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{AF7BF1D0-DA5D-4BA1-B103-5F2013E39995} = {9737F7C4-B0A5-4990-A14D-E3EA14623216}
 		{30528FBF-9FD8-4023-92E3-EAD5611FF603} = {2863EAE5-A94D-44E6-863F-33333B250B3B}
 		{9895A1BF-437F-4A0E-9EA7-B5F246981FFC} = {30528FBF-9FD8-4023-92E3-EAD5611FF603}
+		{3388EAD4-8112-4D88-A7AD-1C104B4B6409} = {30528FBF-9FD8-4023-92E3-EAD5611FF603}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {91FF4F97-0EE4-4138-BEC0-3082BC5C51D7}

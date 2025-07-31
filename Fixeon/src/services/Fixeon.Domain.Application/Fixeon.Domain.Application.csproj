@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fixeon.Domain.Core\Fixeon.Domain.Core.csproj" />
+    <ProjectReference Include="..\Fixeon.Shared.Core\Fixeon.Shared.Core.csproj" />
   </ItemGroup>
 
 </Project>

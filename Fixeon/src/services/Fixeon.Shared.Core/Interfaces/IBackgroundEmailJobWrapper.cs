@@ -1,6 +1,6 @@
-﻿using Fixeon.Shared.Models;
+﻿using Fixeon.Shared.Core.Models;
 
-namespace Fixeon.Auth.Infraestructure.Interfaces
+namespace Fixeon.Shared.Core.Interfaces
 {
     public interface IBackgroundEmailJobWrapper
     {
