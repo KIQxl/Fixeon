@@ -32,3 +32,10 @@ Desktop.ini
 secrets.json
 
 ## src/Fixeon.tests/
+
+## env
+.env
+
+## dockerignore
+.dockerignore
+Dockerfile
