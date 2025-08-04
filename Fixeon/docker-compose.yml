@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fixeon-web
+    env_file:
+      - .env
+    ports:
+      - "5175:8080"
+    depends_on:
+      - redis
+      - minio
+
+  redis:
+    image: redis
+    container_name: fixeon-redis
+    ports:
+      - "6379:6379"
+    restart: always
+    env_file:
+      - .env
+
+  minio:
+    image: minio/minio
+    container_name: fixeon-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: kiqxl
+      MINIO_ROOT_PASSWORD: senha
+    volumes:
+      - minio-data:/data
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fixeon-sql
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: ""
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    restart: always
+
+volumes:
+  minio-data:
+  sqlserver-data:

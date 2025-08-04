@@ -110,7 +110,7 @@ namespace Fixeon.WebApi.Configuration
             services.AddScoped<IEmailServices, EmailService>();
             services.AddScoped<IBackgroundEmailJobWrapper, HangfireWrapper>();
 
-            var redisConnection = configuration.GetConnectionString("Redis")
+            var redisConnection = configuration.GetConnectionString("FixeonRedis")
                           ?? throw new InvalidOperationException("Redis connection string is missing");
 
             services.AddHangfire(config => config.UseRedisStorage(redisConnection));

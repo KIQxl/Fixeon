@@ -15,7 +15,7 @@ namespace Fixeon.Domain.Infraestructure.Configuration
             services.AddDbContext<DomainContext>((serviceProvider, opts) =>
             {
                 opts
-                .UseSqlServer(configuration["ConnectionStrings:DefaultConnection"])
+                .UseSqlServer(configuration["ConnectionStrings:FixeonDefaultConnection"])
                 .AddInterceptors(serviceProvider.GetRequiredService<TenantSaveChangesInterceptor>());
             });
 

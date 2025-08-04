@@ -22,7 +22,7 @@ namespace Fixeon.Auth.Infraestructure.Configuration
         {
             services.AddDbContext<DataContext>((serviceProvider, opts) =>
             {
-                opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"])
+                opts.UseSqlServer(configuration["ConnectionStrings:FixeonDefaultConnection"])
                 .AddInterceptors(serviceProvider.GetRequiredService<TenantSaveChangesInterceptor>());
             });
 
