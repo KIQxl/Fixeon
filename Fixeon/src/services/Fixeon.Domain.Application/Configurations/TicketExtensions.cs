@@ -8,7 +8,7 @@ namespace Fixeon.Domain.Application.Configurations
 {
     public static class TicketExtensions
     {
-        public static TicketResponse ToResponse(this Ticket ticket)
+        public static TicketResponse ToResponse(this Ticket ticket, List<string>? attachmentsUrls = null)
         {
             return new TicketResponse
             {
@@ -27,7 +27,7 @@ namespace Fixeon.Domain.Application.Configurations
                 Interactions = ticket.Interactions,
                 DurationFormat = ticket.Duration.HasValue ? $"{(int)ticket.Duration.Value.TotalDays} dias, {(int)ticket.Duration.Value.Hours} horas e {(int)ticket.Duration.Value.Minutes} minutos" : "Em análise",
                 Duration = ticket.Duration,
-                Attachments = ticket.Attachments
+                Attachments = attachmentsUrls
             };
         }
 

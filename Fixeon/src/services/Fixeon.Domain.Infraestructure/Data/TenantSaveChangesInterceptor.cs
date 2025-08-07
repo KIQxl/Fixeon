@@ -1,6 +1,7 @@
 ﻿using Fixeon.Domain.Core.Interfaces;
 using Fixeon.Shared.Core.Interfaces;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Net.Mail;
 
 namespace Fixeon.Domain.Infraestructure.Data
 {
@@ -25,6 +26,12 @@ namespace Fixeon.Domain.Infraestructure.Data
                     .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added && e.Entity is ITenantEntity))
                 {
                     entry.Property("CompanyId").CurrentValue = tenantId;
+                }
+
+                foreach (var entry in context.ChangeTracker.Entries()
+                    .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added && e.Entity is Attachment))
+                {
+                    entry.Property("Filename").CurrentValue = $"{entry.Property("Filename").CurrentValue}/{tenantId}";
                 }
             }
 

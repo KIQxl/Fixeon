@@ -95,7 +95,7 @@ namespace Fixeon.WebApi.Configuration
                 services.Configure<StorageSettings>(S3StorageSection);
             }
 
-            services.AddSingleton<StorageClientFactory>();
+            services.AddScoped<StorageClientFactory>();
             services.AddScoped<IStorageServices>(sp =>
             {
                 var factory = sp.GetRequiredService<StorageClientFactory>();

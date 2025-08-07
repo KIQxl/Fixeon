@@ -3,5 +3,6 @@
     public interface IStorageServices
     {
         public Task UploadFile(string filename, string contentType, Stream content);
+        public Task<string> GetPresignedUrl(string filename);
     }
 }

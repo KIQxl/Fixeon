@@ -19,6 +19,6 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public List<Interaction>? Interactions { get; set; }
         public string DurationFormat { get; set; }
         public TimeSpan? Duration { get; set; }
-        public List<Attachment> Attachments { get; set; } = new List<Attachment>();
+        public List<string> Attachments { get; set; } = new List<string>();
     }
 }

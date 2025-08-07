@@ -7,6 +7,7 @@ namespace Fixeon.Domain.Infraestructure.Data
     public class DomainContext : DbContext
     {
         private readonly ITenantContext _tenantContext;
+        public Guid _currentTenant => _tenantContext.TenantId;
         public DomainContext(DbContextOptions<DomainContext> opts, ITenantContext tenantContext)
             : base(opts)
         {
@@ -26,8 +27,6 @@ namespace Fixeon.Domain.Infraestructure.Data
                     .Where(
                         p => p.ClrType == typeof(string))))
                 property.SetColumnType("varchar(100)");
-
-            var _currentTenant = _tenantContext.TenantId;
 
             modelBuilder.Entity<Ticket>()
                 .HasQueryFilter(t => t.CompanyId == _currentTenant);

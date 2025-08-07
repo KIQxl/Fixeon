@@ -68,7 +68,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.Include(i => i.Interactions).FirstOrDefaultAsync(t => t.Id.Equals(id));
+                return await _ctx.tickets.Include(i => i.Interactions).Include(a => a.Attachments).FirstOrDefaultAsync(t => t.Id.Equals(id));
             }
             catch (Exception ex)
             {
@@ -80,7 +80,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.AssignedTo.AnalystId.Equals(analystId)).Include(i => i.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(t => t.AssignedTo.AnalystId.Equals(analystId)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -92,7 +92,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.Category.ToUpper().Equals(category.ToUpper())).Include(i => i.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(t => t.Category.ToUpper().Equals(category.ToUpper())).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.Priority.Equals(priority)).Include(i => i.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(t => t.Priority.Equals(priority)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -116,7 +116,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.CreatedByUser.UserId.Equals(userId)).Include(i => i.Interactions).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(t => t.CreatedByUser.UserId.Equals(userId)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -167,7 +167,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 if (analyst.HasValue)
                     query = query.Where(t => t.AssignedTo.AnalystId == analyst.ToString());
 
-                return await query.ToListAsync();
+                return await query.Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {

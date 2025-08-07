@@ -7,6 +7,7 @@ using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
+using System.Net;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -119,7 +120,11 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
-                return new Response<TicketResponse>(ticket.ToResponse());
+                var attachmentsUrl = await GetAttachmentsUrl(ticket.Attachments);
+
+                var response = new Response<TicketResponse>(ticket.ToResponse(attachmentsUrl));
+
+                return response;
             }
             catch (Exception ex)
             {
@@ -137,7 +142,11 @@ namespace Fixeon.Domain.Application.Services
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
 
-                var responses = tickets.Select(x => x.ToResponse());
+                var responses = tickets.Select(x =>
+                {
+                    var urls = GetAttachmentsUrl(x.Attachments);
+                    return x.ToResponse(urls.Result);
+                });
 
                 return new Response<IEnumerable<TicketResponse>>(responses);
             }
@@ -157,7 +166,11 @@ namespace Fixeon.Domain.Application.Services
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
 
-                var responses = tickets.Select(x => x.ToResponse());
+                var responses = tickets.Select(x =>
+                {
+                    var urls = GetAttachmentsUrl(x.Attachments);
+                    return x.ToResponse(urls.Result);
+                });
 
                 return new Response<IEnumerable<TicketResponse>>(responses);
             }
@@ -177,7 +190,11 @@ namespace Fixeon.Domain.Application.Services
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
 
-                var responses = tickets.Select(x => x.ToResponse());
+                var responses = tickets.Select(x =>
+                {
+                    var urls = GetAttachmentsUrl(x.Attachments);
+                    return x.ToResponse(urls.Result);
+                });
 
                 return new Response<IEnumerable<TicketResponse>>(responses);
             }
@@ -363,6 +380,19 @@ namespace Fixeon.Domain.Application.Services
                 return new Response<TicketDashboardResponse>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
 
             }
+        }
+
+        private async Task<List<string>> GetAttachmentsUrl(List<Attachment> attachments)
+        {
+            var urls = new List<string>();
+
+            foreach (var attachment in attachments)
+            {
+                var presignedUrl = await _storageServices.GetPresignedUrl(attachment.Name);
+                urls.Add(presignedUrl);
+            }
+
+            return urls;
         }
     }
 }
