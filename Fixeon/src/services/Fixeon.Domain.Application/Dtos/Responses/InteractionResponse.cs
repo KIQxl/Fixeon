@@ -9,6 +9,6 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public string CreatedByUserId { get; set; }
         public string CreatedByUserName { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Attachment Attachments { get; set; }
+        public List<string> AttachmentsUrls { get; set; }
     }
 }

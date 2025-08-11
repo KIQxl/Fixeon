@@ -56,7 +56,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.interactions.AsNoTracking().Where(i => i.TicketId.Equals(ticketId)).ToListAsync();
+                return await _ctx.interactions.AsNoTracking().Where(i => i.TicketId.Equals(ticketId)).Include(i => i.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.Include(i => i.Interactions).Include(a => a.Attachments).FirstOrDefaultAsync(t => t.Id.Equals(id));
+                return await _ctx.tickets.Include(i => i.Interactions).ThenInclude(i => i.Attachments).Include(a => a.Attachments).FirstOrDefaultAsync(t => t.Id.Equals(id));
             }
             catch (Exception ex)
             {
@@ -149,7 +149,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst)
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
         {
             try
             {
@@ -166,6 +166,9 @@ namespace Fixeon.Domain.Infraestructure.Repositories
 
                 if (analyst.HasValue)
                     query = query.Where(t => t.AssignedTo.AnalystId == analyst.ToString());
+
+                if (user.HasValue)
+                    query = query.Where(t => t.CreatedByUser.UserId == user.ToString());
 
                 return await query.Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }
@@ -186,7 +189,8 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                         InProgress = x.Count(t => t.Status == ETicketStatus.InProgress.ToString()),
                         Resolved = x.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
                         Canceled = x.Count(t => t.Status == ETicketStatus.Canceled.ToString()),
-                        ReOpened = x.Count(t => t.Status == ETicketStatus.Reopened.ToString())
+                        ReOpened = x.Count(t => t.Status == ETicketStatus.Reopened.ToString()),
+                        Total = x.Count()
                     }
                 ).FirstOrDefaultAsync() ?? new TicketAnalysisResponse();
 
@@ -202,25 +206,39 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                var analysis = _ctx.tickets.Where(x => x.AssignedTo != null).GroupBy(x => new { analystId = x.AssignedTo.AnalystId , analystName = x.AssignedTo.AnalystName})
-                    .Select(x => new AnalystTicketsAnalysis
-                    {
-                        AnalystId = x.Key.analystId,
-                        AnalystName = x.Key.analystName,
-                        PendingTickets = x.Count(t => t.Status == ETicketStatus.Pending.ToString()),
-                        ResolvedTickets = x.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
-                        TicketsTotal = x.Count(t => t.AssignedTo.AnalystId == x.Key.analystId),
-                        AverageResolutionTimeInHours = ConvertInHours(x.Where(t => t.Duration.HasValue)
-                                                            .Select(t => t.Duration.Value.TotalHours)
-                                                            .DefaultIfEmpty(0)
-                                                            .Average())
-                    }).ToList() ?? new List<AnalystTicketsAnalysis>();
+                var analysis = _ctx.tickets
+                                .Where(x => x.AssignedTo != null)
+                                .Select(t => new
+                                {
+                                    t.AssignedTo.AnalystId,
+                                    t.AssignedTo.AnalystName,
+                                    t.Status,
+                                    t.CreateAt,
+                                    t.ResolvedAt
+                                })
+                                .AsEnumerable()
+                                .GroupBy(x => new { x.AnalystId, x.AnalystName })
+                                .Select(g => new AnalystTicketsAnalysis
+                                {
+                                    AnalystId = g.Key.AnalystId,
+                                    AnalystName = g.Key.AnalystName,
+                                    PendingTickets = g.Count(t => t.Status == ETicketStatus.Pending.ToString()),
+                                    ResolvedTickets = g.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
+                                    TicketsTotal = g.Count(t => t.AnalystId == g.Key.AnalystId),
+                                    AverageResolutionTimeInHours = ConvertInHours(
+                                        g.Where(t => t.ResolvedAt.HasValue)
+                                         .Select(t => (t.ResolvedAt.Value - t.CreateAt).TotalHours)
+                                         .DefaultIfEmpty(0)
+                                         .Average()
+                                    )
+                                })
+                                .ToList() ?? new List<AnalystTicketsAnalysis>();
 
                 return analysis;
             }
-            catch(Exception ex) 
-            { 
-                throw new Exception(ex.Message); 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 
@@ -228,26 +246,35 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                var analysis = await _ctx.tickets
+                var analysis = _ctx.tickets
                                         .Where(x => x.AssignedTo != null)
+                                        .Select(t => new
+                                        {
+                                            t.AssignedTo.AnalystName,
+                                            t.AssignedTo.AnalystId,
+                                            t.Status,
+                                            t.CreateAt,
+                                            t.ResolvedAt
+                                        })
+                                        .AsEnumerable()
                                         .GroupBy(x => new
                                         {
-                                            analystId = x.AssignedTo.AnalystId,
-                                            analystName = x.AssignedTo.AnalystName
+                                            analystId = x.AnalystId,
+                                            analystName = x.AnalystName
                                         })
                                         .Select(x => new TopAnalystResponse
                                         {
                                             AnalystName = x.Key.analystName,
                                             TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.Now.AddDays(-30) && t.Status == ETicketStatus.Resolved.ToString()),
-                                            AverageTime = ConvertInHours(x.Where(t => t.Duration.HasValue)
-                                                            .Select(t => t.Duration.Value.TotalHours)
+                                            AverageTime = ConvertInHours(x.Where(t => t.ResolvedAt.HasValue)
+                                                            .Select(t => (t.ResolvedAt.Value - t.CreateAt).TotalHours)
                                                             .DefaultIfEmpty(0)
                                                             .Average())
                                         })
                                         .OrderByDescending(x => x.TicketsLast30Days)
                                         .ThenBy(x => x.AverageTime)
                                         .Take(3)
-                                        .ToListAsync()
+                                        .ToList()
                                         ?? new List<TopAnalystResponse>();
 
                 return analysis;

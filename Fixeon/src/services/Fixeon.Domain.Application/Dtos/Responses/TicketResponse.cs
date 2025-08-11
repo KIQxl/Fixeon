@@ -16,7 +16,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public string Priority { get; set; }
         public string Status { get; set; }
         public string Departament { get; set; }
-        public List<Interaction>? Interactions { get; set; }
+        public List<InteractionResponse>? Interactions { get; set; }
         public string DurationFormat { get; set; }
         public TimeSpan? Duration { get; set; }
         public List<string> Attachments { get; set; } = new List<string>();

@@ -20,11 +20,11 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTicketsAsync()
+        public async Task<IActionResult> GetAllTicketsAsync([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst, [FromQuery] Guid? user)
         {
-            var response = await _ticketServices.GetAllTicketsAsync();
+            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst, user);
 
-            if(response.Success)
+            if (response.Success)
                 return Ok(response);
 
             return this.ReturnResponseWithStatusCode(response);
@@ -35,42 +35,6 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> GetTicketById([FromRoute] Guid id)
         {
             var response = await _ticketServices.GetTicketByIdAsync(id);
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
-
-        [HttpGet]
-        [Route("get-by-category/{category}")]
-        public async Task<IActionResult> GetTicketsByCategory([FromRoute] string category)
-        {
-            var response = await _ticketServices.GetTicketsByCategoryAsync(category);
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
-
-        [HttpGet]
-        [Route("get-by-analyst-id/{analyst}")]
-        public async Task<IActionResult> GetTicketsByAnalyst([FromRoute] string analyst)
-        {
-            var response = await _ticketServices.GetTicketsByAnalystIdAsync(analyst);
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
-
-        [HttpGet]
-        [Route("get-by-user-id/{user}")]
-        public async Task<IActionResult> GetTicketsByUser([FromRoute] string user)
-        {
-            var response = await _ticketServices.GetTicketsByUserIdAsync(user);
 
             if (response.Success)
                 return Ok(response);
@@ -137,18 +101,6 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> ChangeTicketStatus([FromBody] ChangeTicketStatusRequest request)
         {
             var response = await _ticketServices.ChangeTicketStatus(request);
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
-
-        [HttpGet]
-        [Route("get-tickets/filter")]
-        public async Task<IActionResult> GetTIcketsFilter([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst)
-        {
-            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst);
 
             if (response.Success)
                 return Ok(response);

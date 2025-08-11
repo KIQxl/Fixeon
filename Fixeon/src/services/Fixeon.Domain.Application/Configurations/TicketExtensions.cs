@@ -22,16 +22,21 @@ namespace Fixeon.Domain.Application.Configurations
                 AssignedTo = ticket.AssignedTo?.AnalystName,
                 Category = ticket.Category,
                 Departament = ticket.Departament,
+                Interactions = ticket.Interactions.Select(i => i.ToInteractionResponse()).ToList(),
                 Priority = ticket.Priority,
                 Status = ticket.Status,
-                Interactions = ticket.Interactions,
                 DurationFormat = ticket.Duration.HasValue ? $"{(int)ticket.Duration.Value.TotalDays} dias, {(int)ticket.Duration.Value.Hours} horas e {(int)ticket.Duration.Value.Minutes} minutos" : "Em análise",
                 Duration = ticket.Duration,
                 Attachments = attachmentsUrls
             };
         }
 
-        public static InteractionResponse ToInteractionResponse(this Interaction interaction)
+        public static void AddInteractionsResponseForTicket(this TicketResponse ticketResponse, List<InteractionResponse>? interactions = null)
+        {
+            ticketResponse.Interactions = interactions;
+        }
+
+        public static InteractionResponse ToInteractionResponse(this Interaction interaction, List<string>? attachmentsUrls = null)
         {
             return new InteractionResponse
             {
@@ -39,7 +44,8 @@ namespace Fixeon.Domain.Application.Configurations
                 CreatedByUserId = interaction.CreatedBy.UserId,
                 CreatedByUserName = interaction.CreatedBy.UserName,
                 TicketId = interaction.TicketId,
-                CreatedAt = interaction.CreatedAt
+                CreatedAt = interaction.CreatedAt,
+                AttachmentsUrls = attachmentsUrls
             };
         }
 

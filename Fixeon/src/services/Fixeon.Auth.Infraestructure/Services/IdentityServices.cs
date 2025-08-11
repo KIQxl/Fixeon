@@ -197,12 +197,14 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 if (result.Succeeded)
                 {
+
                     var user = await _authRepository.FindByEmailWithoutFilter(request.Email);
-                    var roles = await _authRepository.GetRolesByUser(user);
+
+                    var roleResult = _authRepository.AssociateRole(user, "Admin");
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, new List<string> { "Admin" }));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());

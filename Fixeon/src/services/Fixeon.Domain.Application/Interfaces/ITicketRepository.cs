@@ -12,7 +12,7 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<IEnumerable<Ticket>> GetTicketsByPriorityAsync(EPriority priority);
         public Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(string userId);
         public Task<IEnumerable<Ticket>> GetTicketsByAnalystIdAsync(string analystId);
-        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst);
+        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user);
         public Task CreateTicket(Ticket ticket);
         public Task UpdateTicket(Ticket ticket);
 
