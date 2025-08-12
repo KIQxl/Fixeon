@@ -106,5 +106,10 @@ namespace Fixeon.Domain.Core.Entities
             this.Attachments.Add(attachments);
             return true;
         }
+
+        public void ChangeCategory(string category)
+        {
+            this.Category = category;
+        }
     }
 }

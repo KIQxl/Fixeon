@@ -59,6 +59,26 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
+        [Route("update-account")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateAccount([FromBody] UpdateApplicationUserRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new Response<ApplicationUserResponse>(
+                    ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList()));
+
+            var response = await _services.UpdateApplicationUser(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
         [Route("associate-role")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssociateRole([FromBody] AssociateRoleRequest request)
@@ -167,6 +187,42 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> MasterAdminGetAllUsers()
         {
             var response = await _services.MasterAdminGetAllUsers();
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpGet]
+        [Route("get-organizations")]
+        public async Task<IActionResult> GetAllOrganizations()
+        {
+            var response = await _services.GetAllOrganizations();
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [Route("create-organization")]
+        public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
+        {
+            var response = await _services.CreateOrganization(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpPost]
+        [Route("delete-organization/{id}")]
+        public async Task<IActionResult> DeleteOrganization([FromRoute] Guid organizationId)
+        {
+            var response = await _services.DeleteOrganization(organizationId);
 
             if (response.Success)
                 return Ok(response);

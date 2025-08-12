@@ -91,6 +91,42 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
         }
 
+        public async Task<Response<ApplicationUserResponse>> UpdateApplicationUser(UpdateApplicationUserRequest request)
+        {
+            try
+            {
+                var user = await _authRepository.FindById(request.Id.ToString());
+
+                if (user != null)
+                {
+                    if (!string.IsNullOrEmpty(request.UserName))
+                        user.ChangeUserName(request.UserName);
+
+                    if(!string.IsNullOrEmpty(request.Email))
+                        user.ChangeEmail(request.Email);
+
+                    if (request.OrganizationId.HasValue)
+                        user.AssignOrgazation(request.OrganizationId.Value);
+
+                    var result = await _authRepository.UpdateAccount(user);
+                    
+                    if(result.Succeeded)
+                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null));
+
+                    return new Response<ApplicationUserResponse>(result.Errors
+                        .Select(e => e.Description)
+                        .ToList());
+                }
+
+                return new Response<ApplicationUserResponse>("Usuário não encontrado.");
+
+            }
+            catch (Exception ex)
+            {
+                return new Response<ApplicationUserResponse>(ex.Message);
+            }
+        }
+
         public async Task<Response<bool>> CreateRole(string request)
         {
             var roleExists = await _authRepository.GetRole(request);
@@ -234,6 +270,55 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
+        }
+
+        // ORGANIZATION ACTIONS
+        public async Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request)
+        {
+            try
+            {
+                var organization = new Organization(request.Name);
+
+                await _authRepository.CreateOrganization(organization);
+
+                return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId));
+            }
+            catch(Exception ex)
+            {
+                return new Response<OrganizationResponse>(ex.Message);
+            }
+        }
+
+        public async Task<Response<List<OrganizationResponse>>> GetAllOrganizations()
+        {
+            try
+            {
+                var organizations = await _authRepository.GetAllOrganizations();
+                return new Response<List<OrganizationResponse>>(organizations
+                    .Select(o => 
+                        new OrganizationResponse(o.Id, o.Name, o.CompanyId))
+                    .ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<OrganizationResponse>>(ex.Message);
+            }
+        }
+
+        public async Task<Response<bool>> DeleteOrganization(Guid organizationId)
+        {
+            try
+            {
+                var organization = await _authRepository.GetOrganizationById(organizationId);
+
+                await _authRepository.DeleteOrganization(organization);
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message);
+            }
         }
     }
 }

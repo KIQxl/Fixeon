@@ -2,11 +2,10 @@
 {
     public class Organization
     {
-        public Organization(string name, Guid companyId)
+        public Organization(string name)
         {
             Id = Guid.NewGuid();
             Name = name;
-            CompanyId = companyId;
         }
 
         public Guid Id { get; private set; }

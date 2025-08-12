@@ -8,6 +8,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
     {
         public Task<Response<ApplicationUserResponse>> AssociateRole(string email, string roleName);
         public Task<Response<ApplicationUserResponse>> CreateIdentityUser(CreateAccountRequest request);
+        public Task<Response<ApplicationUserResponse>> UpdateApplicationUser(UpdateApplicationUserRequest request);
         public Task<Response<bool>> CreateRole(string request);
         public Task<bool> FindUserByEmail(string email);
         public Task<Response<bool>> GenerateResetPasswordToken(string email);
@@ -17,5 +18,8 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<Response<ApplicationUserResponse>> ResetPassword(ResetPasswordRequest request);
         public Task<Response<ApplicationUserResponse>> MasterAdminCreateFirstForCompany(CreateAccountRequest request);
         public Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers();
+        public Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request);
+        public Task<Response<List<OrganizationResponse>>> GetAllOrganizations();
+        public Task<Response<bool>> DeleteOrganization(Guid organizationId);
     }
 }

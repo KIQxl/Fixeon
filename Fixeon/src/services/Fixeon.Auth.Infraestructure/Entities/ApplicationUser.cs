@@ -21,5 +21,8 @@ namespace Fixeon.Auth.Infraestructure.Entities
         public void AssignCompany(Guid companyId) => CompanyId = companyId;
 
         public void AssignOrgazation(Guid organizationId) => OrganizationId = organizationId;
+
+        public void ChangeEmail(string email) => Email = email;
+        public void ChangeUserName(string userName) => UserName = userName;
     }
 }

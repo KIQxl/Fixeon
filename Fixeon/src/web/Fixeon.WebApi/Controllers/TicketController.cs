@@ -120,5 +120,18 @@ namespace Fixeon.WebApi.Controllers
 
             return this.ReturnResponseWithStatusCode(response);
         }
+
+        [HttpPut]
+        [Route("change-ticket-category")]
+        [Authorize(Roles = "Admin, Analyst")]
+        public async Task<IActionResult> ChangeTicketCategory([FromBody] ChangeTicketCategory request)
+        {
+            var response = await _ticketServices.ChangeTicketCategory(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
     }
 }

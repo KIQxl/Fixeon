@@ -50,6 +50,19 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             }
         }
 
+        public async Task<IdentityResult> UpdateAccount(ApplicationUser applicationUser)
+        {
+            try
+            {
+                var result = await _userManager.UpdateAsync(applicationUser);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<IdentityResult> CreateRole(string roleName)
         {
             try
@@ -164,6 +177,56 @@ namespace Fixeon.Auth.Infraestructure.Repositories
                 var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
 
                 return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task CreateOrganization(Organization organization)
+        {
+            try
+            {
+                await _dataContext.organizations.AddAsync(organization);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<Organization>> GetAllOrganizations()
+        {
+            try
+            {
+                return await _dataContext.organizations.AsNoTracking().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Organization> GetOrganizationById(Guid organizationId)
+        {
+            try
+            {
+                return await _dataContext.organizations.AsNoTracking().FirstOrDefaultAsync(x => x.Id == organizationId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task DeleteOrganization(Organization organization)
+        {
+            try
+            {
+                _dataContext.organizations.Remove(organization);
+                await _dataContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

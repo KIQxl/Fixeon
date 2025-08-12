@@ -9,6 +9,7 @@ using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Core.Models;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -75,6 +76,26 @@ namespace Fixeon.Domain.Application.Services
             {
                 var message = ex.InnerException?.Message ?? ex.Message;
                 return new Response<TicketResponse>($"{message}", EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<TicketResponse>> ChangeTicketCategory(ChangeTicketCategory request)
+        {
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(request.Id);
+                if (ticket is null)
+                    return new Response<TicketResponse>("Ticket não encontrado", EErrorType.NotFound);
+
+                ticket.ChangeCategory(request.Category);
+
+                await _ticketRepository.UpdateTicket(ticket);
+
+                return new Response<TicketResponse>(ticket.ToResponse());
+            }
+            catch (Exception ex)
+            {
+                return new Response<TicketResponse>(ex.Message, EErrorType.ServerError);
             }
         }
 
@@ -320,7 +341,6 @@ namespace Fixeon.Domain.Application.Services
             catch (Exception ex)
             {
                 return new Response<TicketDashboardResponse>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
-
             }
         }
 
