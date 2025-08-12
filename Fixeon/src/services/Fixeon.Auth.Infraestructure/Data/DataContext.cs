@@ -19,12 +19,16 @@ namespace Fixeon.Auth.Infraestructure.Data
 
         public DbSet<ApplicationUser> users { get; set; }
         public DbSet<Company> companies { get; set; }
+        public DbSet<Organization> organizations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
 
             builder.Entity<ApplicationUser>()
+                .HasQueryFilter(u => u.CompanyId == CurrentTenant);
+
+            builder.Entity<Organization>()
                 .HasQueryFilter(u => u.CompanyId == CurrentTenant);
 
             base.OnModelCreating(builder);

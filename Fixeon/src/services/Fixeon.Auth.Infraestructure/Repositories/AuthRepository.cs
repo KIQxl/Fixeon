@@ -66,7 +66,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
+                var user = await _userManager.Users.AsNoTracking().Include(u => u.Company).Include(u => u.Organization).FirstOrDefaultAsync(u => u.Email == email);
 
                 return user;
             }
@@ -86,9 +86,9 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin)
         {
             if(masterAdmin)
-                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync();
+                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().Include(u => u.Company).Include(u => u.Organization).ToListAsync();
 
-            return await _userManager.Users.AsNoTracking().ToListAsync();
+            return await _userManager.Users.AsNoTracking().Include(u => u.Company).Include(u => u.Organization).ToListAsync();
         }
 
         public async Task<ApplicationUser> GetUser(string email)

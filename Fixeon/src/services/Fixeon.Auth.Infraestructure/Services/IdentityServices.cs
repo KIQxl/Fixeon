@@ -68,6 +68,9 @@ namespace Fixeon.Auth.Infraestructure.Services
             {
                 var applicationUser = new ApplicationUser(request.Email, request.Username);
 
+                if (request.OrganizationId.HasValue)
+                    applicationUser.AssignOrgazation(request.OrganizationId.Value);
+
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, false);
 
                 if (result.Succeeded)

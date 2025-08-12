@@ -20,5 +20,6 @@ namespace Fixeon.Auth.Infraestructure.Dtos.Requests
         public string PasswordConfirm { get; set; }
 
         public Guid? CompanyId { get; set; }
+        public Guid? OrganizationId { get; set; }
     }
 }

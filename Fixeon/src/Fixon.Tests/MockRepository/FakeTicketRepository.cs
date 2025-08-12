@@ -30,7 +30,7 @@ namespace Fixon.Tests.MockRepository
             return fakeTickets;
         }
 
-        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst)
+        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
         {
             throw new NotImplementedException();
         }

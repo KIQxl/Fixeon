@@ -12,10 +12,14 @@ namespace Fixeon.Auth.Infraestructure.Entities
             UserName = username;
         }
 
-        public Company Company { get; set; }
+        public Company Company { get; private set; }
 
         public Guid CompanyId {  get; private set; }
+        public Organization? Organization { get; private set; }
+        public Guid? OrganizationId { get; private set; }
 
         public void AssignCompany(Guid companyId) => CompanyId = companyId;
+
+        public void AssignOrgazation(Guid organizationId) => OrganizationId = organizationId;
     }
 }

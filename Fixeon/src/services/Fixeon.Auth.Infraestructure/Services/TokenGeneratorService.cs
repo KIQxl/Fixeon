@@ -28,6 +28,9 @@ namespace Fixeon.Auth.Infraestructure.Services
             claims.Add(new Claim("Email", user.Email));
             claims.Add(new Claim("CompanyId", user.CompanyId.ToString()));
 
+            if (user.OrganizationId.HasValue)
+                claims.Add(new Claim("organizationId", user.OrganizationId.ToString()));
+
             if(roles != null)
                 foreach (var role in roles)
                 {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Auth.Infraestructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250723165439_initial")]
+    [Migration("20250812024303_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -61,6 +61,9 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<Guid?>("OrganizationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -92,6 +95,8 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("OrganizationId");
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
@@ -118,6 +123,26 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .IsUnique();
 
                     b.ToTable("companies");
+                });
+
+            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("organizations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -261,6 +286,23 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Fixeon.Auth.Infraestructure.Entities.Organization", "Organization")
+                        .WithMany("Users")
+                        .HasForeignKey("OrganizationId");
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
+                {
+                    b.HasOne("Fixeon.Auth.Infraestructure.Entities.Company", "Company")
+                        .WithMany("Organizations")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Company");
                 });
 
@@ -316,6 +358,13 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                 });
 
             modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Company", b =>
+                {
+                    b.Navigation("Organizations");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
                 {
                     b.Navigation("Users");
                 });

@@ -61,11 +61,31 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "organizations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "varchar(50)", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_organizations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_organizations_companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -90,6 +110,11 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         principalTable: "companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_organizations_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalTable: "organizations",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -215,6 +240,11 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_OrganizationId",
+                table: "AspNetUsers",
+                column: "OrganizationId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -226,6 +256,11 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                 table: "companies",
                 column: "CNPJ",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_organizations_CompanyId",
+                table: "organizations",
+                column: "CompanyId");
         }
 
         /// <inheritdoc />
@@ -251,6 +286,9 @@ namespace Fixeon.Auth.Infraestructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "organizations");
 
             migrationBuilder.DropTable(
                 name: "companies");
