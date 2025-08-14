@@ -174,7 +174,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
+                var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().Where(x => x.Email == email).Include(x => x.Organization).Include(x => x.Company).FirstOrDefaultAsync();
 
                 return user;
             }

@@ -21,7 +21,9 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     Category = table.Column<string>(type: "varchar(50)", nullable: false),
                     Departament = table.Column<string>(type: "varchar(50)", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
-                    username = table.Column<string>(type: "varchar(100)", nullable: false),
+                    userEmail = table.Column<string>(type: "varchar(100)", nullable: false),
+                    OrganizationName = table.Column<string>(type: "varchar(50)", nullable: true),
+                    OrganizationId = table.Column<string>(type: "varchar(36)", nullable: true),
                     analystId = table.Column<string>(type: "varchar(36)", nullable: true),
                     analystName = table.Column<string>(type: "varchar(100)", nullable: true),
                     CreateAt = table.Column<DateTime>(type: "datetime", nullable: false),
@@ -45,7 +47,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     Message = table.Column<string>(type: "varchar(500)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
-                    username = table.Column<string>(type: "varchar(100)", nullable: false)
+                    userEmail = table.Column<string>(type: "varchar(100)", nullable: false)
                 },
                 constraints: table =>
                 {

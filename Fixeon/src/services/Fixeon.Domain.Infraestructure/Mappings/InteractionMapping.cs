@@ -28,10 +28,10 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .HasColumnType("varchar(36)")
                 .HasColumnName("userId");
 
-                interactionUser.Property(u => u.UserName)
+                interactionUser.Property(u => u.UserEmail)
                 .IsRequired()
                 .HasColumnType("varchar(100)")
-                .HasColumnName("username");
+                .HasColumnName("userEmail");
             });
 
             builder.HasMany(i => i.Attachments)

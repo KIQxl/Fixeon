@@ -8,8 +8,6 @@ using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Core.Models;
-using System.Net;
-using System.Net.Sockets;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -19,12 +17,14 @@ namespace Fixeon.Domain.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IStorageServices _storageServices;
         private readonly IBackgroundEmailJobWrapper _backgroundServices;
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices)
+        private readonly ITenantContext _tenantContext;
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
             _storageServices = storageServices;
             _backgroundServices = backgroundServices;
+            _tenantContext = tenantContext;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -39,13 +39,13 @@ namespace Fixeon.Domain.Application.Services
                 request.Description,
                 request.Category,
                 request.Departament,
-                new User { UserId = request.CreateByUserId, UserName = request.CreateByUsername },
-                request.Priority.ToString());
+                request.Priority.ToString(),
+                new User { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail, OrganizationId = _tenantContext.OrganizationId, OrganizationName = _tenantContext.OrganizationName });
 
             foreach (var file in request.Attachments)
             {
                 await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
-                var attachment = file.ToAttachment(Guid.Parse(ticket.CreatedByUser.UserId), ticket.Id, null);
+                var attachment = file.ToAttachment(_tenantContext.UserId, ticket.Id, null);
                 ticket.AddAttachment(attachment);
             }
 
@@ -60,15 +60,15 @@ namespace Fixeon.Domain.Application.Services
 
                 _backgroundServices.SendEmail(new EmailMessage
                 {
-                    To = request.CreateByUsername,
+                    To = _tenantContext.UserEmail,
                     Subject = "Novo ticket aberto",
                     Body = EmailDictionary.NewTicketInformAnalysts
                     .Replace("{ticketId}", ticket.Id.ToString())
-                    .Replace("{ticketUser}", ticket.CreatedByUser.UserName)
+                    .Replace("{ticketUser}", ticket.CreatedByUser.UserEmail)
                     .Replace("{ticketTitle}", ticket.Title)
                     .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm"))
                 });
-                _backgroundServices.SendEmail(new EmailMessage { To = request.CreateByUsername, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
+                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }
@@ -114,13 +114,13 @@ namespace Fixeon.Domain.Application.Services
             if (ticket.Status.Equals(ETicketStatus.Canceled))
                 return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
-            var interaction = new Interaction(request.TicketId, request.Message, new InteractionUser { UserId = request.CreatedByUserId, UserName = request.CreatedByUserName });
+            var interaction = new Interaction(request.TicketId, request.Message, new InteractionUser { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail});
 
             foreach (var file in request.Attachments)
             {
                 await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
 
-                var attachment = file.ToAttachment(Guid.Parse(interaction.CreatedBy.UserId), null, interaction.Id);
+                var attachment = file.ToAttachment(_tenantContext.UserId, null, interaction.Id);
                 interaction.AddAttachment(attachment);
             }
 

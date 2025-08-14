@@ -9,8 +9,6 @@ namespace Fixeon.Domain.Application.Dtos.Requests
         public string Description { get; set; }
         public string Category { get; set; }
         public string Departament { get; set; }
-        public string CreateByUserId { get; set; }
-        public string CreateByUsername { get; set; }
         public EPriority Priority { get; set; }
         public List<FormFileAdapterDto> Attachments { get; set; } = new List<FormFileAdapterDto>();
     }

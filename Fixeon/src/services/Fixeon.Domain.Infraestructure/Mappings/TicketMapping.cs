@@ -41,11 +41,18 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                     .HasColumnType("varchar(36)")
                     .HasColumnName("userId");
 
-                user.Property(u => u.UserName)
+                user.Property(u => u.UserEmail)
                     .IsRequired()
                     .HasColumnType("varchar(100)")
-                    .HasColumnName("username");
+                    .HasColumnName("userEmail");
 
+                user.Property(u => u.OrganizationId)
+                    .HasColumnName("OrganizationId")
+                    .HasColumnType("varchar(36)");
+
+                user.Property(u => u.OrganizationName)
+                    .HasColumnName("OrganizationName")
+                    .HasColumnType("varchar(50)");
             });
 
             builder.OwnsOne(t => t.AssignedTo, analyst =>

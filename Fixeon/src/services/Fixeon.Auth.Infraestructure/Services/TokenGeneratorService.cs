@@ -23,15 +23,23 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             var claims = new List<Claim>();
 
-            claims.Add(new Claim("Id", user.Id));
-            claims.Add(new Claim("Username", user.UserName));
-            claims.Add(new Claim("Email", user.Email));
-            claims.Add(new Claim("CompanyId", user.CompanyId.ToString()));
+            claims.Add(new Claim("id", user.Id));
+            claims.Add(new Claim("username", user.UserName));
+            claims.Add(new Claim("email", user.Email));
+            claims.Add(new Claim("companyId", user.CompanyId.ToString()));
 
-            if (user.OrganizationId.HasValue)
+            if (user.Organization != null)
+            {
                 claims.Add(new Claim("organizationId", user.OrganizationId.ToString()));
+                claims.Add(new Claim("organizationName", user.Organization.Name));
+            }
+            else
+            {
+                claims.Add(new Claim("organizationId", string.Empty));
+                claims.Add(new Claim("organizationName", string.Empty));
+            }
 
-            if(roles != null)
+            if (roles != null)
                 foreach (var role in roles)
                 {
                     claims.Add(new Claim("roles", role));

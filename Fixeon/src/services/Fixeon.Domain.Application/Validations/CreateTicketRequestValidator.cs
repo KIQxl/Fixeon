@@ -24,13 +24,6 @@ namespace Fixeon.Domain.Application.Validations
             RuleFor(x => x.Priority)
                 .NotEmpty().WithMessage("O campo Prioridade não pode ser vazio.");
 
-            RuleFor(x => x.CreateByUserId)
-                .NotEmpty().WithMessage("Código do usuário de criação não pode ser vazio.")
-                .Length(36).WithMessage("Código do usuário de criação inválido.");
-
-            RuleFor(x => x.CreateByUsername)
-                .NotEmpty().WithMessage("O campo usuário de criação não pode ser vazio.");
-
             RuleFor(x => x.Attachments.Count)
                 .LessThanOrEqualTo(3).WithMessage("O limite máximo de arquivos é 3.");
         }

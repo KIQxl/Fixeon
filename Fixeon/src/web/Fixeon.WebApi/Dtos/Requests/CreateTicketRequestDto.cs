@@ -10,8 +10,6 @@ namespace Fixeon.WebApi.Dtos.Requests
         public string Description { get; set; }
         public string Category { get; set; }
         public string Departament { get; set; }
-        public string CreateByUserId { get; set; }
-        public string CreateByUsername { get; set; }
         public EPriority Priority { get; set; }
         public List<IFormFile> Files { get; set; } = new List<IFormFile>();
 
@@ -27,13 +25,11 @@ namespace Fixeon.WebApi.Dtos.Requests
 
             var request = new CreateTicketRequest
             {
-                Title = Title,
-                Description = Description,
-                Category = Category,
-                Departament = Departament,
-                CreateByUserId = CreateByUserId,
-                CreateByUsername = CreateByUsername,
-                Priority = Priority,
+                Title = this.Title,
+                Description = this.Description,
+                Category = this.Category,
+                Departament = this.Departament,
+                Priority = this.Priority,
                 Attachments = attachments
             };
 

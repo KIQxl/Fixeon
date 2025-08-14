@@ -12,7 +12,7 @@ namespace Fixon.Tests.Domain.Tests
 
         public TicketTests()
         {
-            _services = new TicketServices(new FakeTicketRepository(), new FakeUnitOfWork(), new FakeStorageService(), new FakeBackgroundJob());
+            _services = new TicketServices(new FakeTicketRepository(), new FakeUnitOfWork(), new FakeStorageService(), new FakeBackgroundJob(), new FakeTenantContext());
         }
 
         [TestMethod]
@@ -32,8 +32,6 @@ namespace Fixon.Tests.Domain.Tests
                 Description = "Usuário não consegue acessar o painel administrativo. Apresenta erro 500.",
                 Category = "Acesso",
                 Departament = "TI",
-                CreateByUserId = Guid.NewGuid().ToString(),
-                CreateByUsername = "João Souza",
                 Priority = EPriority.High
             };
 
@@ -51,8 +49,6 @@ namespace Fixon.Tests.Domain.Tests
                 Description = "",
                 Category = "Acesso",
                 Departament = "TI",
-                CreateByUserId = "0000000000000000000000000000000000000000000000000000000",
-                CreateByUsername = "João Souza",
                 Priority = EPriority.High
             };
 

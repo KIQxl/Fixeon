@@ -7,8 +7,6 @@ namespace Fixeon.WebApi.Dtos.Requests
     public class CreateInteractionRequestDto
     {
         public Guid TicketId { get; set; }
-        public string CreatedByUserId { get; set; }
-        public string CreatedByUserName { get; set; }
         public string Message { get; set; }
         public List<IFormFile> Files { get; set; } = new List<IFormFile>();
 
@@ -25,8 +23,6 @@ namespace Fixeon.WebApi.Dtos.Requests
             var request = new CreateInteractionRequest
             {
                 TicketId = TicketId,
-                CreatedByUserId = CreatedByUserId,
-                CreatedByUserName = CreatedByUserName,
                 Message = Message,
                 Attachments = attachments
             };

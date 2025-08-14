@@ -7,16 +7,16 @@ namespace Fixeon.Domain.Core.Entities
     public class Ticket : Entity, ITenantEntity
     {
         private Ticket() { }
-        public Ticket(string title, string description, string category, string departament, User createdByUser, string priority)
+        public Ticket(string title, string description, string category, string departament, string priority, User user)
         {
             Title = title;
             Description = description;
             Category = category;
             Departament = departament;
-            CreatedByUser = createdByUser;
             CreateAt = DateTime.UtcNow;
             Status = ETicketStatus.Pending.ToString();
             Priority = priority;
+            CreatedByUser = user;
         }
 
         public string Title { get; private set; }

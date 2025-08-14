@@ -18,7 +18,8 @@ namespace Fixeon.Domain.Application.Configurations
                 CreatedAt = ticket.CreateAt,
                 ModifiedAt = ticket.ModifiedAt,
                 ResolvedAt = ticket.ResolvedAt,
-                CreatedBy = ticket.CreatedByUser.UserName,
+                CreatedBy = ticket.CreatedByUser.UserEmail,
+                OrganizationName = ticket.CreatedByUser.OrganizationName,
                 AssignedTo = ticket.AssignedTo?.AnalystName,
                 Category = ticket.Category,
                 Departament = ticket.Departament,
@@ -42,7 +43,7 @@ namespace Fixeon.Domain.Application.Configurations
             {
                 Message = interaction.Message,
                 CreatedByUserId = interaction.CreatedBy.UserId,
-                CreatedByUserName = interaction.CreatedBy.UserName,
+                CreatedByUserName = interaction.CreatedBy.UserEmail,
                 TicketId = interaction.TicketId,
                 CreatedAt = interaction.CreatedAt,
                 AttachmentsUrls = attachmentsUrls

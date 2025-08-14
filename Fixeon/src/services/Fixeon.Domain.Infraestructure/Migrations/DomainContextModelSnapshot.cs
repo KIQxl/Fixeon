@@ -160,15 +160,15 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                             b1.Property<Guid>("InteractionId")
                                 .HasColumnType("uniqueidentifier");
 
+                            b1.Property<string>("UserEmail")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("userEmail");
+
                             b1.Property<string>("UserId")
                                 .IsRequired()
                                 .HasColumnType("varchar(36)")
                                 .HasColumnName("userId");
-
-                            b1.Property<string>("UserName")
-                                .IsRequired()
-                                .HasColumnType("varchar(100)")
-                                .HasColumnName("username");
 
                             b1.HasKey("InteractionId");
 
@@ -214,15 +214,23 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                             b1.Property<Guid>("TicketId")
                                 .HasColumnType("uniqueidentifier");
 
+                            b1.Property<string>("OrganizationId")
+                                .HasColumnType("varchar(36)")
+                                .HasColumnName("OrganizationId");
+
+                            b1.Property<string>("OrganizationName")
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("OrganizationName");
+
+                            b1.Property<string>("UserEmail")
+                                .IsRequired()
+                                .HasColumnType("varchar(100)")
+                                .HasColumnName("userEmail");
+
                             b1.Property<string>("UserId")
                                 .IsRequired()
                                 .HasColumnType("varchar(36)")
                                 .HasColumnName("userId");
-
-                            b1.Property<string>("UserName")
-                                .IsRequired()
-                                .HasColumnType("varchar(100)")
-                                .HasColumnName("username");
 
                             b1.HasKey("TicketId");
 

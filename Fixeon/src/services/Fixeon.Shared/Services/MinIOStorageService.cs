@@ -43,7 +43,7 @@ namespace Fixeon.Shared.Services
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _settings.BucketName,
-                Key = $"{_tenantContext.TenantId}/{filename}",
+                Key = filename,
                 Expires = DateTime.Now.AddMinutes(30)
             };
 

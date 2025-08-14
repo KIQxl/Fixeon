@@ -1,6 +1,4 @@
-﻿using Fixeon.Domain.Core.Entities;
-
-namespace Fixeon.Domain.Application.Dtos.Responses
+﻿namespace Fixeon.Domain.Application.Dtos.Responses
 {
     public record TicketResponse
     {
@@ -11,6 +9,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public DateTime? ModifiedAt { get; set; }
         public DateTime? ResolvedAt { get; set; }
         public string CreatedBy { get; set; }
+        public string? OrganizationName { get; set; }
         public string? AssignedTo { get; set; }
         public string Category { get; set; }
         public string Priority { get; set; }

@@ -1,13 +1,13 @@
 ﻿using Fixeon.Shared.Core.Interfaces;
 
-namespace Fixeon.Shared.Models
+namespace Fixon.Tests.MockRepository
 {
-    public class TenantContext : ITenantContext
+    public class FakeTenantContext : ITenantContext
     {
         public Guid TenantId { get; set; }
         public string? OrganizationName { get; set; }
         public Guid? OrganizationId { get; set; }
         public Guid UserId { get; set; }
-        public string UserEmail { get; set; }
+        public string UserEmail { get; set ; }
     }
 }

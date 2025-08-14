@@ -5,12 +5,12 @@ namespace Fixeon.Domain.Core.Entities
     public class Interaction : Entity
     {
         private Interaction() { }
-        public Interaction(Guid ticketId, string message, InteractionUser createdBy)
+        public Interaction(Guid ticketId, string message, InteractionUser user)
         {
             TicketId = ticketId;
             Message = message;
+            CreatedBy = user;
             CreatedAt = DateTime.UtcNow;
-            CreatedBy = createdBy;
         }
 
         public Guid TicketId { get; set; }

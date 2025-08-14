@@ -38,7 +38,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -53,7 +53,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var roles = await _authRepository.GetRolesByUser(user);
 
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
         }
 
         public async Task<bool> FindUserByEmail(string email)
@@ -69,7 +69,14 @@ namespace Fixeon.Auth.Infraestructure.Services
                 var applicationUser = new ApplicationUser(request.Email, request.Username);
 
                 if (request.OrganizationId.HasValue)
-                    applicationUser.AssignOrgazation(request.OrganizationId.Value);
+                {
+                    var organization = await _authRepository.GetOrganizationById(request.OrganizationId.Value);
+
+                    if (organization is null)
+                        return new Response<ApplicationUserResponse>("Erro ao relacionar organização ao usuário.");
+
+                    applicationUser.AssignOrganization(organization);
+                }
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, false);
 
@@ -80,7 +87,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -106,12 +113,19 @@ namespace Fixeon.Auth.Infraestructure.Services
                         user.ChangeEmail(request.Email);
 
                     if (request.OrganizationId.HasValue)
-                        user.AssignOrgazation(request.OrganizationId.Value);
+                    {
+                        var organization = await _authRepository.GetOrganizationById(request.OrganizationId.Value);
+
+                        if(organization is null)
+                            return new Response<ApplicationUserResponse>("Erro ao relacionar organização ao usuário.");
+
+                        user.AssignOrganization(organization);
+                    }
 
                     var result = await _authRepository.UpdateAccount(user);
                     
                     if(result.Succeeded)
-                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null));
+                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, null));
 
                     return new Response<ApplicationUserResponse>(result.Errors
                         .Select(e => e.Description)
@@ -149,7 +163,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var user = await _authRepository.FindByEmailWithoutFilter(email);
 
             if (user is null)
-                return new Response<LoginResponse>("Usuário não encotrado.");
+                return new Response<LoginResponse>("Usuário não encontrado.");
 
             var result = await _authRepository.Login(user, password);
 
@@ -182,7 +196,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (result.Succeeded)
             {
                 var roles = await _authRepository.GetRolesByUser(user);
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, roles));
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
             }
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -217,7 +231,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var result = await _authRepository.ResetPassword(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null));
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, null));
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
         }
@@ -237,13 +251,11 @@ namespace Fixeon.Auth.Infraestructure.Services
                 if (result.Succeeded)
                 {
 
-                    var user = await _authRepository.FindByEmailWithoutFilter(request.Email);
+                    var roleResult = await _authRepository.AssociateRole(applicationUser, "Admin");
 
-                    var roleResult = _authRepository.AssociateRole(user, "Admin");
+                    _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = applicationUser.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
-
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, new List<string> { "Admin" }));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(applicationUser.Id, applicationUser.UserName, applicationUser.Email, applicationUser.Organization?.Name ?? null, new List<string> { "Admin" }));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -266,7 +278,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
