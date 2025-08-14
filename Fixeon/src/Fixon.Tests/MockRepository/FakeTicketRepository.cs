@@ -10,6 +10,7 @@ namespace Fixon.Tests.MockRepository
     {
         private readonly List<Ticket> fakeTickets = TicketsMock.GetTickets();
         private readonly List<Analyst> fakeAnalysts = TicketsMock.Analysts;
+        private readonly List<Interaction> fakeInteractions = TicketsMock.Interactions();
         public Task CreateAttachment(List<Attachment> attachments)
         {
             return Task.CompletedTask;
@@ -30,16 +31,33 @@ namespace Fixon.Tests.MockRepository
             return fakeTickets;
         }
 
-        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
         {
-            throw new NotImplementedException();
+            var mockTickets = fakeTickets.ToList();
+
+            if (!string.IsNullOrEmpty(category))
+                mockTickets = mockTickets.Where(x => x.Category == category).ToList();
+
+            if (!string.IsNullOrEmpty(status))
+                mockTickets = mockTickets.Where(x => x.Status == status).ToList();
+
+            if (!string.IsNullOrEmpty(priority))
+                mockTickets = mockTickets.Where(x => x.Priority == priority).ToList();
+
+            if (analyst.HasValue)
+                mockTickets = mockTickets.Where(x => x.AssignedTo.AnalystId == analyst.ToString()).ToList();
+
+            if (user.HasValue)
+                mockTickets = mockTickets.Where(x => x.CreatedByUser.UserId == user.ToString()).ToList();
+
+            return fakeTickets;
         }
 
         public async Task<List<AnalystTicketsAnalysis>> GetAnalystTicketsAnalysis()
         {
             try
             {
-                var analysis = fakeTickets.Where(x => x.AssignedTo != null).GroupBy(x => new { analystId = x.AssignedTo.AnalystId, analystName = x.AssignedTo.AnalystName })
+                var analysis = fakeTickets.Where(x => x.AssignedTo != null).GroupBy(x => new { analystId = x.AssignedTo.AnalystId, analystName = x.AssignedTo.AnalystEmail })
                     .Select(x => new AnalystTicketsAnalysis
                     {
                         AnalystId = x.Key.analystId,
@@ -61,9 +79,9 @@ namespace Fixon.Tests.MockRepository
             }
         }
 
-        public Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId)
+        public async Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId)
         {
-            throw new NotImplementedException();
+            return fakeInteractions.Where(x => x.TicketId == ticketId).ToList();
         }
 
         public async Task<Ticket> GetTicketByIdAsync(Guid id)
@@ -95,26 +113,6 @@ namespace Fixon.Tests.MockRepository
             }
         }
 
-        public Task<IEnumerable<Ticket>> GetTicketsByAnalystIdAsync(string analystId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Ticket>> GetTicketsByCategoryAsync(string category)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Ticket>> GetTicketsByPriorityAsync(EPriority priority)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(string userId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<TopAnalystResponse>> GetTopAnalyst()
         {
             try
@@ -124,7 +122,7 @@ namespace Fixon.Tests.MockRepository
                                         .GroupBy(x => new
                                         {
                                             analystId = x.AssignedTo.AnalystId,
-                                            analystName = x.AssignedTo.AnalystName
+                                            analystName = x.AssignedTo.AnalystEmail
                                         })
                                         .Select(x => new TopAnalystResponse
                                         {

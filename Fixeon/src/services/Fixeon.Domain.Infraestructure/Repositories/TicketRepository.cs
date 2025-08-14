@@ -76,54 +76,6 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Ticket>> GetTicketsByAnalystIdAsync(string analystId)
-        {
-            try
-            {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.AssignedTo.AnalystId.Equals(analystId)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
-        public async Task<IEnumerable<Ticket>> GetTicketsByCategoryAsync(string category)
-        {
-            try
-            {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.Category.ToUpper().Equals(category.ToUpper())).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
-        public async Task<IEnumerable<Ticket>> GetTicketsByPriorityAsync(EPriority priority)
-        {
-            try
-            {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.Priority.Equals(priority)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
-        public async Task<IEnumerable<Ticket>> GetTicketsByUserIdAsync(string userId)
-        {
-            try
-            {
-                return await _ctx.tickets.AsNoTracking().Where(t => t.CreatedByUser.UserId.Equals(userId)).Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
         public async Task UpdateTicket(Ticket ticket)
         {
             try
@@ -211,17 +163,17 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                                 .Select(t => new
                                 {
                                     t.AssignedTo.AnalystId,
-                                    t.AssignedTo.AnalystName,
+                                    t.AssignedTo.AnalystEmail,
                                     t.Status,
                                     t.CreateAt,
                                     t.ResolvedAt
                                 })
                                 .AsEnumerable()
-                                .GroupBy(x => new { x.AnalystId, x.AnalystName })
+                                .GroupBy(x => new { x.AnalystId, x.AnalystEmail })
                                 .Select(g => new AnalystTicketsAnalysis
                                 {
                                     AnalystId = g.Key.AnalystId,
-                                    AnalystName = g.Key.AnalystName,
+                                    AnalystName = g.Key.AnalystEmail,
                                     PendingTickets = g.Count(t => t.Status == ETicketStatus.Pending.ToString()),
                                     ResolvedTickets = g.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
                                     TicketsTotal = g.Count(t => t.AnalystId == g.Key.AnalystId),
@@ -250,7 +202,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                                         .Where(x => x.AssignedTo != null)
                                         .Select(t => new
                                         {
-                                            t.AssignedTo.AnalystName,
+                                            t.AssignedTo.AnalystEmail,
                                             t.AssignedTo.AnalystId,
                                             t.Status,
                                             t.CreateAt,
@@ -260,7 +212,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                                         .GroupBy(x => new
                                         {
                                             analystId = x.AnalystId,
-                                            analystName = x.AnalystName
+                                            analystName = x.AnalystEmail
                                         })
                                         .Select(x => new TopAnalystResponse
                                         {

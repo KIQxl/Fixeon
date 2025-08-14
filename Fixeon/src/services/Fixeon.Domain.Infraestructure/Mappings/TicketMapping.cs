@@ -62,10 +62,10 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                     .HasColumnType("varchar(36)")
                     .HasColumnName("analystId");
 
-                analyst.Property(u => u.AnalystName)
+                analyst.Property(u => u.AnalystEmail)
                     .IsRequired()
                     .HasColumnType("varchar(100)")
-                    .HasColumnName("analystName");
+                    .HasColumnName("analystEmail");
             });
 
             builder.Property(t => t.CreateAt)

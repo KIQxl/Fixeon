@@ -7,7 +7,7 @@ namespace Fixon.Tests.MockRepository
     {
         public void SendEmail(EmailMessage email)
         {
-            throw new NotImplementedException();
+            // Do nothing :)
         }
     }
 }

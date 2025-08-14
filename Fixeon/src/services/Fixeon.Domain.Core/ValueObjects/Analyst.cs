@@ -3,6 +3,6 @@
     public record Analyst
     {
         public string AnalystId { get; set; }
-        public string AnalystName { get; set; }
+        public string AnalystEmail { get; set; }
     }
 }

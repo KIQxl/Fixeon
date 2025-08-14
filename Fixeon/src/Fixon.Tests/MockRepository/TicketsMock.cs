@@ -202,27 +202,27 @@ namespace Fixon.Tests.MockRepository
                 new Analyst
                 {
                     AnalystId = Guid.NewGuid().ToString(),
-                    AnalystName = "Ana Carolina Souza"
+                    AnalystEmail = "Ana Carolina Souza"
                 },
                 new Analyst
                 {
                     AnalystId = Guid.NewGuid().ToString(),
-                    AnalystName = "Bruno Henrique Almeida"
+                    AnalystEmail = "Bruno Henrique Almeida"
                 },
                 new Analyst
                 {
                     AnalystId = Guid.NewGuid().ToString(),
-                    AnalystName = "Carla Fernanda Ribeiro"
+                    AnalystEmail = "Carla Fernanda Ribeiro"
                 },
                 new Analyst
                 {
                     AnalystId = Guid.NewGuid().ToString(),
-                    AnalystName = "Diego Luiz Martins"
+                    AnalystEmail = "Diego Luiz Martins"
                 },
                 new Analyst
                 {
                     AnalystId = Guid.NewGuid().ToString(),
-                    AnalystName = "Elaine Cristina Rocha"
+                    AnalystEmail = "Elaine Cristina Rocha"
                 }
             };
 
@@ -246,6 +246,66 @@ namespace Fixon.Tests.MockRepository
             }
 
             return Tickets;
+        }
+
+        public static List<Interaction> Interactions()
+        {
+            var ticket1 = Tickets[2];
+            var ticket2 = Tickets[0];
+            var ticket3 = Tickets[5];
+            var ticket4 = Tickets[7];
+            var ticket5 = Tickets[8];
+
+            var interactions = new List<Interaction>();
+
+            var random = new Random();
+            
+            for(var i = 0; i < random.Next(1, 10); i++)
+            {
+                var analyst = Analysts[random.Next(0, 4)];
+                var interaction = new Interaction(ticket1.Id, "Interações ticket 1", new InteractionUser { UserId = analyst.AnalystId, UserEmail = analyst.AnalystEmail });
+
+                interactions.Add(interaction);
+                ticket1.NewInteraction(interaction);
+            }
+
+            for (var i = 0; i < random.Next(1, 10); i++)
+            {
+                var id = Guid.NewGuid().ToString();
+                var interaction = new Interaction(ticket1.Id, "Interações ticket 2", new InteractionUser { UserId = id, UserEmail = $"{id.Substring(0, 4)}ticket2@email.com" });
+
+                interactions.Add(interaction);
+                ticket2.NewInteraction(interaction);
+            }
+
+            for (var i = 0; i < random.Next(1, 10); i++)
+            {
+                var id = Guid.NewGuid().ToString();
+                var interaction = new Interaction(ticket1.Id, "Interações ticket 3", new InteractionUser { UserId = id, UserEmail = $"{id.Substring(0, 4)}ticket3@email.com" });
+
+                interactions.Add(interaction);
+                ticket3.NewInteraction(interaction);
+            }
+
+            for (var i = 0; i < random.Next(1, 10); i++)
+            {
+                var id = Guid.NewGuid().ToString();
+                var interaction = new Interaction(ticket1.Id, "Interações ticket 4", new InteractionUser { UserId = id, UserEmail = $"{id.Substring(0, 4)}ticket4@email.com" });
+
+                interactions.Add(interaction);
+                ticket4.NewInteraction(interaction);
+            }
+
+            for (var i = 0; i < random.Next(1, 10); i++)
+            {
+                var id = Guid.NewGuid().ToString();
+                var interaction = new Interaction(ticket1.Id, "Interações ticket 5", new InteractionUser { UserId = id, UserEmail = $"{id.Substring(0, 4)}ticket5@email.com" });
+
+                interactions.Add(interaction);
+                ticket5.NewInteraction(interaction);
+            }
+
+            return interactions;
         }
     }
 }

@@ -4,14 +4,14 @@ namespace Fixon.Tests.MockRepository
 {
     public class FakeStorageService : IStorageServices
     {
-        public Task<string> GetPresignedUrl(string filename)
+        public async Task<string> GetPresignedUrl(string filename)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
-        public Task UploadFile(string filename, string contentType, Stream content)
+        public async Task UploadFile(string filename, string contentType, Stream content)
         {
-            throw new NotImplementedException();
+            await Task.CompletedTask;
         }
     }
 }

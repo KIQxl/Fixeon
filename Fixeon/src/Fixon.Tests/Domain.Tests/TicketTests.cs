@@ -1,6 +1,7 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Services;
 using Fixeon.Domain.Core.Enums;
+using Fixeon.Domain.Core.ValueObjects;
 using Fixon.Tests.MockRepository;
 
 namespace Fixon.Tests.Domain.Tests
@@ -55,6 +56,57 @@ namespace Fixon.Tests.Domain.Tests
             var result = await _services.CreateTicket(request);
 
             Assert.IsTrue(result.Errors.Any() && !result.Success);
+        }
+
+        [TestMethod]
+        public async Task VerifyCreateInteraction()
+        {
+            var ticket = TicketsMock.Tickets.First();
+
+            var request = new CreateInteractionRequest
+            {
+                TicketId = ticket.Id,
+                Message = "Ticket encerrado com sucesso."
+            };
+
+            var result = await _services.CreateTicketInteraction(request);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+        public async Task VerifyAssignTicketToAnalyst()
+        {
+            var ticket = TicketsMock.Tickets[8];
+            var analyst = TicketsMock.Analysts[4];
+
+            var request = new CreateAssignTicketRequest
+            {
+                TicketId = ticket.Id,
+                AnalystId = analyst.AnalystId,
+                AnalystEmail = analyst.AnalystEmail
+            };
+
+            var result = await _services.AssignTicketTo(request);
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+
+        public async Task VerifyChangeTicketCategory()
+        {
+            var ticket = TicketsMock.Tickets[8];
+
+            var request = new ChangeTicketCategory
+            {
+                Id = ticket.Id,
+                Category = "Nova categoria de ticket"
+            };
+
+            var result = await _services.ChangeTicketCategory(request);
+
+            Assert.IsTrue(result.Success && result.Data.Category.Equals(request.Category));
         }
     }
 }

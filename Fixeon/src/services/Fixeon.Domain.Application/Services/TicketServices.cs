@@ -116,6 +116,8 @@ namespace Fixeon.Domain.Application.Services
 
             var interaction = new Interaction(request.TicketId, request.Message, new InteractionUser { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail});
 
+            ticket.NewInteraction(interaction);
+
             foreach (var file in request.Attachments)
             {
                 await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
@@ -126,7 +128,7 @@ namespace Fixeon.Domain.Application.Services
 
             try
             {
-                await _ticketRepository.CreateInteraction(interaction);
+                //await _ticketRepository.CreateInteraction(interaction);
                 await _ticketRepository.UpdateTicket(ticket);
 
                 var result = await _unitOfWork.Commit();
@@ -232,7 +234,7 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
-                if (!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystName = request.AnalystName }))
+                if (!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail }))
                     return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
                 await _ticketRepository.UpdateTicket(ticket);
@@ -242,7 +244,7 @@ namespace Fixeon.Domain.Application.Services
                 if (result)
                     return new Response<TicketResponse>(ticket.ToResponse());
 
-                return new Response<TicketResponse>($"Não foi possível atribuir o ticket {ticket.Id} ao Analista {request.AnalystName} - {request.AnalystId}.", EErrorType.ServerError);
+                return new Response<TicketResponse>($"Não foi possível atribuir o ticket {ticket.Id} ao Analista {request.AnalystEmail} - {request.AnalystId}.", EErrorType.ServerError);
             }
             catch (Exception ex)
             {

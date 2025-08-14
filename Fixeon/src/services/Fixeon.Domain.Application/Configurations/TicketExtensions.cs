@@ -20,7 +20,7 @@ namespace Fixeon.Domain.Application.Configurations
                 ResolvedAt = ticket.ResolvedAt,
                 CreatedBy = ticket.CreatedByUser.UserEmail,
                 OrganizationName = ticket.CreatedByUser.OrganizationName,
-                AssignedTo = ticket.AssignedTo?.AnalystName,
+                AssignedTo = ticket.AssignedTo?.AnalystEmail,
                 Category = ticket.Category,
                 Departament = ticket.Departament,
                 Interactions = ticket.Interactions.Select(i => i.ToInteractionResponse()).ToList(),
