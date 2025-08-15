@@ -241,7 +241,7 @@ namespace Fixon.Tests.MockRepository
             {
                 if (random.NextDouble() > 0.5)
                 {
-                    ticket.ResolveTicket();
+                    ticket.ResolveTicket(new Analyst());
                 }
             }
 

@@ -28,7 +28,8 @@ namespace Fixeon.Domain.Application.Configurations
                 Status = ticket.Status,
                 DurationFormat = ticket.Duration.HasValue ? $"{(int)ticket.Duration.Value.TotalDays} dias, {(int)ticket.Duration.Value.Hours} horas e {(int)ticket.Duration.Value.Minutes} minutos" : "Em análise",
                 Duration = ticket.Duration,
-                Attachments = attachmentsUrls
+                Attachments = attachmentsUrls,
+                ClosedBy = ticket.ClosedBy?.AnalystEmail
             };
         }
 

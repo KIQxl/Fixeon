@@ -19,5 +19,6 @@
         public string DurationFormat { get; set; }
         public TimeSpan? Duration { get; set; }
         public List<string> Attachments { get; set; } = new List<string>();
+        public string? ClosedBy { get; set; }
     }
 }

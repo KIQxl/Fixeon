@@ -12,7 +12,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(i => i.Message)
                 .IsRequired()
-                .HasColumnType("varchar(500)");
+                .HasColumnType("varchar(3000)");
 
             builder.Property(i => i.CreatedAt)
                 .IsRequired()

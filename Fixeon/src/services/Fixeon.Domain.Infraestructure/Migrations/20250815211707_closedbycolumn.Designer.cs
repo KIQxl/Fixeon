@@ -4,6 +4,7 @@ using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    partial class DomainContextModelSnapshot : ModelSnapshot
+    [Migration("20250815211707_closedbycolumn")]
+    partial class closedbycolumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,11 +196,13 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                             b1.Property<string>("AnalystEmail")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("analystEmail");
 
                             b1.Property<string>("AnalystId")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("varchar(36)")
                                 .HasColumnName("analystId");
 
@@ -216,13 +221,15 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                             b1.Property<string>("AnalystEmail")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("varchar(100)")
-                                .HasColumnName("closedByName");
+                                .HasColumnName("analystEmail");
 
                             b1.Property<string>("AnalystId")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("varchar(36)")
-                                .HasColumnName("closedById");
+                                .HasColumnName("analystId");
 
                             b1.HasKey("TicketId");
 

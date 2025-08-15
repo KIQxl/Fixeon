@@ -4,6 +4,7 @@ using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    partial class DomainContextModelSnapshot : ModelSnapshot
+    [Migration("20250815153736_columnname")]
+    partial class columnname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +76,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("varchar(3000)");
+                        .HasColumnType("varchar(500)");
 
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uniqueidentifier");
@@ -107,7 +110,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("varchar(3000)");
+                        .HasColumnType("varchar(2500)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime");
@@ -209,29 +212,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                                 .HasForeignKey("TicketId");
                         });
 
-                    b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Analyst", "ClosedBy", b1 =>
-                        {
-                            b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("AnalystEmail")
-                                .IsRequired()
-                                .HasColumnType("varchar(100)")
-                                .HasColumnName("closedByName");
-
-                            b1.Property<string>("AnalystId")
-                                .IsRequired()
-                                .HasColumnType("varchar(36)")
-                                .HasColumnName("closedById");
-
-                            b1.HasKey("TicketId");
-
-                            b1.ToTable("tickets");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TicketId");
-                        });
-
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.User", "CreatedByUser", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
@@ -264,8 +244,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         });
 
                     b.Navigation("AssignedTo");
-
-                    b.Navigation("ClosedBy");
 
                     b.Navigation("CreatedByUser")
                         .IsRequired();

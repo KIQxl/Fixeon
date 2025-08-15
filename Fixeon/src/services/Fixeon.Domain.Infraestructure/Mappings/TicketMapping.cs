@@ -16,7 +16,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(t => t.Description)
                 .IsRequired()
-                .HasColumnType("varchar(2500)");
+                .HasColumnType("varchar(3000)");
 
             builder.Property(t => t.Category)
                 .IsRequired()
@@ -77,6 +77,19 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(t => t.ResolvedAt)
                 .HasColumnType("datetime");
+
+            builder.OwnsOne(t => t.ClosedBy, analyst =>
+            {
+                analyst.Property(u => u.AnalystId)
+                    .IsRequired()
+                    .HasColumnType("varchar(36)")
+                    .HasColumnName("closedById");
+
+                analyst.Property(u => u.AnalystEmail)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)")
+                    .HasColumnName("closedByName");
+            });
 
             builder.HasMany(t => t.Interactions)
                 .WithOne(i => i.Ticket)

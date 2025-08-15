@@ -33,18 +33,27 @@ namespace Fixeon.Domain.Core.Entities
         public string Priority { get; private set; }
         public List<Interaction> Interactions { get; private set; } = new List<Interaction>();
         public TimeSpan? Duration => ResolvedAt.HasValue ? ResolvedAt.Value - CreateAt : null;
+        public Analyst? ClosedBy { get; private set; }
 
         public Guid CompanyId { get; private set; }
 
-        public void ResolveTicket()
+        public bool ResolveTicket(Analyst analyst)
         {
-            this.Status = ETicketStatus.Resolved.ToString();
-            this.ResolvedAt = DateTime.UtcNow;
+            if(this.Status.Equals(ETicketStatus.InProgress.ToString()) || this.Status.Equals(ETicketStatus.Reopened.ToString()))
+            {
+                this.Status = ETicketStatus.Resolved.ToString();
+                this.ResolvedAt = DateTime.UtcNow;
+                ClosedBy = analyst;
+
+                return true;
+            }
+
+            return false;
         }
 
         public bool AssignTicketToAnalyst(Analyst assignTo)
         {
-            if (this.Status == ETicketStatus.Canceled.ToString())
+            if (this.Status == ETicketStatus.Canceled.ToString() || this.Status == ETicketStatus.Resolved.ToString())
                 return false;
 
             this.AssignedTo = assignTo;
@@ -62,7 +71,7 @@ namespace Fixeon.Domain.Core.Entities
 
         public bool ReOpenTicket()
         {
-            if (this.Status == ETicketStatus.Canceled.ToString())
+            if (this.Status != ETicketStatus.Resolved.ToString())
                 return false;
 
             this.Status = ETicketStatus.Reopened.ToString();

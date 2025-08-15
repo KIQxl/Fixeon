@@ -128,7 +128,7 @@ namespace Fixeon.Domain.Application.Services
 
             try
             {
-                //await _ticketRepository.CreateInteraction(interaction);
+                await _ticketRepository.CreateInteraction(interaction);
                 await _ticketRepository.UpdateTicket(ticket);
 
                 var result = await _unitOfWork.Commit();
@@ -235,7 +235,10 @@ namespace Fixeon.Domain.Application.Services
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
                 if (!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail }))
-                    return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
+                    return new Response<TicketResponse>($"Esse ticket está cancelado ou finalizado. Tickets cancelados ou finalizados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
+
+                if (ticket.AssignedTo == new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail })
+                    return new Response<TicketResponse>("Esse ticket já pertence a esse analista.", EErrorType.BadRequest);
 
                 await _ticketRepository.UpdateTicket(ticket);
 
@@ -259,13 +262,17 @@ namespace Fixeon.Domain.Application.Services
             {
                 var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
+                if(ticket.Status.Equals(request.Status.ToString()))
+                    return new Response<TicketResponse>("Essa ação já foi realizada.", EErrorType.BadRequest);
+
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
                 switch (request.Status)
                 {
                     case ETicketStatus.Resolved:
-                        ticket.ResolveTicket();
+                        if(!ticket.ResolveTicket(new Analyst { AnalystId = _tenantContext.UserId.ToString(), AnalystEmail = _tenantContext.UserEmail }))
+                            return new Response<TicketResponse>("Esse ticket não pode ser fechado pois já foi finalizado ou cancelado.", EErrorType.BadRequest);
                         break;
 
                     case ETicketStatus.Canceled:
@@ -274,7 +281,7 @@ namespace Fixeon.Domain.Application.Services
 
                     case ETicketStatus.Reopened:
                         if (!ticket.ReOpenTicket())
-                            return new Response<TicketResponse>("Tickets cancelados não podem ser reabertos.", EErrorType.BadRequest);
+                            return new Response<TicketResponse>("Esse ticket não pode ser reaberto pois ainda não foi finalizado ou está cancelado.", EErrorType.BadRequest);
                         break;
 
                     default:
