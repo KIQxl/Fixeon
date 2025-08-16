@@ -108,6 +108,9 @@ namespace Fixeon.Domain.Application.Services
 
             var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
+            if(ticket.Status != ETicketStatus.InProgress.ToString() || ticket.Status != ETicketStatus.Reopened.ToString())
+                return new Response<TicketResponse>("Ticket finalizado. não foi possível adicionar a interação.", EErrorType.NotFound);
+
             if (ticket is null)
                 return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
@@ -234,11 +237,11 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
-                if (!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail }))
-                    return new Response<TicketResponse>($"Esse ticket está cancelado ou finalizado. Tickets cancelados ou finalizados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
-
                 if (ticket.AssignedTo == new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail })
                     return new Response<TicketResponse>("Esse ticket já pertence a esse analista.", EErrorType.BadRequest);
+
+                if (!ticket.AssignTicketToAnalyst(new Analyst { AnalystId = request.AnalystId, AnalystEmail = request.AnalystEmail }))
+                    return new Response<TicketResponse>($"Esse ticket está cancelado ou finalizado. Tickets cancelados ou finalizados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
                 await _ticketRepository.UpdateTicket(ticket);
 
@@ -272,7 +275,7 @@ namespace Fixeon.Domain.Application.Services
                 {
                     case ETicketStatus.Resolved:
                         if(!ticket.ResolveTicket(new Analyst { AnalystId = _tenantContext.UserId.ToString(), AnalystEmail = _tenantContext.UserEmail }))
-                            return new Response<TicketResponse>("Esse ticket não pode ser fechado pois já foi finalizado ou cancelado.", EErrorType.BadRequest);
+                            return new Response<TicketResponse>("Esse ticket não pode ser fechado pois já foi finalizado, cancelado ou não possui um analista responsável.", EErrorType.BadRequest);
                         break;
 
                     case ETicketStatus.Canceled:
