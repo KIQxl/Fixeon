@@ -108,8 +108,8 @@ namespace Fixeon.Domain.Application.Services
 
             var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
-            if(ticket.Status != ETicketStatus.InProgress.ToString() || ticket.Status != ETicketStatus.Reopened.ToString())
-                return new Response<TicketResponse>("Ticket finalizado. não foi possível adicionar a interação.", EErrorType.NotFound);
+            if(ticket.Status != ETicketStatus.InProgress.ToString() && ticket.Status != ETicketStatus.Reopened.ToString())
+                return new Response<TicketResponse>("Ticket finalizado ou ainda não tem um analista responsável. não foi possível adicionar a interação.", EErrorType.NotFound);
 
             if (ticket is null)
                 return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
@@ -306,11 +306,11 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
+        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol)
         {
             try
             {
-                var tickets = await _ticketRepository.GetAllTicketsFilterAsync(category, status, priority, analyst, user);
+                var tickets = await _ticketRepository.GetAllTicketsFilterAsync(category, status, priority, analyst, user, protocol);
 
                 if (tickets is null)
                     return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);

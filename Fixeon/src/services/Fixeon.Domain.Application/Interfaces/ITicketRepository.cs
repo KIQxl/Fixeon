@@ -7,7 +7,7 @@ namespace Fixeon.Domain.Application.Interfaces
     {
         public Task<Ticket> GetTicketByIdAsync(Guid id);
         public Task<IEnumerable<Ticket>> GetAllTicketsAsync();
-        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user);
+        public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol);
         public Task CreateTicket(Ticket ticket);
         public Task UpdateTicket(Ticket ticket);
 

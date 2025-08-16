@@ -20,9 +20,9 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTicketsAsync([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst, [FromQuery] Guid? user)
+        public async Task<IActionResult> GetAllTicketsAsync([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst, [FromQuery] Guid? user, [FromQuery] string? protocol)
         {
-            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst, user);
+            var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst, user, protocol);
 
             if (response.Success)
                 return Ok(response);

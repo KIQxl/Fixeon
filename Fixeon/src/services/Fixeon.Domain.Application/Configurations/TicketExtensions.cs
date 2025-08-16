@@ -13,6 +13,7 @@ namespace Fixeon.Domain.Application.Configurations
             return new TicketResponse
             {
                 Id = ticket.Id,
+                Protocol = ticket.Protocol,
                 Title = ticket.Title,
                 Description = ticket.Description,
                 CreatedAt = ticket.CreateAt,

@@ -101,7 +101,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol)
         {
             try
             {
@@ -121,6 +121,9 @@ namespace Fixeon.Domain.Infraestructure.Repositories
 
                 if (user.HasValue)
                     query = query.Where(t => t.CreatedByUser.UserId == user.ToString());
+
+                if (!string.IsNullOrEmpty(protocol))
+                    query = query.Where(t => t.Protocol == protocol);
 
                 return await query.Include(i => i.Interactions).Include(a => a.Attachments).ToListAsync();
             }

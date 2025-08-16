@@ -31,7 +31,7 @@ namespace Fixon.Tests.MockRepository
             return fakeTickets;
         }
 
-        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user)
+        public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol)
         {
             var mockTickets = fakeTickets.ToList();
 
@@ -49,6 +49,9 @@ namespace Fixon.Tests.MockRepository
 
             if (user.HasValue)
                 mockTickets = mockTickets.Where(x => x.CreatedByUser.UserId == user.ToString()).ToList();
+
+            if (!string.IsNullOrEmpty(protocol))
+                mockTickets = mockTickets.Where(x => x.Protocol == protocol).ToList();
 
             return fakeTickets;
         }

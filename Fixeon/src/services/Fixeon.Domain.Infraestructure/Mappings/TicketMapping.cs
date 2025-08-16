@@ -14,6 +14,10 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .IsRequired()
                 .HasColumnType("varchar(100)");
 
+            builder.Property(t => t.Protocol)
+                .IsRequired()
+                .HasColumnType("varchar(6)");
+
             builder.Property(t => t.Description)
                 .IsRequired()
                 .HasColumnType("varchar(3000)");

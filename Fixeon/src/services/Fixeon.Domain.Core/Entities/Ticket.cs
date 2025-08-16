@@ -10,6 +10,7 @@ namespace Fixeon.Domain.Core.Entities
         public Ticket(string title, string description, string category, string departament, string priority, User user)
         {
             Title = title;
+            Protocol = this.Id.ToString().Substring(0, 5);
             Description = description;
             Category = category;
             Departament = departament;
@@ -19,6 +20,7 @@ namespace Fixeon.Domain.Core.Entities
             CreatedByUser = user;
         }
 
+        public string Protocol { get; private set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
         public string Category { get; private set; }

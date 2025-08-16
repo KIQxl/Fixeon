@@ -1,7 +1,6 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Services;
 using Fixeon.Domain.Core.Enums;
-using Fixeon.Domain.Core.ValueObjects;
 using Fixon.Tests.MockRepository;
 
 namespace Fixon.Tests.Domain.Tests

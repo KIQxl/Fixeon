@@ -13,7 +13,7 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<Response<TicketResponse>> AssignTicketTo(CreateAssignTicketRequest request);
         public Task<Response<TicketResponse>> ChangeTicketStatus(ChangeTicketStatusRequest request);
         public Task<Response<TicketResponse>> ChangeTicketCategory(ChangeTicketCategory request);
-        public Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user);
+        public Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol);
         public Task<Response<TicketDashboardResponse>> GetDashboardTickets();
     }
 }
