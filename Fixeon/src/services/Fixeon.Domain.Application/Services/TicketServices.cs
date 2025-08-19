@@ -356,6 +356,46 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
+        public async Task<Response<List<string>>> GetCategories()
+        {
+            try
+            {
+                var categories = await _ticketRepository.GetCategories();
+
+                return new Response<List<string>>(categories.Select(c => c.Name).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<string>>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<bool>> CreateCategory(CreateCategoryRequest request)
+        {
+            try
+            {
+                var validationResult = request.Validate();
+
+                if (!validationResult.IsValid)
+                    return new Response<bool>(validationResult.Errors.Select(e => e.ErrorMessage).ToList(), EErrorType.BadRequest);
+
+                var category = new Category(request.CategoryName);
+
+                await _ticketRepository.CreateCategory(category);
+
+                var result = await _unitOfWork.Commit();
+                if(!result)
+                    return new Response<bool>("Não foi possivel cadastrar a categoria.", EErrorType.BadRequest);
+
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
+            }
+        }
+
         private async Task<List<string>> GetAttachmentsUrl(List<Attachment> attachments)
         {
             var urls = new List<string>();

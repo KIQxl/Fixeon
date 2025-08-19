@@ -16,6 +16,11 @@ namespace Fixon.Tests.MockRepository
             return Task.CompletedTask;
         }
 
+        public Task CreateCategory(Category category)
+        {
+            return Task.CompletedTask;
+        }
+
         public Task CreateInteraction(Interaction interaction)
         {
             return Task.CompletedTask;
@@ -80,6 +85,11 @@ namespace Fixon.Tests.MockRepository
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<Category>> GetCategories()
+        {
+            return new List<Category>();
         }
 
         public async Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId)
