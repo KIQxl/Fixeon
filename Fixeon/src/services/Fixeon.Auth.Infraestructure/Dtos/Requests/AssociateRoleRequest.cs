@@ -8,6 +8,6 @@ namespace Fixeon.Auth.Infraestructure.Dtos.Requests
         public string UserId { get; set; }
 
         [Required(ErrorMessage = "O campo Nome é obrigatório")]
-        public string RoleName { get; set; }
+        public List<string> Roles { get; set; }
     }
 }

@@ -111,7 +111,7 @@ namespace Fixeon.WebApi.Controllers
         [HttpGet]
         [Route("get-tickets/analysis")]
         [Authorize(Roles = "Admin, Analyst")]
-        public async Task<IActionResult> GetTIcketsAnalysis()
+        public async Task<IActionResult> GetTicketsAnalysis()
         {
             var response = await _ticketServices.GetDashboardTickets();
 

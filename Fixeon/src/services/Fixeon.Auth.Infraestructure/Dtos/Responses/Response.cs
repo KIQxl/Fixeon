@@ -4,7 +4,7 @@ namespace Fixeon.Auth.Application.Dtos.Responses
 {
     public class Response<T> : IResponse
     {
-        public Response(T data)
+        public Response(T data, bool? success = true)
         {
             Data = data;
             Success = true;

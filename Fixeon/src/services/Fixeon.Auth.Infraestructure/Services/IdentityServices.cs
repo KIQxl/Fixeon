@@ -38,7 +38,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -53,12 +53,40 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var roles = await _authRepository.GetRolesByUser(user);
 
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles));
+        }
+
+        public async Task<Response<List<ApplicationUserResponse>>> GetUserByRoleName(string role)
+        {
+            var users = await _authRepository.GetUsersByRoleName(role);
+
+            if (users is null)
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
+
+            var response = new List<ApplicationUserResponse>();
+
+            foreach (var u in users)
+            {
+                var roles = await _authRepository.GetRolesByUser(u);
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
+            }
+
+            return new Response<List<ApplicationUserResponse>>(response);
         }
 
         public async Task<bool> FindUserByEmail(string email)
         {
             return await _authRepository.FindByEmail(email) is null;
+        }
+
+        public async Task<Response<List<string>>> GetAllRoles()
+        {
+            var roles = await _authRepository.GetAllRoles();
+
+            if (roles is null)
+                return new Response<List<string>>("Nenhum perfil encontrado.");
+
+            return new Response<List<string>>(roles.Select(r => r.Name).ToList(), true);
         }
 
         // CREATE
@@ -87,7 +115,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -125,7 +153,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     var result = await _authRepository.UpdateAccount(user);
                     
                     if(result.Succeeded)
-                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, null));
+                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, null));
 
                     return new Response<ApplicationUserResponse>(result.Errors
                         .Select(e => e.Description)
@@ -179,27 +207,35 @@ namespace Fixeon.Auth.Infraestructure.Services
             return new Response<LoginResponse>("Credenciais inválidas.");
         }
 
-        public async Task<Response<ApplicationUserResponse>> AssociateRole(string userId, string roleName)
+        public async Task<Response<ApplicationUserResponse>> AssociateRole(string userId, List<string> rolesList)
         {
             var user = await _authRepository.FindById(userId);
 
             if (user is null)
                 return new Response<ApplicationUserResponse>("Usuário não encontrado.");
 
-            var role = await _authRepository.GetRole(roleName);
+            var roles = await _authRepository.GetRolesByName(rolesList);
 
-            if (role is null)
-                return new Response<ApplicationUserResponse>("Perfil não encontrado.");
+            if (roles is null)
+                return new Response<ApplicationUserResponse>("Perfis não encontrados.");
 
-            var result = await _authRepository.AssociateRole(user, role.Name);
+            var currentRoles = await _authRepository.GetRolesByUser(user);
 
-            if (result.Succeeded)
+            var removeResult = await _authRepository.RemoveRoles(user, currentRoles);
+
+            if (removeResult.Succeeded)
             {
-                var roles = await _authRepository.GetRolesByUser(user);
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, roles));
+                var result = await _authRepository.AssociateRoles(user, roles.Select(r => r.Name).ToList());
+
+                if (result.Succeeded)
+                {
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles.Select(r => r.Name).ToList()));
+                }
+
+                return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
             }
 
-            return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+            return new Response<ApplicationUserResponse>(removeResult.Errors.Select(e => e.Description).ToList());
         }
 
         public async Task<Response<bool>> GenerateResetPasswordToken(string email)
@@ -231,7 +267,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var result = await _authRepository.ResetPassword(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, null));
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, null));
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
         }
@@ -255,7 +291,13 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = applicationUser.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(applicationUser.Id, applicationUser.UserName, applicationUser.Email, applicationUser.Organization?.Name ?? null, new List<string> { "Admin" }));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(
+                        applicationUser.Id, 
+                        applicationUser.UserName, 
+                        applicationUser.Email, 
+                        applicationUser.Organization?.Name ?? null, 
+                        applicationUser.Organization?.Id ?? null, 
+                        new List<string> { "Admin" }));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -278,7 +320,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);

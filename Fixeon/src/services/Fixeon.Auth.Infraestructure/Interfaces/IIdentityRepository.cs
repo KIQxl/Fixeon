@@ -12,7 +12,11 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<ApplicationUser> FindById(string id);
         public Task<IdentityResult> CreateRole(string roleName);
         public Task<IdentityResult> AssociateRole(ApplicationUser user, string role);
+        public Task<IdentityResult> AssociateRoles(ApplicationUser user, List<string> roles);
+        public Task<IdentityResult> RemoveRoles(ApplicationUser user, List<string> roles);
         public Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin);
+        public Task<List<IdentityRole>> GetAllRoles();
+        public Task<List<IdentityRole>> GetRolesByName(List<string> rolesName);
         public Task<ApplicationUser> GetUser(string email);
         public Task<string> GenerateResetPasswordToken(ApplicationUser user);
         public Task<IdentityResult> ResetPassword(ApplicationUser user, string token, string newPassword);

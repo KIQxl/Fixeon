@@ -58,7 +58,7 @@ namespace Fixeon.WebApi.Controllers
             return BadRequest(response);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update-account")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAccount([FromBody] UpdateApplicationUserRequest request)
@@ -90,7 +90,7 @@ namespace Fixeon.WebApi.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList()));
 
-            var response = await _services.AssociateRole(request.UserId, request.RoleName);
+            var response = await _services.AssociateRole(request.UserId, request.Roles);
 
             if (response.Success)
                 return Ok(response);
@@ -117,6 +117,32 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _services.GetAllUsers();
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpGet]
+        [Route("get-all-roles")]
+        [Authorize]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var response = await _services.GetAllRoles();
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
+        }
+
+        [HttpGet]
+        [Route("analysts")]
+        [Authorize]
+        public async Task<IActionResult> GetAllAnalysts()
+        {
+            var response = await _services.GetUserByRoleName("analyst");
 
             if (response.Success)
                 return Ok(response);

@@ -45,6 +45,7 @@ namespace Fixeon.Domain.Core.Entities
             {
                 this.Status = ETicketStatus.Resolved.ToString();
                 this.ResolvedAt = DateTime.UtcNow;
+                this.ModifiedAt = DateTime.UtcNow;
                 ClosedBy = analyst;
 
                 return true;

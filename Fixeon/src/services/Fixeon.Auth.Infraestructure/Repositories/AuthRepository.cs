@@ -35,6 +35,34 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             }
         }
 
+        public async Task<IdentityResult> AssociateRoles(ApplicationUser user, List<string> roles)
+        {
+            try
+            {
+                var result = await _userManager.AddToRolesAsync(user, roles);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<IdentityResult> RemoveRoles(ApplicationUser user, List<string> roles)
+        {
+            try
+            {
+                var result = await _userManager.RemoveFromRolesAsync(user, roles);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<IdentityResult> CreateAccount(ApplicationUser request, string password, bool ignoreTenantInterceptor = false)
         {
             try
@@ -104,6 +132,11 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             return await _userManager.Users.AsNoTracking().Include(u => u.Company).Include(u => u.Organization).ToListAsync();
         }
 
+        public async Task<List<IdentityRole>> GetAllRoles()
+        {
+            return await _roleManager.Roles.ToListAsync();
+        }
+
         public async Task<ApplicationUser> GetUser(string email)
         {
             return await FindByEmail(email);
@@ -149,6 +182,18 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             try
             {
                 return await _roleManager.FindByNameAsync(roleName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<IdentityRole>> GetRolesByName(List<string> rolesName)
+        {
+            try
+            {
+                return await _roleManager.Roles.Where(r => rolesName.Contains(r.Name)).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -213,7 +258,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                return await _dataContext.organizations.AsNoTracking().FirstOrDefaultAsync(x => x.Id == organizationId);
+                return await _dataContext.organizations.FirstOrDefaultAsync(x => x.Id == organizationId);
             }
             catch (Exception ex)
             {
