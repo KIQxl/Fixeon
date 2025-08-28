@@ -18,7 +18,7 @@ namespace Fixeon.Auth.Infraestructure.Dtos.Requests
         [Required(ErrorMessage = "O campo Confirmação de senha obrigatório")]
         [Compare("Password", ErrorMessage = "Senhas não conferem")]
         public string PasswordConfirm { get; set; }
-
+        public List<string>? Roles { get; set; }
         public Guid? CompanyId { get; set; }
         public Guid? OrganizationId { get; set; }
     }

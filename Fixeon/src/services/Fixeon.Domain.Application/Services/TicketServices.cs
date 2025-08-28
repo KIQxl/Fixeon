@@ -66,9 +66,9 @@ namespace Fixeon.Domain.Application.Services
                     .Replace("{ticketId}", ticket.Id.ToString())
                     .Replace("{ticketUser}", ticket.CreatedByUser.UserEmail)
                     .Replace("{ticketTitle}", ticket.Title)
-                    .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm"))
+                    .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm")) //Envio para o email da equipe.
                 });
-                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
+                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening }); //Envio para o email correto.
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }

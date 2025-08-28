@@ -40,6 +40,8 @@ namespace Fixeon.Auth.Infraestructure.Configuration
 
                 opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
                 opts.Lockout.MaxFailedAccessAttempts = 5;
+
+                opts.User.AllowedUserNameCharacters = null;
             });
 
             return services;
