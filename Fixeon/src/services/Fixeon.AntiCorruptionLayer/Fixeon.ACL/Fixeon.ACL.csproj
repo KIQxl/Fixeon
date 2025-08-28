@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Fixeon.Auth.Infraestructure\Fixeon.Auth.Infraestructure.csproj" />
+    <ProjectReference Include="..\..\Fixeon.Domain.Application\Fixeon.Domain.Application.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -18,6 +18,10 @@ namespace Fixeon.Auth.Infraestructure.Mappings
                 .IsRequired()
                 .HasColumnType("varchar(14)");
 
+            builder.Property(x => x.Email)
+                .IsRequired()
+                .HasColumnType("varchar(100)");
+
             builder.HasMany(x => x.Users)
                 .WithOne(x => x.Company)
                 .HasForeignKey(x => x.CompanyId);

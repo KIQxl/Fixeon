@@ -1,8 +1,11 @@
-﻿using Fixeon.Domain.Application.Configurations;
+﻿using Fixeon.Domain.Application.Contracts;
+using Fixeon.Domain.Application.Dtos;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Domain.Application.Mapper;
+using Fixeon.Domain.Application.Validator;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
@@ -18,13 +21,15 @@ namespace Fixeon.Domain.Application.Services
         private readonly IStorageServices _storageServices;
         private readonly IBackgroundEmailJobWrapper _backgroundServices;
         private readonly ITenantContext _tenantContext;
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext)
+        private readonly IAuthACL _authACL;
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IAuthACL authACL)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
             _storageServices = storageServices;
             _backgroundServices = backgroundServices;
             _tenantContext = tenantContext;
+            _authACL = authACL;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -34,20 +39,9 @@ namespace Fixeon.Domain.Application.Services
             if (!validationResult.IsValid)
                 return new Response<TicketResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.BadRequest);
 
-            var ticket = new Ticket(
-                request.Title,
-                request.Description,
-                request.Category,
-                request.Departament,
-                request.Priority.ToString(),
-                new User { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail, OrganizationId = _tenantContext.OrganizationId, OrganizationName = _tenantContext.OrganizationName });
+            var ticket = TicketMapper.ToEntity(request, _tenantContext);
 
-            foreach (var file in request.Attachments)
-            {
-                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
-                var attachment = file.ToAttachment(_tenantContext.UserId, ticket.Id, null);
-                ticket.AddAttachment(attachment);
-            }
+            await ProccessTicketAttachment(ticket, request.Attachments);
 
             try
             {
@@ -58,17 +52,19 @@ namespace Fixeon.Domain.Application.Services
                 if (!result)
                     return new Response<TicketResponse>("Não foi possível realizar a abertura do chamado.", EErrorType.ServerError);
 
+                var companyEmail = await _authACL.GetCompanyEmail(_tenantContext.TenantId);
+
                 _backgroundServices.SendEmail(new EmailMessage
                 {
-                    To = _tenantContext.UserEmail,
+                    To = companyEmail,
                     Subject = "Novo ticket aberto",
                     Body = EmailDictionary.NewTicketInformAnalysts
                     .Replace("{ticketId}", ticket.Id.ToString())
                     .Replace("{ticketUser}", ticket.CreatedByUser.UserEmail)
                     .Replace("{ticketTitle}", ticket.Title)
-                    .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm")) //Envio para o email da equipe.
+                    .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm"))
                 });
-                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening }); //Envio para o email correto.
+                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }
@@ -108,26 +104,20 @@ namespace Fixeon.Domain.Application.Services
 
             var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
-            if(ticket.Status != ETicketStatus.InProgress.ToString() && ticket.Status != ETicketStatus.Reopened.ToString())
-                return new Response<TicketResponse>("Ticket finalizado ou ainda não tem um analista responsável. não foi possível adicionar a interação.", EErrorType.NotFound);
-
             if (ticket is null)
                 return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
+
+            if (ticket.Status != ETicketStatus.InProgress.ToString() && ticket.Status != ETicketStatus.Reopened.ToString())
+                return new Response<TicketResponse>("Ticket finalizado ou ainda não tem um analista responsável. não foi possível adicionar a interação.", EErrorType.NotFound);
 
             if (ticket.Status.Equals(ETicketStatus.Canceled))
                 return new Response<TicketResponse>($"O ticket {ticket.Id} está cancelado. Tickets cancelados não podem ser modificados. Solicite a reabertura do ticket para realizar modificações.", EErrorType.BadRequest);
 
-            var interaction = new Interaction(request.TicketId, request.Message, new InteractionUser { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail});
+            var interaction = InteractionMapper.ToEntity(request, _tenantContext);
 
             ticket.NewInteraction(interaction);
 
-            foreach (var file in request.Attachments)
-            {
-                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
-
-                var attachment = file.ToAttachment(_tenantContext.UserId, null, interaction.Id);
-                interaction.AddAttachment(attachment);
-            }
+            await ProccessInteractionAttachment(interaction, request.Attachments);
 
             try
             {
@@ -407,6 +397,27 @@ namespace Fixeon.Domain.Application.Services
             }
 
             return urls;
+        }
+
+        private async Task ProccessTicketAttachment(Ticket ticket, List<FormFileAdapterDto> attachments)
+        {
+            foreach (var file in attachments)
+            {
+                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
+                var attachment = file.ToAttachment(_tenantContext.UserId, ticket.Id, null);
+                ticket.AddAttachment(attachment);
+            }
+        }
+
+        private async Task ProccessInteractionAttachment(Interaction interaction, List<FormFileAdapterDto> attachments)
+        {
+            foreach (var file in attachments)
+            {
+                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
+
+                var attachment = file.ToAttachment(_tenantContext.UserId, null, interaction.Id);
+                interaction.AddAttachment(attachment);
+            }
         }
     }
 }

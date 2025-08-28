@@ -19,7 +19,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var company = new Company(request.Name, request.CNPJ);
+                var company = new Company(request.Name, request.CNPJ, request.Email);
 
                 await _repository.CreateCompany(company);
 

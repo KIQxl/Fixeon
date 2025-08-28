@@ -30,7 +30,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             if(masterCompany is null)
             {
-                masterCompany = new Company(companyName, "00000000000000");
+                masterCompany = new Company(companyName, "00000000000000", "fixeon.company@email.com");
                 await dbContext.companies.AddAsync(masterCompany);
                 await dbContext.SaveChangesAsync();
             }

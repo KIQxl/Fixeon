@@ -1,13 +1,31 @@
-﻿using Fixeon.Domain.Application.Dtos.Responses;
-using Fixeon.Domain.Application.Interfaces;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
+using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Core.Entities;
-using FluentValidation;
-using FluentValidation.Results;
+using Fixeon.Domain.Core.ValueObjects;
+using Fixeon.Shared.Core.Interfaces;
 
-namespace Fixeon.Domain.Application.Configurations
+namespace Fixeon.Domain.Application.Mapper
 {
-    public static class TicketExtensions
+    public static class TicketMapper
     {
+        public static Ticket ToEntity(CreateTicketRequest request, ITenantContext tenantContext)
+        {
+            return new Ticket(
+                request.Title,
+                request.Description,
+                request.Category,
+                request.Departament,
+                request.Priority.ToString(),
+                new User
+                {
+                    UserId = tenantContext.UserId.ToString(),
+                    UserEmail = tenantContext.UserEmail,
+                    OrganizationId = tenantContext.OrganizationId,
+                    OrganizationName = tenantContext.OrganizationName
+                }
+            );
+        }
+
         public static TicketResponse ToResponse(this Ticket ticket, List<string>? attachmentsUrls = null)
         {
             return new TicketResponse
@@ -37,36 +55,6 @@ namespace Fixeon.Domain.Application.Configurations
         public static void AddInteractionsResponseForTicket(this TicketResponse ticketResponse, List<InteractionResponse>? interactions = null)
         {
             ticketResponse.Interactions = interactions;
-        }
-
-        public static InteractionResponse ToInteractionResponse(this Interaction interaction, List<string>? attachmentsUrls = null)
-        {
-            return new InteractionResponse
-            {
-                Message = interaction.Message,
-                CreatedByUserId = interaction.CreatedBy.UserId,
-                CreatedByUserName = interaction.CreatedBy.UserEmail,
-                TicketId = interaction.TicketId,
-                CreatedAt = interaction.CreatedAt,
-                AttachmentsUrls = attachmentsUrls
-            };
-        }
-
-        public static ValidationResult Validate<T>(this T obj) where T : IRequest
-        {
-            var validatorType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .FirstOrDefault(t =>
-                    t.BaseType?.IsGenericType == true &&
-                    t.BaseType.GetGenericTypeDefinition() == typeof(AbstractValidator<>) &&
-                    t.BaseType.GenericTypeArguments[0] == typeof(T));
-
-            if (validatorType == null)
-                return null;
-
-            var validator = (IValidator<T>)Activator.CreateInstance(validatorType)!;
-
-            return validator.Validate(obj);
         }
     }
 }

@@ -29,7 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fixeon.Shared", "Fixeon.Sha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Shared", "src\services\Fixeon.Shared\Fixeon.Shared.csproj", "{9895A1BF-437F-4A0E-9EA7-B5F246981FFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixeon.Shared.Core", "src\services\Fixeon.Shared.Core\Fixeon.Shared.Core.csproj", "{3388EAD4-8112-4D88-A7AD-1C104B4B6409}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fixeon.Shared.Core", "src\services\Fixeon.Shared.Core\Fixeon.Shared.Core.csproj", "{3388EAD4-8112-4D88-A7AD-1C104B4B6409}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fixeon.ACL", "Fixeon.ACL", "{5946E952-5217-461C-90A1-923BA4D67274}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fixeon.ACL", "src\services\Fixeon.AntiCorruptionLayer\Fixeon.ACL\Fixeon.ACL.csproj", "{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,10 @@ Global
 		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3388EAD4-8112-4D88-A7AD-1C104B4B6409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +93,8 @@ Global
 		{30528FBF-9FD8-4023-92E3-EAD5611FF603} = {2863EAE5-A94D-44E6-863F-33333B250B3B}
 		{9895A1BF-437F-4A0E-9EA7-B5F246981FFC} = {30528FBF-9FD8-4023-92E3-EAD5611FF603}
 		{3388EAD4-8112-4D88-A7AD-1C104B4B6409} = {30528FBF-9FD8-4023-92E3-EAD5611FF603}
+		{5946E952-5217-461C-90A1-923BA4D67274} = {2863EAE5-A94D-44E6-863F-33333B250B3B}
+		{079A3F6D-B72F-4B98-865A-AF7E6E78FD2B} = {5946E952-5217-461C-90A1-923BA4D67274}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {91FF4F97-0EE4-4138-BEC0-3082BC5C51D7}
