@@ -40,7 +40,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-account")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
         {
             if (!ModelState.IsValid)
@@ -60,7 +60,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("update-account")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> UpdateAccount([FromBody] UpdateApplicationUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -80,7 +80,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("associate-role")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> AssociateRole([FromBody] AssociateRoleRequest request)
         {
             if (!ModelState.IsValid)
@@ -100,7 +100,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-user-by-id/{id}")]
-        [Authorize]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetUserById([FromRoute] string id)
         {
             var response = await _services.GetuserById(id);
@@ -113,7 +113,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all-users")]
-        [Authorize]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await _services.GetAllUsers();
@@ -126,7 +126,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all-roles")]
-        [Authorize]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> GetAllRoles()
         {
             var response = await _services.GetAllRoles();
@@ -139,7 +139,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("analysts")]
-        [Authorize]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> GetAllAnalysts()
         {
             var response = await _services.GetUserByRoleName("analyst");
@@ -176,7 +176,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-role")]
-        [Authorize(Roles = "MasterAdmin")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
         {
             if (!ModelState.IsValid)
@@ -196,7 +196,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-account-master")]
-        [Authorize(Roles = "MasterAdmin")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
         public async Task<IActionResult> CreateFirstUserForCompany([FromBody] CreateAccountRequest request)
         {
             var response = await _services.MasterAdminCreateFirstForCompany(request);
@@ -209,7 +209,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-all-master")]
-        [Authorize(Roles = "MasterAdmin")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
         public async Task<IActionResult> MasterAdminGetAllUsers()
         {
             var response = await _services.MasterAdminGetAllUsers();
@@ -222,6 +222,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-organizations")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> GetAllOrganizations()
         {
             var response = await _services.GetAllOrganizations();
@@ -234,6 +235,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-organization")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
         {
             var response = await _services.CreateOrganization(request);
@@ -246,6 +248,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("delete-organization/{id}")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> DeleteOrganization([FromRoute] Guid organizationId)
         {
             var response = await _services.DeleteOrganization(organizationId);

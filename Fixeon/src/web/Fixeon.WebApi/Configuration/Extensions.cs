@@ -262,6 +262,11 @@ namespace Fixeon.WebApi.Configuration
                };
            });
 
+            services.AddAuthorization(opts =>
+            {
+                AuthorizationPolicies.AddPolicies(opts);
+            });
+
             return services;
         }
 

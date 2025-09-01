@@ -12,12 +12,26 @@ namespace Fixeon.Domain.Infraestructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "categories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "varchar(100)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tickets",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Protocol = table.Column<string>(type: "varchar(6)", nullable: false),
                     Title = table.Column<string>(type: "varchar(100)", nullable: false),
-                    Description = table.Column<string>(type: "varchar(2500)", nullable: false),
+                    Description = table.Column<string>(type: "varchar(3000)", nullable: false),
                     Category = table.Column<string>(type: "varchar(50)", nullable: false),
                     Departament = table.Column<string>(type: "varchar(50)", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
@@ -25,12 +39,14 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     OrganizationName = table.Column<string>(type: "varchar(50)", nullable: true),
                     OrganizationId = table.Column<string>(type: "varchar(36)", nullable: true),
                     analystId = table.Column<string>(type: "varchar(36)", nullable: true),
-                    analystName = table.Column<string>(type: "varchar(100)", nullable: true),
+                    analystEmail = table.Column<string>(type: "varchar(100)", nullable: true),
                     CreateAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     Status = table.Column<string>(type: "varchar(30)", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime", nullable: true),
                     ResolvedAt = table.Column<DateTime>(type: "datetime", nullable: true),
                     Priority = table.Column<string>(type: "varchar(20)", nullable: false),
+                    closedById = table.Column<string>(type: "varchar(36)", nullable: true),
+                    closedByName = table.Column<string>(type: "varchar(100)", nullable: true),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -44,7 +60,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TicketId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Message = table.Column<string>(type: "varchar(500)", nullable: false),
+                    Message = table.Column<string>(type: "varchar(3000)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     userId = table.Column<string>(type: "varchar(36)", nullable: false),
                     userEmail = table.Column<string>(type: "varchar(100)", nullable: false)
@@ -109,6 +125,9 @@ namespace Fixeon.Domain.Infraestructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "attachments");
+
+            migrationBuilder.DropTable(
+                name: "categories");
 
             migrationBuilder.DropTable(
                 name: "interactions");

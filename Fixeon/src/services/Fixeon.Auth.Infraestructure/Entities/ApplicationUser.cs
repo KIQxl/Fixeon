@@ -10,6 +10,7 @@ namespace Fixeon.Auth.Infraestructure.Entities
         {
             Email = email;
             UserName = username;
+            CreatedAt = DateTime.Now;
         }
 
         public Company Company { get; private set; }
@@ -17,6 +18,7 @@ namespace Fixeon.Auth.Infraestructure.Entities
         public Guid CompanyId {  get; private set; }
         public Organization? Organization { get; private set; }
         public Guid? OrganizationId { get; private set; }
+        public DateTime CreatedAt { get; private set; }
 
         public void AssignCompany(Guid companyId) => CompanyId = companyId;
 

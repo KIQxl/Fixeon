@@ -8,7 +8,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 {
     public class SeedMasterData
     {
-        private static readonly List<string> _baseRoles = new List<string> { "Admin", "Analyst", "CommonUser"};
+        private static readonly List<string> _baseRoles = new List<string> { "Admin", "Analista", "Usuario"};
         public static async Task SeedData(IServiceProvider provider)
         {
             var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();

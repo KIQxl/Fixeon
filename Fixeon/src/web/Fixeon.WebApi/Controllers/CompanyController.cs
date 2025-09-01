@@ -18,7 +18,8 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize( Roles = "MasterAdmin")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
+
         public async Task<IActionResult> GetAllCompanies()
         {
             var result = await _companyApplicationServices.GetAllCompanies();
@@ -30,7 +31,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "MasterAdmin")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
         public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequest request)
         {
             var result = await _companyApplicationServices.CreateCompany(request);

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250815211833_closedby")]
-    partial class closedby
+    [Migration("20250829172135_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,6 +63,24 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         {
                             t.HasCheckConstraint("CK_Attachment_Ticket_Or_Interaction", "(TicketId IS NOT NULL AND InteractionId IS NULL) OR (TicketId IS NULL AND InteractionId IS NOT NULL)");
                         });
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("categories");
                 });
 
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Interaction", b =>
@@ -118,6 +136,10 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.Property<string>("Priority")
                         .IsRequired()
                         .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Protocol")
+                        .IsRequired()
+                        .HasColumnType("varchar(6)");
 
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime");

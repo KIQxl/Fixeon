@@ -20,6 +20,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize( Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetAllTicketsAsync([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst, [FromQuery] Guid? user, [FromQuery] string? protocol)
         {
             var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst, user, protocol);
@@ -32,6 +33,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetTicketById([FromRoute] Guid id)
         {
             var response = await _ticketServices.GetTicketByIdAsync(id);
@@ -44,6 +46,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-interactions-by-ticket-id/{id}")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetInteractionsByTicketId([FromRoute] Guid id)
         {
             var response = await _ticketServices.GetInteractionsByTicketIdAsync(id);
@@ -56,6 +59,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-ticket")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> CreateTicket([FromForm] CreateTicketRequestDto request)
         {
             var requestAdapt = request.ToApplicationRequest();
@@ -70,6 +74,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-interaction")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> CreateInteraction([FromForm] CreateInteractionRequestDto request)
         {
             var requestAdapt = request.ToApplicationRequest();
@@ -84,7 +89,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("assign-ticket")]
-        [Authorize(Roles = "Admin, Analyst")]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> AssignTicketToAnalyst([FromBody] CreateAssignTicketRequest request)
         {
             var response = await _ticketServices.AssignTicketTo(request);
@@ -97,7 +102,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("change-ticket-status")]
-        [Authorize(Roles = "Admin, Analyst")]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> ChangeTicketStatus([FromBody] ChangeTicketStatusRequest request)
         {
             var response = await _ticketServices.ChangeTicketStatus(request);
@@ -110,7 +115,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("get-tickets/analysis")]
-        [Authorize(Roles = "Admin, Analyst")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> GetTicketsAnalysis()
         {
             var response = await _ticketServices.GetDashboardTickets();
@@ -123,7 +128,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPut]
         [Route("change-ticket-category")]
-        [Authorize(Roles = "Admin, Analyst")]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> ChangeTicketCategory([FromBody] ChangeTicketCategory request)
         {
             var response = await _ticketServices.ChangeTicketCategory(request);
@@ -136,7 +141,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-category")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequest request)
         {
             var response = await _ticketServices.CreateCategory(request);
@@ -149,7 +154,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("categories")]
-        [Authorize]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetAllCategories()
         {
             var response = await _ticketServices.GetCategories();

@@ -205,7 +205,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(id);
+                var user = await _userManager.Users.Include(x => x.Company).Include(x => x.Organization).FirstOrDefaultAsync(x => x.Id == id);
 
                 return user;
             }

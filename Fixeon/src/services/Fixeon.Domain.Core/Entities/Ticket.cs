@@ -14,7 +14,7 @@ namespace Fixeon.Domain.Core.Entities
             Description = description;
             Category = category;
             Departament = departament;
-            CreateAt = DateTime.UtcNow;
+            CreateAt = DateTime.Now;
             Status = ETicketStatus.Pending.ToString();
             Priority = priority;
             CreatedByUser = user;
