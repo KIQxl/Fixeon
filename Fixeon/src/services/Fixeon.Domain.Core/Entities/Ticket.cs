@@ -36,8 +36,8 @@ namespace Fixeon.Domain.Core.Entities
         public List<Interaction> Interactions { get; private set; } = new List<Interaction>();
         public TimeSpan? Duration => ResolvedAt.HasValue ? ResolvedAt.Value - CreateAt : null;
         public Analyst? ClosedBy { get; private set; }
-
         public Guid CompanyId { get; private set; }
+        public SLAInfo SLAInfo { get; private set; }
 
         public bool ResolveTicket(Analyst analyst)
         {
@@ -47,6 +47,8 @@ namespace Fixeon.Domain.Core.Entities
                 this.ResolvedAt = DateTime.UtcNow;
                 this.ModifiedAt = DateTime.UtcNow;
                 ClosedBy = analyst;
+
+                SetResolutionAccomplished();
 
                 return true;
             }
@@ -62,6 +64,9 @@ namespace Fixeon.Domain.Core.Entities
             this.AssignedTo = assignTo;
             this.Status = ETicketStatus.InProgress.ToString();
             this.ModifiedAt = DateTime.UtcNow;
+
+            if (!SLAInfo.FirstResponse.Accomplished.HasValue)
+                SetFirstResponseAccomplished();
 
             return true;
         }
@@ -123,5 +128,16 @@ namespace Fixeon.Domain.Core.Entities
         {
             this.Category = category;
         }
+
+        public void SetSLADeadlines(int firstResponseSLA, int resolutionSLA)
+        {
+            SLAInfo = new SLAInfo(firstResponseSLA, resolutionSLA);
+        }
+
+        private void SetFirstResponseAccomplished()
+           => SLAInfo.SetFirstResponseAccomplished();
+
+        private void SetResolutionAccomplished()
+           => SLAInfo.SetResolutionAccomplished();
     }
 }
