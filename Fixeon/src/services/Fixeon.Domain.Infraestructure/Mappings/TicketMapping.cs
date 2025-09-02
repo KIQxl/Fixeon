@@ -95,6 +95,33 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                     .HasColumnName("closedByName");
             });
 
+            builder.OwnsOne(t => t.SLAInfo, SLA =>
+            {
+                SLA.OwnsOne(s => s.FirstInteraction, FI =>
+                {
+                    FI.Property(x => x.Deadline)
+                    .HasColumnType("datetime")
+                    .HasColumnName("FirstInteractionDeadline");
+
+                    FI.Property(x => x.Accomplished)
+                    .HasColumnType("datetime")
+                    .HasColumnName("FirstInteractionAccomplished");
+
+                });
+
+                SLA.OwnsOne(s => s.Resolution, R =>
+                {
+                    R.Property(x => x.Deadline)
+                    .HasColumnType("datetime")
+                    .HasColumnName("ResolutionDeadline");
+
+                    R.Property(x => x.Accomplished)
+                    .HasColumnType("datetime")
+                    .HasColumnName("ResolutionAccomplished");
+
+                });
+            });
+
             builder.HasMany(t => t.Interactions)
                 .WithOne(i => i.Ticket)
                 .HasForeignKey(i => i.TicketId);

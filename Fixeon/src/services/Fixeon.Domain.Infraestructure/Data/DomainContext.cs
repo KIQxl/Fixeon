@@ -18,6 +18,7 @@ namespace Fixeon.Domain.Infraestructure.Data
         public DbSet<Interaction> interactions { get; set; }
         public DbSet<Attachment> attachments { get; set; }
         public DbSet<Category> categories { get; set; }
+        public DbSet<OrganizationsSLA> organizationsSLAs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

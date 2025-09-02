@@ -65,8 +65,11 @@ namespace Fixeon.Domain.Core.Entities
             this.Status = ETicketStatus.InProgress.ToString();
             this.ModifiedAt = DateTime.UtcNow;
 
-            if (!SLAInfo.FirstResponse.Accomplished.HasValue)
+            if (!SLAInfo.FirstInteraction.Accomplished.HasValue)
                 SetFirstResponseAccomplished();
+
+            //if (!SLAInfo.Resolution.Deadline.HasValue)
+            //    SetResolutionDeadline();
 
             return true;
         }
@@ -129,10 +132,11 @@ namespace Fixeon.Domain.Core.Entities
             this.Category = category;
         }
 
-        public void SetSLADeadlines(int firstResponseSLA, int resolutionSLA)
-        {
-            SLAInfo = new SLAInfo(firstResponseSLA, resolutionSLA);
-        }
+        public void SetFirstInteractionDeadline(int firstResponseSLA) => 
+            SLAInfo = new SLAInfo(firstResponseSLA);
+
+        public void SetResolutionDeadline(int resolutionDeadline) =>
+            SLAInfo.SetResolutionDeadline(resolutionDeadline);
 
         private void SetFirstResponseAccomplished()
            => SLAInfo.SetFirstResponseAccomplished();

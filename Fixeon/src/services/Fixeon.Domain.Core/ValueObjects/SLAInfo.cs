@@ -2,19 +2,22 @@
 {
     public class SLAInfo
     {
-        public SLA FirstResponse { get; set; }
+        public SLA FirstInteraction { get; set; }
         public SLA Resolution { get; set; }
 
-        public SLAInfo(int firstResponseDeadline, int resolutionDeadline)
+        public SLAInfo(int? firstResponseDeadline)
         {
-            FirstResponse = new SLA(DateTime.Now.AddMinutes(firstResponseDeadline), null);
-            Resolution = new SLA(DateTime.Now.AddMinutes(resolutionDeadline), null);
+            FirstInteraction = new SLA(DateTime.Now.AddMinutes(firstResponseDeadline.Value), null);
+            Resolution = new SLA(null, null);
         }
 
         public void SetFirstResponseAccomplished()
-            => FirstResponse.Accomplish();
+            => FirstInteraction.Accomplish();
 
         public void SetResolutionAccomplished()
             => Resolution.Accomplish();
+
+        public void SetResolutionDeadline(int? resolutionDeadline)
+            => Resolution.Deadline = DateTime.Now.AddMinutes(resolutionDeadline.Value);
     }
 }
