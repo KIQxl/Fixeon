@@ -6,6 +6,7 @@ namespace Fixeon.ACL.Ticket.ACL.Auth
     public class AuthACL : IAuthACL
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly IIdentityRepository _identityRepository;
 
         public AuthACL(ICompanyRepository companyRepository)
         {

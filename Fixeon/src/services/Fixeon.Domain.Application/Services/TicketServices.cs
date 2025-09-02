@@ -22,7 +22,9 @@ namespace Fixeon.Domain.Application.Services
         private readonly IBackgroundEmailJobWrapper _backgroundServices;
         private readonly ITenantContext _tenantContext;
         private readonly IAuthACL _authACL;
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IAuthACL authACL)
+        private readonly ISLARepository _slaRepository;
+
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IAuthACL authACL, ISLARepository slaRepository)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
@@ -30,6 +32,7 @@ namespace Fixeon.Domain.Application.Services
             _backgroundServices = backgroundServices;
             _tenantContext = tenantContext;
             _authACL = authACL;
+            _slaRepository = slaRepository;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -40,6 +43,18 @@ namespace Fixeon.Domain.Application.Services
                 return new Response<TicketResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.BadRequest);
 
             var ticket = TicketMapper.ToEntity(request, _tenantContext);
+
+            if (_tenantContext.OrganizationId.HasValue)
+            {
+                var SLAs = await _slaRepository.GetSLAByOrganizationAndPriority(_tenantContext.OrganizationId.Value, request.Priority);
+
+                var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction);
+                var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution);
+                var defaultSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Defaul);
+
+                ticket.SetFirstInteractionDeadline(firstInteractionSLA != null ? firstInteractionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
+                ticket.SetResolutionDeadline(resolutionSLA != null ? resolutionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
+            }
 
             await ProccessTicketAttachment(ticket, request.Attachments);
 

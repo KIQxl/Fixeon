@@ -18,6 +18,12 @@ namespace Fixeon.Domain.Core.Entities
             Status = ETicketStatus.Pending.ToString();
             Priority = priority;
             CreatedByUser = user;
+
+            SLAInfo = new SLAInfo
+            {
+                FirstInteraction = new SLA(),
+                Resolution = new SLA(),
+            };
         }
 
         public string Protocol { get; private set; }
@@ -25,7 +31,7 @@ namespace Fixeon.Domain.Core.Entities
         public string Description { get; private set; }
         public string Category { get; private set; }
         public string Departament { get; private set; }
-        public List<Attachment> Attachments {  get; private set; } = new List<Attachment>();
+        public List<Attachment> Attachments { get; private set; } = new List<Attachment>();
         public User CreatedByUser { get; private set; }
         public Analyst? AssignedTo { get; private set; }
         public DateTime CreateAt { get; private set; }
@@ -41,7 +47,7 @@ namespace Fixeon.Domain.Core.Entities
 
         public bool ResolveTicket(Analyst analyst)
         {
-            if(this.Status.Equals(ETicketStatus.InProgress.ToString()) || this.Status.Equals(ETicketStatus.Reopened.ToString()))
+            if (this.Status.Equals(ETicketStatus.InProgress.ToString()) || this.Status.Equals(ETicketStatus.Reopened.ToString()))
             {
                 this.Status = ETicketStatus.Resolved.ToString();
                 this.ResolvedAt = DateTime.UtcNow;
@@ -65,11 +71,7 @@ namespace Fixeon.Domain.Core.Entities
             this.Status = ETicketStatus.InProgress.ToString();
             this.ModifiedAt = DateTime.UtcNow;
 
-            if (!SLAInfo.FirstInteraction.Accomplished.HasValue)
-                SetFirstResponseAccomplished();
-
-            //if (!SLAInfo.Resolution.Deadline.HasValue)
-            //    SetResolutionDeadline();
+            SetFirstResponseAccomplished();
 
             return true;
         }
@@ -132,16 +134,16 @@ namespace Fixeon.Domain.Core.Entities
             this.Category = category;
         }
 
-        public void SetFirstInteractionDeadline(int firstResponseSLA) => 
-            SLAInfo = new SLAInfo(firstResponseSLA);
+        public void SetFirstInteractionDeadline(int deadlineInMinutes)
+            => SLAInfo.SetFirstInteractionDeadline(deadlineInMinutes);
 
-        public void SetResolutionDeadline(int resolutionDeadline) =>
-            SLAInfo.SetResolutionDeadline(resolutionDeadline);
+        public void SetResolutionDeadline(int deadlineInMinutes)
+            => SLAInfo.SetResolutionDeadline(deadlineInMinutes);
 
         private void SetFirstResponseAccomplished()
-           => SLAInfo.SetFirstResponseAccomplished();
+            => SLAInfo.SetFirstResponseAccomplished();
 
         private void SetResolutionAccomplished()
-           => SLAInfo.SetResolutionAccomplished();
+            => SLAInfo.SetResolutionAccomplished();
     }
 }

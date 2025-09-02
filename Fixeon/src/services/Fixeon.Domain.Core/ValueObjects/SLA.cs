@@ -2,6 +2,7 @@
 {
     public class SLA
     {
+        public SLA() { }
         public DateTime? Deadline { get; set; }
         public DateTime? Accomplished { get; set; }
         public bool? WithinDeadline =>
@@ -9,12 +10,15 @@
             ? Accomplished <= Deadline
             : null;
 
-        public SLA(DateTime? deadline, DateTime? accomplished)
+        public void Accomplish()
         {
-            Deadline = deadline;
-            Accomplished = accomplished;
+            if(!Accomplished.HasValue && Deadline.HasValue)
+                Accomplished = DateTime.Now;
         }
-
-        public void Accomplish() => Accomplished = DateTime.Now;
+        public void SetDeadline(int deadlineInMinutes)
+        {
+            if(!Deadline.HasValue)
+                Deadline = DateTime.Now.AddMinutes(deadlineInMinutes);
+        }
     }
 }

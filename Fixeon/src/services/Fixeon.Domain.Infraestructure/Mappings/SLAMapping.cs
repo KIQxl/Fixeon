@@ -8,7 +8,38 @@ namespace Fixeon.Domain.Infraestructure.Mappings
     {
         public void Configure(EntityTypeBuilder<OrganizationsSLA> builder)
         {
-            throw new NotImplementedException();
+            builder.HasKey(s => s.Id);
+
+            builder.Property(s => s.CompanyId)
+                .IsRequired()
+                .HasColumnType("varchar(36)");
+
+            builder.Property(s => s.Organization)
+                .IsRequired()
+                .HasColumnType("varchar(50)");
+
+            builder.Property(s => s.OrganizationId)
+                .IsRequired()
+                .HasColumnType("varchar(36)");
+
+            builder.Property(s => s.SLAPriority)
+                .IsRequired()
+                .HasColumnType("varchar(30)");
+
+            builder.Property(s => s.SLAInMinutes)
+                .IsRequired()
+                .HasColumnType("int");
+
+            builder.Property(s => s.Type)
+                .IsRequired()
+                .HasColumnType("int");
+
+            builder.Property(s => s.CreateAt)
+                .IsRequired()
+                .HasColumnType("datetime");
+
+            builder.Property(s => s.Type)
+                .HasColumnType("datetime");
         }
     }
 }
