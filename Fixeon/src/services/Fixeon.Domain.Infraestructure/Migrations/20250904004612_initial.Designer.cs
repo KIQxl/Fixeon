@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20250829172135_initial")]
+    [Migration("20250904004612_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -106,6 +106,38 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.ToTable("interactions");
                 });
 
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.OrganizationsSLA", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("SLAInMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SLAPriority")
+                        .IsRequired()
+                        .HasColumnType("varchar(30)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("organizationsSLAs");
+                });
+
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Ticket", b =>
                 {
                     b.Property<Guid>("Id")
@@ -155,6 +187,55 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("tickets");
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Entities.Company", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CNPJ")
+                        .IsRequired()
+                        .HasColumnType("varchar(14)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CNPJ")
+                        .IsUnique();
+
+                    b.ToTable("companies");
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Entities.Organization", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("organizations");
                 });
 
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Attachment", b =>
@@ -209,6 +290,17 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.Navigation("Ticket");
                 });
 
+            modelBuilder.Entity("Fixeon.Domain.Core.Entities.OrganizationsSLA", b =>
+                {
+                    b.HasOne("Fixeon.Domain.Entities.Organization", "Organization")
+                        .WithMany("SLAs")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Ticket", b =>
                 {
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Analyst", "AssignedTo", b1 =>
@@ -257,6 +349,67 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                                 .HasForeignKey("TicketId");
                         });
 
+                    b.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLAInfo", "SLAInfo", b1 =>
+                        {
+                            b1.Property<Guid>("TicketId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("TicketId");
+
+                            b1.ToTable("tickets");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TicketId");
+
+                            b1.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLA", "FirstInteraction", b2 =>
+                                {
+                                    b2.Property<Guid>("SLAInfoTicketId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<DateTime?>("Accomplished")
+                                        .HasColumnType("datetime")
+                                        .HasColumnName("FirstInteractionAccomplished");
+
+                                    b2.Property<DateTime?>("Deadline")
+                                        .HasColumnType("datetime")
+                                        .HasColumnName("FirstInteractionDeadline");
+
+                                    b2.HasKey("SLAInfoTicketId");
+
+                                    b2.ToTable("tickets");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SLAInfoTicketId");
+                                });
+
+                            b1.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLA", "Resolution", b2 =>
+                                {
+                                    b2.Property<Guid>("SLAInfoTicketId")
+                                        .HasColumnType("uniqueidentifier");
+
+                                    b2.Property<DateTime?>("Accomplished")
+                                        .HasColumnType("datetime")
+                                        .HasColumnName("ResolutionAccomplished");
+
+                                    b2.Property<DateTime?>("Deadline")
+                                        .HasColumnType("datetime")
+                                        .HasColumnName("ResolutionDeadline");
+
+                                    b2.HasKey("SLAInfoTicketId");
+
+                                    b2.ToTable("tickets");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SLAInfoTicketId");
+                                });
+
+                            b1.Navigation("FirstInteraction")
+                                .IsRequired();
+
+                            b1.Navigation("Resolution")
+                                .IsRequired();
+                        });
+
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.User", "CreatedByUser", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
@@ -294,6 +447,20 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.Navigation("CreatedByUser")
                         .IsRequired();
+
+                    b.Navigation("SLAInfo")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Entities.Organization", b =>
+                {
+                    b.HasOne("Fixeon.Domain.Entities.Company", "Company")
+                        .WithMany("Organizations")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Interaction", b =>
@@ -306,6 +473,16 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.Navigation("Attachments");
 
                     b.Navigation("Interactions");
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Entities.Company", b =>
+                {
+                    b.Navigation("Organizations");
+                });
+
+            modelBuilder.Entity("Fixeon.Domain.Entities.Organization", b =>
+                {
+                    b.Navigation("SLAs");
                 });
 #pragma warning restore 612, 618
         }

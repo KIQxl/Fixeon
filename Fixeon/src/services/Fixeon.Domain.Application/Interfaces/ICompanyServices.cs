@@ -1,8 +1,7 @@
-﻿using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Infraestructure.Dtos.Requests;
-using Fixeon.Auth.Infraestructure.Dtos.Responses;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
+using Fixeon.Domain.Application.Dtos.Responses;
 
-namespace Fixeon.Auth.Infraestructure.Interfaces
+namespace Fixeon.Domain.Application.Interfaces
 {
     public interface ICompanyServices
     {

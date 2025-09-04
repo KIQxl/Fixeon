@@ -25,6 +25,21 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "companies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "varchar(200)", nullable: false),
+                    CNPJ = table.Column<string>(type: "varchar(14)", nullable: false),
+                    Email = table.Column<string>(type: "varchar(100)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_companies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tickets",
                 columns: table => new
                 {
@@ -47,11 +62,34 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     Priority = table.Column<string>(type: "varchar(20)", nullable: false),
                     closedById = table.Column<string>(type: "varchar(36)", nullable: true),
                     closedByName = table.Column<string>(type: "varchar(100)", nullable: true),
-                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FirstInteractionDeadline = table.Column<DateTime>(type: "datetime", nullable: true),
+                    FirstInteractionAccomplished = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ResolutionDeadline = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ResolutionAccomplished = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tickets", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "organizations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "varchar(50)", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_organizations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_organizations_companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,6 +110,29 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         name: "FK_interactions_tickets_TicketId",
                         column: x => x.TicketId,
                         principalTable: "tickets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "organizationsSLAs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrganizationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SLAInMinutes = table.Column<int>(type: "int", nullable: false),
+                    SLAPriority = table.Column<string>(type: "varchar(30)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_organizationsSLAs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_organizationsSLAs_organizations_OrganizationId",
+                        column: x => x.OrganizationId,
+                        principalTable: "organizations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -115,9 +176,25 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_companies_CNPJ",
+                table: "companies",
+                column: "CNPJ",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_interactions_TicketId",
                 table: "interactions",
                 column: "TicketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_organizations_CompanyId",
+                table: "organizations",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_organizationsSLAs_OrganizationId",
+                table: "organizationsSLAs",
+                column: "OrganizationId");
         }
 
         /// <inheritdoc />
@@ -130,10 +207,19 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 name: "categories");
 
             migrationBuilder.DropTable(
+                name: "organizationsSLAs");
+
+            migrationBuilder.DropTable(
                 name: "interactions");
 
             migrationBuilder.DropTable(
+                name: "organizations");
+
+            migrationBuilder.DropTable(
                 name: "tickets");
+
+            migrationBuilder.DropTable(
+                name: "companies");
         }
     }
 }

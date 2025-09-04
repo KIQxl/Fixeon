@@ -1,6 +1,6 @@
-﻿using Fixeon.Auth.Infraestructure.Entities;
+﻿using Fixeon.Domain.Entities;
 
-namespace Fixeon.Auth.Infraestructure.Interfaces
+namespace Fixeon.Domain.Application.Interfaces
 {
     public interface ICompanyRepository
     {

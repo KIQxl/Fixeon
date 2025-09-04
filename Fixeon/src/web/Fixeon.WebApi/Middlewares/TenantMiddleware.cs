@@ -23,17 +23,13 @@ namespace Fixeon.WebApi.Middlewares
             }
 
             var organizationIdClaim = context.User.FindFirst("organizationId");
-            var organizationNameClaim = context.User.FindFirst("organizationName");
 
-            if(organizationIdClaim != null && organizationNameClaim != null)
+            if(organizationIdClaim != null)
             {
                 Guid.TryParse(organizationIdClaim.Value, out var orgId);
-                var orgName = organizationNameClaim.Value;
 
                 context.Items["OrganizationId"] = orgId;
-                context.Items["OrganizationName"] = orgName;
                 tenantContext.OrganizationId = orgId;
-                tenantContext.OrganizationName = orgName;
             }
 
             var userIdClaim = context.User.FindFirst("id");

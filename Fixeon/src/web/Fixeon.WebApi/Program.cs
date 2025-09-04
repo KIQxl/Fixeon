@@ -1,5 +1,5 @@
-using Fixeon.Auth.Infraestructure.Services;
 using Fixeon.WebApi.Configuration;
+using Fixeon.WebApi.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 

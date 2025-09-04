@@ -1,15 +1,13 @@
 ﻿using Fixeon.Domain.Core.Enums;
-using Fixeon.Domain.Core.Interfaces;
+using Fixeon.Domain.Entities;
 
 namespace Fixeon.Domain.Core.Entities
 {
-    public class OrganizationsSLA : Entity, ITenantEntity
+    public class OrganizationsSLA : Entity
     {
         private OrganizationsSLA() { }
-        public OrganizationsSLA(Guid companyId, string organization, Guid organizationId, int sLAInMinutes, string sLAPriority, ESLAType type)
+        public OrganizationsSLA(Guid organizationId, int sLAInMinutes, string sLAPriority, ESLAType type)
         {
-            CompanyId = companyId;
-            Organization = organization;
             OrganizationId = organizationId;
             SLAInMinutes = sLAInMinutes;
             SLAPriority = sLAPriority;
@@ -17,8 +15,7 @@ namespace Fixeon.Domain.Core.Entities
             CreateAt = DateTime.Now;
         }
 
-        public Guid CompanyId { get; private set; }
-        public string Organization { get; private set; }
+        public Organization Organization { get; private set; }
         public Guid OrganizationId { get; private set; }
         public int SLAInMinutes { get; private set; }
         public string SLAPriority { get; private set; }

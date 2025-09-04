@@ -1,4 +1,5 @@
 ﻿using Fixeon.Domain.Core.Entities;
+using Fixeon.Domain.Entities;
 using Fixeon.Shared.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,8 @@ namespace Fixeon.Domain.Infraestructure.Data
         public DbSet<Interaction> interactions { get; set; }
         public DbSet<Attachment> attachments { get; set; }
         public DbSet<Category> categories { get; set; }
+        public DbSet<Company> companies { get; set; }
+        public DbSet<Organization> organizations { get; set; }
         public DbSet<OrganizationsSLA> organizationsSLAs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,6 +38,9 @@ namespace Fixeon.Domain.Infraestructure.Data
 
             modelBuilder.Entity<Interaction>()
                 .HasQueryFilter(i => i.Ticket.CompanyId == _currentTenant);
+
+            modelBuilder.Entity<Organization>()
+                .HasQueryFilter(u => u.CompanyId == _currentTenant);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DomainContext).Assembly);
         }

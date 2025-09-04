@@ -220,43 +220,43 @@ namespace Fixeon.WebApi.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet]
-        [Route("get-organizations")]
-        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> GetAllOrganizations()
-        {
-            var response = await _services.GetAllOrganizations();
+        //[HttpGet]
+        //[Route("get-organizations")]
+        //[Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        //public async Task<IActionResult> GetAllOrganizations()
+        //{
+        //    var response = await _services.GetAllOrganizations();
 
-            if (response.Success)
-                return Ok(response);
+        //    if (response.Success)
+        //        return Ok(response);
 
-            return BadRequest(response);
-        }
+        //    return BadRequest(response);
+        //}
 
-        [HttpPost]
-        [Route("create-organization")]
-        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
-        {
-            var response = await _services.CreateOrganization(request);
+        //[HttpPost]
+        //[Route("create-organization")]
+        //[Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        //public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
+        //{
+        //    var response = await _services.CreateOrganization(request);
 
-            if (response.Success)
-                return Ok(response);
+        //    if (response.Success)
+        //        return Ok(response);
 
-            return BadRequest(response);
-        }
+        //    return BadRequest(response);
+        //}
 
-        [HttpPost]
-        [Route("delete-organization/{id}")]
-        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> DeleteOrganization([FromRoute] Guid organizationId)
-        {
-            var response = await _services.DeleteOrganization(organizationId);
+        //[HttpPost]
+        //[Route("delete-organization/{id}")]
+        //[Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        //public async Task<IActionResult> DeleteOrganization([FromRoute] Guid organizationId)
+        //{
+        //    var response = await _services.DeleteOrganization(organizationId);
 
-            if (response.Success)
-                return Ok(response);
+        //    if (response.Success)
+        //        return Ok(response);
 
-            return BadRequest(response);
-        }
+        //    return BadRequest(response);
+        //}
     }
 }

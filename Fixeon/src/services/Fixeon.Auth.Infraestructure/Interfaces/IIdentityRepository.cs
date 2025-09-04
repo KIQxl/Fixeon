@@ -24,9 +24,5 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<List<string>> GetRolesByUser(ApplicationUser user);
         public Task<IdentityRole> GetRole(string roleName);
         public Task<ApplicationUser> FindByEmailWithoutFilter(string email);
-        public Task CreateOrganization(Organization organization);
-        public Task<List<Organization>> GetAllOrganizations();
-        public Task<Organization> GetOrganizationById(Guid organizationId);
-        public Task DeleteOrganization(Organization organization);
     }
 }

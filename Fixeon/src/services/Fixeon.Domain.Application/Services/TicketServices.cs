@@ -11,6 +11,7 @@ using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Core.Models;
+using System.Net.Sockets;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -21,18 +22,16 @@ namespace Fixeon.Domain.Application.Services
         private readonly IStorageServices _storageServices;
         private readonly IBackgroundEmailJobWrapper _backgroundServices;
         private readonly ITenantContext _tenantContext;
-        private readonly IAuthACL _authACL;
-        private readonly ISLARepository _slaRepository;
+        private readonly IOrganizationServices _organizationServices;
 
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IAuthACL authACL, ISLARepository slaRepository)
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IOrganizationServices organizationServices)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
             _storageServices = storageServices;
             _backgroundServices = backgroundServices;
             _tenantContext = tenantContext;
-            _authACL = authACL;
-            _slaRepository = slaRepository;
+            _organizationServices = organizationServices;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -45,16 +44,7 @@ namespace Fixeon.Domain.Application.Services
             var ticket = TicketMapper.ToEntity(request, _tenantContext);
 
             if (_tenantContext.OrganizationId.HasValue)
-            {
-                var SLAs = await _slaRepository.GetSLAByOrganizationAndPriority(_tenantContext.OrganizationId.Value, request.Priority);
-
-                var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction);
-                var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution);
-                var defaultSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Defaul);
-
-                ticket.SetFirstInteractionDeadline(firstInteractionSLA != null ? firstInteractionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
-                ticket.SetResolutionDeadline(resolutionSLA != null ? resolutionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
-            }
+                SetTicketSLA(ticket);
 
             await ProccessTicketAttachment(ticket, request.Attachments);
 
@@ -67,11 +57,9 @@ namespace Fixeon.Domain.Application.Services
                 if (!result)
                     return new Response<TicketResponse>("Não foi possível realizar a abertura do chamado.", EErrorType.ServerError);
 
-                var companyEmail = await _authACL.GetCompanyEmail(_tenantContext.TenantId);
-
                 _backgroundServices.SendEmail(new EmailMessage
                 {
-                    To = companyEmail,
+                    To = "",
                     Subject = "Novo ticket aberto",
                     Body = EmailDictionary.NewTicketInformAnalysts
                     .Replace("{ticketId}", ticket.Id.ToString())
@@ -433,6 +421,18 @@ namespace Fixeon.Domain.Application.Services
                 var attachment = file.ToAttachment(_tenantContext.UserId, null, interaction.Id);
                 interaction.AddAttachment(attachment);
             }
+        }
+
+        private async void SetTicketSLA(Ticket ticket)
+        {
+            var SLAs = await _organizationServices.GetSLAByOrganization(_tenantContext.OrganizationId.Value);
+
+            var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
+            var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution && x.SLAPriority == ticket.Priority);
+            var defaultSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Defaul);
+
+            ticket.SetFirstInteractionDeadline(firstInteractionSLA != null ? firstInteractionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
+            ticket.SetResolutionDeadline(resolutionSLA != null ? resolutionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
         }
     }
 }

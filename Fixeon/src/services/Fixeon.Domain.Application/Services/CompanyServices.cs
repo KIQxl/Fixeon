@@ -1,10 +1,10 @@
-﻿using Fixeon.Auth.Application.Dtos.Responses;
-using Fixeon.Auth.Infraestructure.Dtos.Requests;
-using Fixeon.Auth.Infraestructure.Dtos.Responses;
-using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Auth.Infraestructure.Interfaces;
+﻿using Fixeon.Domain.Application.Dtos.Enums;
+using Fixeon.Domain.Application.Dtos.Requests;
+using Fixeon.Domain.Application.Dtos.Responses;
+using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Domain.Entities;
 
-namespace Fixeon.Auth.Infraestructure.Services
+namespace Fixeon.Domain.Application.Services
 {
     public class CompanyServices : ICompanyServices
     {
@@ -27,7 +27,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
             catch (Exception ex)
             {
-                return new Response<CompanyResponse>(ex.Message);
+                return new Response<CompanyResponse>(ex.Message, EErrorType.ServerError);
             }
         }
 
@@ -43,7 +43,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
             catch (Exception ex)
             {
-                return new Response<List<CompanyResponse>>(ex.Message);
+                return new Response<List<CompanyResponse>>(ex.Message, EErrorType.ServerError);
 
             }
         }

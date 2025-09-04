@@ -1,8 +1,8 @@
-﻿using Fixeon.Auth.Infraestructure.Entities;
+﻿using Fixeon.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Fixeon.Auth.Infraestructure.Mappings
+namespace Fixeon.Domain.Infraestructure.Mappings
 {
     public class OrganizationMapping : IEntityTypeConfiguration<Organization>
     {
@@ -18,8 +18,8 @@ namespace Fixeon.Auth.Infraestructure.Mappings
                 .WithMany(c => c.Organizations)
                 .HasForeignKey(o => o.CompanyId);
 
-            builder.HasMany(o => o.Users)
-                .WithOne(u => u.Organization)
+            builder.HasMany(o => o.SLAs)
+                .WithOne(o => o.Organization)
                 .HasForeignKey(o => o.OrganizationId);
         }
     }

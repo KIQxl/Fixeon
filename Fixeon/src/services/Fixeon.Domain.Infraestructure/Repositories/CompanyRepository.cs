@@ -1,14 +1,14 @@
-﻿using Fixeon.Auth.Infraestructure.Data;
-using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Auth.Infraestructure.Interfaces;
+﻿using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Domain.Entities;
+using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Fixeon.Auth.Infraestructure.Repositories
+namespace Fixeon.Domain.Infraestructure.Repositories
 {
     public class CompanyRepository : ICompanyRepository
     {
-        private readonly DataContext _context;
-        public CompanyRepository(DataContext dataContext)
+        private readonly DomainContext _context;
+        public CompanyRepository(DomainContext dataContext)
         {
             this._context = dataContext;
         }

@@ -1,11 +1,9 @@
-﻿using Fixeon.ACL.Ticket.ACL.Auth;
-using Fixeon.Auth.Infraestructure.Configuration;
+﻿using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Auth.Infraestructure.Repositories;
 using Fixeon.Auth.Infraestructure.Services;
-using Fixeon.Domain.Application.Contracts;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
@@ -181,7 +179,11 @@ namespace Fixeon.WebApi.Configuration
             services.AddScoped<ITicketRepository, TicketRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWOrk>();
             services.AddScoped<Fixeon.Domain.Infraestructure.Data.TenantSaveChangesInterceptor>();
-            services.AddScoped<IAuthACL, AuthACL>();
+            //services.AddScoped<IAuthACL, AuthACL>();
+            services.AddScoped<ICompanyServices, CompanyServices>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IOrganizationServices, OrganizationServices>();
 
             return services;
         }
@@ -274,8 +276,6 @@ namespace Fixeon.WebApi.Configuration
         {
             services.AddScoped<IIdentityRepository, AuthRepository>();
             services.AddScoped<IIdentityServices, IdentityServices>();
-            services.AddScoped<ICompanyServices, CompanyServices>();
-            services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<IUrlEncoder, UrlEncoder>();
             services.AddScoped<Fixeon.Auth.Infraestructure.Data.TenantSaveChangesInterceptor>();

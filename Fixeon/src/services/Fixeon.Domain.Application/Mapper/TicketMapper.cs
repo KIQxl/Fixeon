@@ -21,7 +21,7 @@ namespace Fixeon.Domain.Application.Mapper
                     UserId = tenantContext.UserId.ToString(),
                     UserEmail = tenantContext.UserEmail,
                     OrganizationId = tenantContext.OrganizationId,
-                    OrganizationName = tenantContext.OrganizationName
+                    OrganizationName = ""
                 }
             );
         }

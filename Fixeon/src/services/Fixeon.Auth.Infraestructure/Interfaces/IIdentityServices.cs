@@ -19,9 +19,6 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<Response<ApplicationUserResponse>> ResetPassword(ResetPasswordRequest request);
         public Task<Response<ApplicationUserResponse>> MasterAdminCreateFirstForCompany(CreateAccountRequest request);
         public Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers();
-        public Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request);
-        public Task<Response<List<OrganizationResponse>>> GetAllOrganizations();
-        public Task<Response<bool>> DeleteOrganization(Guid organizationId);
         public Task<Response<List<ApplicationUserResponse>>> GetUserByRoleName(string role);
     }
 }

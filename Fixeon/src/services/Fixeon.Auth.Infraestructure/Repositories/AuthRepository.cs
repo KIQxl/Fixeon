@@ -107,7 +107,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.Users.AsNoTracking().Include(u => u.Company).Include(u => u.Organization).FirstOrDefaultAsync(u => u.Email == email);
+                var user = await _userManager.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
 
                 return user;
             }
@@ -127,9 +127,9 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin)
         {
             if(masterAdmin)
-                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().Include(u => u.Company).Include(u => u.Organization).ToListAsync();
+                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync();
 
-            return await _userManager.Users.AsNoTracking().Include(u => u.Company).Include(u => u.Organization).ToListAsync();
+            return await _userManager.Users.AsNoTracking().ToListAsync();
         }
 
         public async Task<List<IdentityRole>> GetAllRoles()
@@ -205,7 +205,7 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.Users.Include(x => x.Company).Include(x => x.Organization).FirstOrDefaultAsync(x => x.Id == id);
+                var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == id);
 
                 return user;
             }
@@ -219,59 +219,9 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         {
             try
             {
-                var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().Where(x => x.Email == email).Include(x => x.Organization).Include(x => x.Company).FirstOrDefaultAsync();
+                var user = await _userManager.Users.AsNoTracking().IgnoreQueryFilters().Where(x => x.Email == email).FirstOrDefaultAsync();
 
                 return user;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task CreateOrganization(Organization organization)
-        {
-            try
-            {
-                await _dataContext.organizations.AddAsync(organization);
-                await _dataContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<List<Organization>> GetAllOrganizations()
-        {
-            try
-            {
-                return await _dataContext.organizations.AsNoTracking().ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<Organization> GetOrganizationById(Guid organizationId)
-        {
-            try
-            {
-                return await _dataContext.organizations.FirstOrDefaultAsync(x => x.Id == organizationId);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task DeleteOrganization(Organization organization)
-        {
-            try
-            {
-                _dataContext.organizations.Remove(organization);
-                await _dataContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

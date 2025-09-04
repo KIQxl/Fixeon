@@ -1,4 +1,4 @@
-﻿namespace Fixeon.Auth.Infraestructure.Dtos.Requests
+﻿namespace Fixeon.Domain.Application.Dtos.Requests
 {
     public class CreateCompanyRequest
     {

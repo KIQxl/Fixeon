@@ -1,8 +1,8 @@
-﻿using Fixeon.Auth.Infraestructure.Entities;
+﻿using Fixeon.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Fixeon.Auth.Infraestructure.Mappings
+namespace Fixeon.Domain.Infraestructure.Mappings
 {
     public class CompanyMapping : IEntityTypeConfiguration<Company>
     {
@@ -21,10 +21,6 @@ namespace Fixeon.Auth.Infraestructure.Mappings
             builder.Property(x => x.Email)
                 .IsRequired()
                 .HasColumnType("varchar(100)");
-
-            builder.HasMany(x => x.Users)
-                .WithOne(x => x.Company)
-                .HasForeignKey(x => x.CompanyId);
 
             builder.HasIndex(x => x.CNPJ).IsUnique();
         }

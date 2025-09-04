@@ -28,12 +28,6 @@ namespace Fixeon.Auth.Infraestructure.Data
                 {
                     entry.Property("CompanyId").CurrentValue = tenantId;
                 }
-
-                foreach (var entry in context.ChangeTracker.Entries()
-                    .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added && e.Entity is Organization))
-                {
-                    entry.Property("CompanyId").CurrentValue = tenantId;
-                }
             }
 
             return base.SavingChangesAsync(eventData, result, cancellationToken);

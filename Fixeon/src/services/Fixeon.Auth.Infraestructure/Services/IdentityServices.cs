@@ -14,15 +14,13 @@ namespace Fixeon.Auth.Infraestructure.Services
         private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
         private readonly IUrlEncoder _urlEncoder;
         private readonly ITokenGeneratorService _tokenGeneratorService;
-        private readonly ICompanyRepository _companyRepository;
 
-        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, ICompanyRepository companyRepository)
+        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService)
         {
             _authRepository = authRepository;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
             _urlEncoder = urlEncoder;
             _tokenGeneratorService = tokenGeneratorService;
-            _companyRepository = companyRepository;
         }
 
         // GET
@@ -38,7 +36,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.OrganizationId, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -53,7 +51,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var roles = await _authRepository.GetRolesByUser(user);
 
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles));
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.OrganizationId, roles));
         }
 
         public async Task<Response<List<ApplicationUserResponse>>> GetUserByRoleName(string role)
@@ -68,7 +66,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.OrganizationId, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -99,14 +97,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                 var user = new ApplicationUser(request.Email, request.Username);
 
                 if (request.OrganizationId.HasValue)
-                {
-                    var organization = await _authRepository.GetOrganizationById(request.OrganizationId.Value);
-
-                    if (organization is null)
-                        return new Response<ApplicationUserResponse>("Erro ao relacionar organização ao usuário.");
-
-                    user.AssignOrganization(organization);
-                }
+                    user.AssignOrganization(request.OrganizationId.Value);
 
                 var result = await _authRepository.CreateAccount(user, request.Password, false);
 
@@ -119,7 +110,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles.Select(r => r.Name).ToList()));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.OrganizationId, roles.Select(r => r.Name).ToList()));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -145,19 +136,12 @@ namespace Fixeon.Auth.Infraestructure.Services
                         user.ChangeEmail(request.Email);
 
                     if (request.OrganizationId.HasValue)
-                    {
-                        var organization = await _authRepository.GetOrganizationById(request.OrganizationId.Value);
-
-                        if (organization is null)
-                            return new Response<ApplicationUserResponse>("Erro ao relacionar organização ao usuário.");
-
-                        user.AssignOrganization(organization);
-                    }
+                        user.AssignOrganization(request.OrganizationId.Value);
 
                     var result = await _authRepository.UpdateAccount(user);
 
                     if (result.Succeeded)
-                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, null));
+                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.OrganizationId, null));
 
                     return new Response<ApplicationUserResponse>(result.Errors
                         .Select(e => e.Description)
@@ -233,7 +217,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 if (result.Succeeded)
                 {
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, roles.Select(r => r.Name).ToList()));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.OrganizationId, roles.Select(r => r.Name).ToList()));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -271,7 +255,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var result = await _authRepository.ResetPassword(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.Organization?.Name ?? null, user.Organization?.Id ?? null, null));
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.OrganizationId, null));
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
         }
@@ -281,8 +265,6 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var company = await _companyRepository.GetCompanyById(request.CompanyId.Value);
-
                 var applicationUser = new ApplicationUser(request.Email, request.Username);
                 applicationUser.AssignCompany(request.CompanyId.Value);
 
@@ -299,8 +281,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                         applicationUser.Id,
                         applicationUser.UserName,
                         applicationUser.Email,
-                        applicationUser.Organization?.Name ?? null,
-                        applicationUser.Organization?.Id ?? null,
+                        applicationUser.OrganizationId ?? null,
                         new List<string> { "Admin" }));
                 }
 
@@ -324,59 +305,10 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.Organization?.Name ?? null, u.Organization?.Id ?? null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.OrganizationId, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
-        }
-
-        // ORGANIZATION ACTIONS
-        public async Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request)
-        {
-            try
-            {
-                var organization = new Organization(request.Name);
-
-                await _authRepository.CreateOrganization(organization);
-
-                return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId));
-            }
-            catch (Exception ex)
-            {
-                return new Response<OrganizationResponse>(ex.Message);
-            }
-        }
-
-        public async Task<Response<List<OrganizationResponse>>> GetAllOrganizations()
-        {
-            try
-            {
-                var organizations = await _authRepository.GetAllOrganizations();
-                return new Response<List<OrganizationResponse>>(organizations
-                    .Select(o =>
-                        new OrganizationResponse(o.Id, o.Name, o.CompanyId))
-                    .ToList());
-            }
-            catch (Exception ex)
-            {
-                return new Response<List<OrganizationResponse>>(ex.Message);
-            }
-        }
-
-        public async Task<Response<bool>> DeleteOrganization(Guid organizationId)
-        {
-            try
-            {
-                var organization = await _authRepository.GetOrganizationById(organizationId);
-
-                await _authRepository.DeleteOrganization(organization);
-
-                return new Response<bool>(true);
-            }
-            catch (Exception ex)
-            {
-                return new Response<bool>(ex.Message);
-            }
         }
     }
 }

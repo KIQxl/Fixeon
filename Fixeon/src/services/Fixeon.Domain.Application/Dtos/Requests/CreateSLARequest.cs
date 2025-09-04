@@ -5,7 +5,6 @@ namespace Fixeon.Domain.Application.Dtos.Requests
 {
     public struct CreateSLARequest : IRequest
     {
-        public string Organization { get; private set; }
         public Guid OrganizationId { get; private set; }
         public int SLAInMinutes { get; private set; }
         public EPriority SLAPriority { get; private set; }

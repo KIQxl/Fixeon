@@ -85,8 +85,6 @@ namespace Fixeon.Auth.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -95,58 +93,7 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("OrganizationId");
-
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Company", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CNPJ")
-                        .IsRequired()
-                        .HasColumnType("varchar(14)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CNPJ")
-                        .IsUnique();
-
-                    b.ToTable("companies");
-                });
-
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("organizations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -282,34 +229,6 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.ApplicationUser", b =>
-                {
-                    b.HasOne("Fixeon.Auth.Infraestructure.Entities.Company", "Company")
-                        .WithMany("Users")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Fixeon.Auth.Infraestructure.Entities.Organization", "Organization")
-                        .WithMany("Users")
-                        .HasForeignKey("OrganizationId");
-
-                    b.Navigation("Company");
-
-                    b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
-                {
-                    b.HasOne("Fixeon.Auth.Infraestructure.Entities.Company", "Company")
-                        .WithMany("Organizations")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -359,18 +278,6 @@ namespace Fixeon.Auth.Infraestructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Company", b =>
-                {
-                    b.Navigation("Organizations");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Fixeon.Auth.Infraestructure.Entities.Organization", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

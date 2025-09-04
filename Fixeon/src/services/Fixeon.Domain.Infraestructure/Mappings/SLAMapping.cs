@@ -10,17 +10,9 @@ namespace Fixeon.Domain.Infraestructure.Mappings
         {
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.CompanyId)
-                .IsRequired()
-                .HasColumnType("varchar(36)");
-
-            builder.Property(s => s.Organization)
-                .IsRequired()
-                .HasColumnType("varchar(50)");
-
             builder.Property(s => s.OrganizationId)
                 .IsRequired()
-                .HasColumnType("varchar(36)");
+                .HasColumnType("uniqueidentifier");
 
             builder.Property(s => s.SLAPriority)
                 .IsRequired()
@@ -38,7 +30,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .IsRequired()
                 .HasColumnType("datetime");
 
-            builder.Property(s => s.Type)
+            builder.Property(s => s.ModifiedAt)
                 .HasColumnType("datetime");
         }
     }

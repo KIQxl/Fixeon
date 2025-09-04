@@ -1,5 +1,5 @@
-﻿using Fixeon.Auth.Infraestructure.Dtos.Requests;
-using Fixeon.Auth.Infraestructure.Interfaces;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
+using Fixeon.Domain.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

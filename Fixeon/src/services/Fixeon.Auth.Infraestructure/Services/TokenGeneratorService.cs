@@ -28,15 +28,13 @@ namespace Fixeon.Auth.Infraestructure.Services
             claims.Add(new Claim("email", user.Email));
             claims.Add(new Claim("companyId", user.CompanyId.ToString()));
 
-            if (user.Organization != null)
+            if (user.OrganizationId != null)
             {
                 claims.Add(new Claim("organizationId", user.OrganizationId.ToString()));
-                claims.Add(new Claim("organizationName", user.Organization.Name));
             }
             else
             {
                 claims.Add(new Claim("organizationId", string.Empty));
-                claims.Add(new Claim("organizationName", string.Empty));
             }
 
             if (roles != null)
