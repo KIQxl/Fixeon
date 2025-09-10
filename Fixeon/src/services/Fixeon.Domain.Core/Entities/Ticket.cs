@@ -50,8 +50,8 @@ namespace Fixeon.Domain.Core.Entities
             if (this.Status.Equals(ETicketStatus.InProgress.ToString()) || this.Status.Equals(ETicketStatus.Reopened.ToString()))
             {
                 this.Status = ETicketStatus.Resolved.ToString();
-                this.ResolvedAt = DateTime.UtcNow;
-                this.ModifiedAt = DateTime.UtcNow;
+                this.ResolvedAt = DateTime.Now;
+                this.ModifiedAt = DateTime.Now;
                 ClosedBy = analyst;
 
                 SetResolutionAccomplished();
@@ -69,7 +69,7 @@ namespace Fixeon.Domain.Core.Entities
 
             this.AssignedTo = assignTo;
             this.Status = ETicketStatus.InProgress.ToString();
-            this.ModifiedAt = DateTime.UtcNow;
+            this.ModifiedAt = DateTime.Now;
 
             SetFirstResponseAccomplished();
 
@@ -79,7 +79,7 @@ namespace Fixeon.Domain.Core.Entities
         public void CancelTicket()
         {
             this.Status = ETicketStatus.Canceled.ToString();
-            this.ModifiedAt = DateTime.UtcNow;
+            this.ModifiedAt = DateTime.Now;
         }
 
         public bool ReOpenTicket()
@@ -88,7 +88,7 @@ namespace Fixeon.Domain.Core.Entities
                 return false;
 
             this.Status = ETicketStatus.Reopened.ToString();
-            this.ModifiedAt = DateTime.UtcNow;
+            this.ModifiedAt = DateTime.Now;
 
             return true;
         }
@@ -99,7 +99,7 @@ namespace Fixeon.Domain.Core.Entities
                 return false;
 
             this.Interactions.Add(interaction);
-            this.ModifiedAt = DateTime.UtcNow;
+            this.ModifiedAt = DateTime.Now;
 
             return true;
         }
@@ -110,7 +110,7 @@ namespace Fixeon.Domain.Core.Entities
                 return false;
 
             this.AssignedTo = assignTo;
-            this.ModifiedAt = DateTime.UtcNow;
+            this.ModifiedAt = DateTime.Now;
 
             return true;
         }

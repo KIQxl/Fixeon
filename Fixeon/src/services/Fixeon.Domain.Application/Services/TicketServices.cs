@@ -41,10 +41,22 @@ namespace Fixeon.Domain.Application.Services
             if (!validationResult.IsValid)
                 return new Response<TicketResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.BadRequest);
 
-            var ticket = TicketMapper.ToEntity(request, _tenantContext);
+            var customer = new User { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail };
 
             if (_tenantContext.OrganizationId.HasValue)
-                SetTicketSLA(ticket);
+            {
+                var organization = await _organizationServices.GetOrganizationById(_tenantContext.OrganizationId.Value);
+
+                if (organization != null)
+                {
+                    customer.OrganizationId = organization.Data.Id;
+                    customer.OrganizationName = organization.Data.Name;
+                }
+            }
+
+            var ticket = TicketMapper.ToEntity(request, customer);
+
+            await SetTicketSLA(ticket);
 
             await ProccessTicketAttachment(ticket, request.Attachments);
 
@@ -67,6 +79,7 @@ namespace Fixeon.Domain.Application.Services
                     .Replace("{ticketTitle}", ticket.Title)
                     .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm"))
                 });
+
                 _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
 
                 return new Response<TicketResponse>(ticket.ToResponse());
@@ -258,7 +271,7 @@ namespace Fixeon.Domain.Application.Services
             {
                 var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
-                if(ticket.Status.Equals(request.Status.ToString()))
+                if (ticket.Status.Equals(request.Status.ToString()))
                     return new Response<TicketResponse>("Essa ação já foi realizada.", EErrorType.BadRequest);
 
                 if (ticket is null)
@@ -267,7 +280,7 @@ namespace Fixeon.Domain.Application.Services
                 switch (request.Status)
                 {
                     case ETicketStatus.Resolved:
-                        if(!ticket.ResolveTicket(new Analyst { AnalystId = _tenantContext.UserId.ToString(), AnalystEmail = _tenantContext.UserEmail }))
+                        if (!ticket.ResolveTicket(new Analyst { AnalystId = _tenantContext.UserId.ToString(), AnalystEmail = _tenantContext.UserEmail }))
                             return new Response<TicketResponse>("Esse ticket não pode ser fechado pois já foi finalizado, cancelado ou não possui um analista responsável.", EErrorType.BadRequest);
                         break;
 
@@ -377,7 +390,7 @@ namespace Fixeon.Domain.Application.Services
                 await _ticketRepository.CreateCategory(category);
 
                 var result = await _unitOfWork.Commit();
-                if(!result)
+                if (!result)
                     return new Response<bool>("Não foi possivel cadastrar a categoria.", EErrorType.BadRequest);
 
 
@@ -423,16 +436,20 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        private async void SetTicketSLA(Ticket ticket)
+        private async Task SetTicketSLA(Ticket ticket)
         {
-            var SLAs = await _organizationServices.GetSLAByOrganization(_tenantContext.OrganizationId.Value);
+            if (_tenantContext.OrganizationId.HasValue)
+            {
+                var SLAs = await _organizationServices.GetSLAByOrganization(_tenantContext.OrganizationId.Value);
 
-            var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
-            var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution && x.SLAPriority == ticket.Priority);
-            var defaultSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Defaul);
+                var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
+                if (firstInteractionSLA != null)
+                    ticket.SetFirstInteractionDeadline(firstInteractionSLA.SLAInMinutes);
 
-            ticket.SetFirstInteractionDeadline(firstInteractionSLA != null ? firstInteractionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
-            ticket.SetResolutionDeadline(resolutionSLA != null ? resolutionSLA.SLAInMinutes : defaultSLA.SLAInMinutes);
+                var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution && x.SLAPriority == ticket.Priority);
+                if (resolutionSLA != null)
+                    ticket.SetResolutionDeadline(resolutionSLA.SLAInMinutes);
+            }
         }
     }
 }

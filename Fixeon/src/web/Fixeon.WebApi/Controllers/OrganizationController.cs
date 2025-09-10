@@ -70,10 +70,10 @@ namespace Fixeon.WebApi.Controllers
             return this.ReturnResponseWithStatusCode(response);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("create-sla")]
         //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
-        public async Task<IActionResult> CreateOrganizationSLA(CreateSLARequest request)
+        public async Task<IActionResult> CreateOrganizationSLA([FromBody] CreateSLARequest request)
         {
             var response = await _organizationServices.CreateOrganizationSLA(request);
 

@@ -8,7 +8,7 @@ namespace Fixeon.Domain.Application.Mapper
 {
     public static class TicketMapper
     {
-        public static Ticket ToEntity(CreateTicketRequest request, ITenantContext tenantContext)
+        public static Ticket ToEntity(CreateTicketRequest request, User customer)
         {
             return new Ticket(
                 request.Title,
@@ -16,13 +16,7 @@ namespace Fixeon.Domain.Application.Mapper
                 request.Category,
                 request.Departament,
                 request.Priority.ToString(),
-                new User
-                {
-                    UserId = tenantContext.UserId.ToString(),
-                    UserEmail = tenantContext.UserEmail,
-                    OrganizationId = tenantContext.OrganizationId,
-                    OrganizationName = ""
-                }
+                customer
             );
         }
 
@@ -37,9 +31,8 @@ namespace Fixeon.Domain.Application.Mapper
                 CreatedAt = ticket.CreateAt,
                 ModifiedAt = ticket.ModifiedAt,
                 ResolvedAt = ticket.ResolvedAt,
-                CreatedBy = ticket.CreatedByUser.UserEmail,
-                OrganizationName = ticket.CreatedByUser.OrganizationName,
-                AssignedTo = ticket.AssignedTo?.AnalystEmail,
+                Customer = ticket.CreatedByUser,
+                Analyst = ticket.AssignedTo ?? new Analyst(),
                 Category = ticket.Category,
                 Departament = ticket.Departament,
                 Interactions = ticket.Interactions.Select(i => i.ToInteractionResponse()).ToList(),
@@ -48,7 +41,8 @@ namespace Fixeon.Domain.Application.Mapper
                 DurationFormat = ticket.Duration.HasValue ? $"{(int)ticket.Duration.Value.TotalDays} dias, {(int)ticket.Duration.Value.Hours} horas e {(int)ticket.Duration.Value.Minutes} minutos" : "Em análise",
                 Duration = ticket.Duration,
                 Attachments = attachmentsUrls,
-                ClosedBy = ticket.ClosedBy?.AnalystEmail
+                ClosedBy = ticket.ClosedBy ?? new Analyst(),
+                SLAInfo = ticket.SLAInfo
             };
         }
 
