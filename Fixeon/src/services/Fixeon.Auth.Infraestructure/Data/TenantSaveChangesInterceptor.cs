@@ -6,8 +6,8 @@ namespace Fixeon.Auth.Infraestructure.Data
 {
     public class TenantSaveChangesInterceptor : SaveChangesInterceptor
     {
-        private readonly ITenantContext _tenantContext;
-        public TenantSaveChangesInterceptor(ITenantContext tenantContext)
+        private readonly ITenantContextServices _tenantContext;
+        public TenantSaveChangesInterceptor(ITenantContextServices tenantContext)
         {
             this._tenantContext = tenantContext;
         }

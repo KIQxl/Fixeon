@@ -1,10 +1,10 @@
-﻿using Fixeon.ACL.DomainContextQueries;
-using Fixeon.Auth.Infraestructure.Configuration;
+﻿using Fixeon.Auth.Infraestructure.Configuration;
 using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Fixeon.Auth.Infraestructure.Repositories;
 using Fixeon.Auth.Infraestructure.Services;
+using Fixeon.Domain.Application.Contracts;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
@@ -91,7 +91,9 @@ namespace Fixeon.WebApi.Configuration
                 .RegisterBackgroundServices(configuration);
 
             services.AddHttpContextAccessor();
-            services.AddScoped<ITenantContext, TenantContext>();
+            services.AddScoped<ITenantContextServices, TenantContextServices>();
+            services.AddScoped<IOrganizationResolver, OrganizationResolver>();
+            services.AddScoped<ICompanyResolver, CompanyResolver>();
 
             var smtpSection = configuration.GetSection("SmtpSettings");
             services.Configure<SmtpSettings>(smtpSection);
@@ -184,6 +186,7 @@ namespace Fixeon.WebApi.Configuration
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IOrganizationServices, OrganizationServices>();
+            services.AddScoped<ITicketNotificationServices, TicketNotificationServices>();
 
             return services;
         }
@@ -278,7 +281,6 @@ namespace Fixeon.WebApi.Configuration
             services.AddScoped<IIdentityServices, IdentityServices>();
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
             services.AddScoped<IUrlEncoder, UrlEncoder>();
-            services.AddScoped<IOrganizationACLQueries, OrganizationQueries>();
             services.AddScoped<Fixeon.Auth.Infraestructure.Data.TenantSaveChangesInterceptor>();
 
             return services;

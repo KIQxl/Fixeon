@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\services\Fixeon.AntiCorruptionLayer\Fixeon.ACL\Fixeon.ACL.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Auth.Infraestructure\Fixeon.Auth.Infraestructure.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Domain.Infraestructure\Fixeon.Domain.Infraestructure.csproj" />
     <ProjectReference Include="..\..\services\Fixeon.Shared\Fixeon.Shared.csproj" />

@@ -7,11 +7,11 @@ namespace Fixeon.Auth.Infraestructure.Data
 {
     public class DataContext : IdentityDbContext<ApplicationUser>
     {
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
         public Guid CurrentTenant => _tenantContext.TenantId;
 
         public bool IgnoreTenantInterceptor { get; set; } = false;
-        public DataContext(DbContextOptions<DataContext> opts, ITenantContext tenantContext)
+        public DataContext(DbContextOptions<DataContext> opts, ITenantContextServices tenantContext)
             : base(opts)
         {
             _tenantContext = tenantContext;

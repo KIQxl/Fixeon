@@ -7,9 +7,9 @@ namespace Fixeon.Shared.Services
     public class StorageClientFactory
     {
         private readonly StorageSettings _storageSettings;
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
 
-        public StorageClientFactory(IOptions<StorageSettings> storageSettings, ITenantContext tenantContext)
+        public StorageClientFactory(IOptions<StorageSettings> storageSettings, ITenantContextServices tenantContext)
         {
             _storageSettings = storageSettings.Value;
             _tenantContext = tenantContext;

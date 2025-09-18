@@ -8,7 +8,7 @@ namespace Fixeon.Domain.Application.Mapper
 {
     public static class InteractionMapper
     {
-        public static Interaction ToEntity(CreateInteractionRequest request, ITenantContext tenantContext)
+        public static Interaction ToEntity(CreateInteractionRequest request, ITenantContextServices tenantContext)
         {
             return new Interaction(
                 request.TicketId,

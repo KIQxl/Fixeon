@@ -12,7 +12,7 @@ namespace Fixeon.WebApi.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ITenantContext tenantContext)
+        public async Task Invoke(HttpContext context, ITenantContextServices tenantContext)
         {
             var companyClaim = context.User.FindFirst("companyId");
 

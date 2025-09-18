@@ -14,7 +14,7 @@ namespace Fixeon.Auth.Infraestructure.Services
     {
         private readonly JwtSettings _jwtSettings;
 
-        public TokenGeneratorService(IOptions<JwtSettings> jwtSettings, ITenantContext tenantContext)
+        public TokenGeneratorService(IOptions<JwtSettings> jwtSettings, ITenantContextServices tenantContext)
         {
             this._jwtSettings = jwtSettings.Value;
         }

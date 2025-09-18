@@ -1,5 +1,4 @@
-﻿using Fixeon.Domain.Application.Contracts;
-using Fixeon.Domain.Application.Dtos;
+﻿using Fixeon.Domain.Application.Dtos;
 using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Dtos.Responses;
@@ -10,8 +9,6 @@ using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
-using Fixeon.Shared.Core.Models;
-using System.Net.Sockets;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -20,18 +17,18 @@ namespace Fixeon.Domain.Application.Services
         private readonly ITicketRepository _ticketRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IStorageServices _storageServices;
-        private readonly IBackgroundEmailJobWrapper _backgroundServices;
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
         private readonly IOrganizationServices _organizationServices;
+        private readonly ITicketNotificationServices _notificationServices;
 
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, IBackgroundEmailJobWrapper backgroundServices, ITenantContext tenantContext, IOrganizationServices organizationServices)
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, ITenantContextServices tenantContext, IOrganizationServices organizationServices, ITicketNotificationServices notificationServices)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
             _storageServices = storageServices;
-            _backgroundServices = backgroundServices;
             _tenantContext = tenantContext;
             _organizationServices = organizationServices;
+            _notificationServices = notificationServices;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -41,18 +38,9 @@ namespace Fixeon.Domain.Application.Services
             if (!validationResult.IsValid)
                 return new Response<TicketResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.BadRequest);
 
-            var customer = new User { UserId = _tenantContext.UserId.ToString(), UserEmail = _tenantContext.UserEmail };
+            var currentUser = await _tenantContext.GetCurrentUser();
 
-            if (_tenantContext.OrganizationId.HasValue)
-            {
-                var organization = await _organizationServices.GetOrganizationById(_tenantContext.OrganizationId.Value);
-
-                if (organization != null)
-                {
-                    customer.OrganizationId = organization.Data.Id;
-                    customer.OrganizationName = organization.Data.Name;
-                }
-            }
+            var customer = new User { UserId = currentUser.UserId.ToString(), UserEmail = currentUser.UserEmail, OrganizationId = currentUser.Organization.OrganizationId, OrganizationName = currentUser.Organization.OrganizationName };
 
             var ticket = TicketMapper.ToEntity(request, customer);
 
@@ -66,21 +54,12 @@ namespace Fixeon.Domain.Application.Services
 
                 var result = await _unitOfWork.Commit();
 
+                await _notificationServices.NotifyAnalystTeam(ticket, _tenantContext.TenantId);
+
+                await _notificationServices.NotifyRequesterAsync(_tenantContext.UserEmail);
+
                 if (!result)
                     return new Response<TicketResponse>("Não foi possível realizar a abertura do chamado.", EErrorType.ServerError);
-
-                _backgroundServices.SendEmail(new EmailMessage
-                {
-                    To = "",
-                    Subject = "Novo ticket aberto",
-                    Body = EmailDictionary.NewTicketInformAnalysts
-                    .Replace("{ticketId}", ticket.Id.ToString())
-                    .Replace("{ticketUser}", ticket.CreatedByUser.UserEmail)
-                    .Replace("{ticketTitle}", ticket.Title)
-                    .Replace("{ticketCreatedAt}", ticket.CreateAt.ToString("dd/MM/yyyy HH:mm"))
-                });
-
-                _backgroundServices.SendEmail(new EmailMessage { To = _tenantContext.UserEmail, Subject = "Ticket registrado com sucesso!", Body = EmailDictionary.ConfirmationTicketOpening });
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }

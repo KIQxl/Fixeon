@@ -1,13 +1,14 @@
-﻿using Fixeon.Shared.Core.Interfaces;
+﻿using Fixeon.Shared.Core.Models;
 
-namespace Fixeon.Shared.Models
+namespace Fixeon.Shared.Core.Interfaces
 {
-    public class TenantContext : ITenantContext
+    public interface ITenantContextServices
     {
         public Guid TenantId { get; set; }
-        public string? OrganizationName { get; set; }
         public Guid? OrganizationId { get; set; }
         public Guid UserId { get; set; }
         public string UserEmail { get; set; }
+
+        public Task<CurrentUser> GetCurrentUser();
     }
 }

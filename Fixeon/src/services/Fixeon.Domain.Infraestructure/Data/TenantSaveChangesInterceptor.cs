@@ -7,9 +7,9 @@ namespace Fixeon.Domain.Infraestructure.Data
 {
     public class TenantSaveChangesInterceptor : SaveChangesInterceptor
     {
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
 
-        public TenantSaveChangesInterceptor(ITenantContext tenantContext)
+        public TenantSaveChangesInterceptor(ITenantContextServices tenantContext)
         {
             _tenantContext = tenantContext;
         }

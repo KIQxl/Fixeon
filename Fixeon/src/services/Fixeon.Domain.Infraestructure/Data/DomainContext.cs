@@ -7,9 +7,9 @@ namespace Fixeon.Domain.Infraestructure.Data
 {
     public class DomainContext : DbContext
     {
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
         public Guid _currentTenant => _tenantContext.TenantId;
-        public DomainContext(DbContextOptions<DomainContext> opts, ITenantContext tenantContext)
+        public DomainContext(DbContextOptions<DomainContext> opts, ITenantContextServices tenantContext)
             : base(opts)
         {
             _tenantContext = tenantContext;

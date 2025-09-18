@@ -7,7 +7,7 @@ namespace Fixeon.Shared.Services
 {
     public class MinIOStorageService : StorageService
     {
-        public MinIOStorageService(StorageSettings settings, ITenantContext tenantContext)
+        public MinIOStorageService(StorageSettings settings, ITenantContextServices tenantContext)
         {
             _settings = settings;
 
@@ -22,7 +22,7 @@ namespace Fixeon.Shared.Services
 
         private readonly AmazonS3Client _client;
         private readonly StorageSettings _settings;
-        private readonly ITenantContext _tenantContext;
+        private readonly ITenantContextServices _tenantContext;
 
         public override async Task UploadFile(string filename, string contentType, Stream content)
         {

@@ -14,15 +14,15 @@ namespace Fixeon.Auth.Infraestructure.Services
         private readonly IBackgroundEmailJobWrapper _backgroundEmailJobWrapper;
         private readonly IUrlEncoder _urlEncoder;
         private readonly ITokenGeneratorService _tokenGeneratorService;
-        private readonly IOrganizationACLQueries _OrganizationQueries;
+        private readonly IOrganizationResolver _organizationResolver;
 
-        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, IOrganizationACLQueries organizationQueries)
+        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, IOrganizationResolver organizationResolver)
         {
             _authRepository = authRepository;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
             _urlEncoder = urlEncoder;
             _tokenGeneratorService = tokenGeneratorService;
-            _OrganizationQueries = organizationQueries;
+            _organizationResolver = organizationResolver;
         }
 
         // GET
@@ -38,19 +38,10 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                UserOrganizationResponse organizationResponse = new UserOrganizationResponse();
 
-                if (u.OrganizationId.HasValue)
-                {
-                    var org = await _OrganizationQueries.GetOrganizationByIdAsync(u.OrganizationId.Value);
+                var organization = await _organizationResolver.GetOrganization(u.OrganizationId.Value);
 
-                    if(org != null)
-                    {
-                        organizationResponse.OrganizationId = org.OrganizationId;
-                        organizationResponse.OrganizationName = org.OrganizationName;
-                    }
-                }
-
+                var organizationResponse = new UserOrganizationResponse { OrganizationId = organization.OrganizationId, OrganizationName = organization.OrganizationName };
 
                 response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
             }
@@ -67,18 +58,13 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var roles = await _authRepository.GetRolesByUser(user);
 
-            UserOrganizationResponse organizationResponse = new UserOrganizationResponse();
+            var org = await _organizationResolver.GetOrganization(user.OrganizationId.Value);
 
-            if (user.OrganizationId.HasValue)
+            UserOrganizationResponse organizationResponse = new UserOrganizationResponse
             {
-                var org = await _OrganizationQueries.GetOrganizationByIdAsync(user.OrganizationId.Value);
-
-                if (org != null)
-                {
-                    organizationResponse.OrganizationId = org.OrganizationId;
-                    organizationResponse.OrganizationName = org.OrganizationName;
-                }
-            }
+                OrganizationId = org.OrganizationId,
+                OrganizationName = org.OrganizationName
+            };
 
             return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, organizationResponse, roles));
         }
@@ -95,19 +81,13 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                UserOrganizationResponse organizationResponse = new UserOrganizationResponse();
+                var org = await _organizationResolver.GetOrganization(u.OrganizationId.Value);
 
-                if (u.OrganizationId.HasValue)
+                UserOrganizationResponse organizationResponse = new UserOrganizationResponse
                 {
-                    var org = await _OrganizationQueries.GetOrganizationByIdAsync(u.OrganizationId.Value);
-
-                    if (org != null)
-                    {
-                        organizationResponse.OrganizationId = org.OrganizationId;
-                        organizationResponse.OrganizationName = org.OrganizationName;
-                    }
-                }
-
+                    OrganizationId = org.OrganizationId,
+                    OrganizationName = org.OrganizationName
+                };
 
                 response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
             }
@@ -151,18 +131,13 @@ namespace Fixeon.Auth.Infraestructure.Services
                     if (roles.Any())
                         await _authRepository.AssociateRoles(user, roles.Select(r => r.Name).ToList());
 
-                    UserOrganizationResponse organizationResponse = new UserOrganizationResponse();
+                    var org = await _organizationResolver.GetOrganization(user.OrganizationId.Value);
 
-                    if (user.OrganizationId.HasValue)
+                    UserOrganizationResponse organizationResponse = new UserOrganizationResponse
                     {
-                        var org = await _OrganizationQueries.GetOrganizationByIdAsync(user.OrganizationId.Value);
-
-                        if (org != null)
-                        {
-                            organizationResponse.OrganizationId = org.OrganizationId;
-                            organizationResponse.OrganizationName = org.OrganizationName;
-                        }
-                    }
+                        OrganizationId = org.OrganizationId,
+                        OrganizationName = org.OrganizationName
+                    };
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
