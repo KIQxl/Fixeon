@@ -56,6 +56,16 @@ namespace Fixeon.Domain.Application.Services
             {
                 var organization = new Organization(request.Name);
 
+                if (request.Slas.Any())
+                {
+                    foreach (var sla in request.Slas)
+                    {
+                        var SLA = new OrganizationsSLA(organization.Id, sla.SLAInMinutes, sla.SLAPriority.ToString(), sla.Type);
+
+                        organization.NewSLAConfig(SLA);
+                    }
+                }
+
                 await _organizationRepository.CreateOrganization(organization);
 
                 return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId, organization.SLAs));

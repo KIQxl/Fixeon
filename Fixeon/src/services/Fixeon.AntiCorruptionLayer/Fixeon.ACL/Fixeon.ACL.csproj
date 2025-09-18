@@ -11,4 +11,8 @@
     <ProjectReference Include="..\..\Fixeon.Domain.Application\Fixeon.Domain.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AuthContextQueries\" />
+  </ItemGroup>
+
 </Project>
