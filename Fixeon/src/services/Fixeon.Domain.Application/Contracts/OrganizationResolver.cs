@@ -13,18 +13,45 @@ namespace Fixeon.Domain.Application.Contracts
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<CurrentOrganization> GetOrganization(Guid organizationId)
+        public async Task<OrganizationResolverView> GetOrganization(Guid organizationId)
         {
             var organization = await _organizationRepository.GetOrganizationById(organizationId);
 
             if (organization == null)
-                return new CurrentOrganization();
+                return new OrganizationResolverView();
 
-            return new CurrentOrganization
+            return new OrganizationResolverView
             {
                 OrganizationId = organizationId,
                 OrganizationName = organization.Name,
             };
+        }
+
+        public async Task<List<OrganizationResolverView>> GetOrganizations(IEnumerable<Guid> organizationIds)
+        {
+            var orgs = await _organizationRepository.GetOrganizations(organizationIds);
+
+            return orgs.Select(o => new OrganizationResolverView
+            {
+                OrganizationId = o.Id,
+                OrganizationName = o.Name
+            }).ToList();
+        }
+
+        public async Task<List<SLAResolverView>> GetSLAByOrganization(Guid organizationId)
+        {
+            var SLAs = await _organizationRepository.GetSLAByOrganization(organizationId);
+
+            var SLAsView = SLAs.Select(s => new SLAResolverView
+            {
+                OrganizationId = s.OrganizationId,
+                SLAInMinutes = s.SLAInMinutes,
+                SLAPriority = s.SLAPriority,
+                Type = (int)s.Type
+            })
+                .ToList();
+
+            return SLAsView;
         }
     }
 }

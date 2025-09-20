@@ -35,15 +35,33 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var response = new List<ApplicationUserResponse>();
 
+            var orgIds = users
+                            .Where(u => u.OrganizationId.HasValue)
+                            .Select(u => u.OrganizationId.Value)
+                            .Distinct()
+                            .ToList();
+
+            var organizations = await _organizationResolver.GetOrganizations(orgIds);
+            var orgDict = organizations.ToDictionary(o => o.OrganizationId, o => o);
+
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
 
-                var organization = await _organizationResolver.GetOrganization(u.OrganizationId.Value);
+                UserOrganizationResponse? organizationResponse = null;
 
-                var organizationResponse = new UserOrganizationResponse { OrganizationId = organization.OrganizationId, OrganizationName = organization.OrganizationName };
+                if (u.OrganizationId.HasValue && orgDict.TryGetValue(u.OrganizationId.Value, out var org))
+                {
+                    organizationResponse = new UserOrganizationResponse { OrganizationId = org.OrganizationId, OrganizationName = org.OrganizationName };
+                }
 
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
+                response.Add(new ApplicationUserResponse(
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    organizationResponse,
+                    roles
+                ));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);

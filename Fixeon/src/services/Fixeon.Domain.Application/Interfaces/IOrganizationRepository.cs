@@ -7,6 +7,8 @@ namespace Fixeon.Domain.Application.Interfaces
     {
         public Task<List<Organization>> GetAllOrganizations();
         public Task<Organization> GetOrganizationById(Guid organizationId);
+        public Task<List<Organization>> GetOrganizations(IEnumerable<Guid> organizationIds);
+
         public Task CreateOrganization(Organization organization);
         public Task UpdateOrganization(Organization organization);
         public Task DeleteOrganization(Organization organization);

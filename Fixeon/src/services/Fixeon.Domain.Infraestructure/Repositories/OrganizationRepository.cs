@@ -39,6 +39,13 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<List<Organization>> GetOrganizations(IEnumerable<Guid> organizationIds)
+        {
+            return await _context.organizations
+                .Where(o => organizationIds.Contains(o.Id))
+                .ToListAsync();
+        }
+
 
         public async Task CreateOrganization(Organization organization)
         {

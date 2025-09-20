@@ -18,16 +18,16 @@ namespace Fixeon.Domain.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IStorageServices _storageServices;
         private readonly ITenantContextServices _tenantContext;
-        private readonly IOrganizationServices _organizationServices;
+        private readonly IOrganizationResolver _organizationResolver;
         private readonly ITicketNotificationServices _notificationServices;
 
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, ITenantContextServices tenantContext, IOrganizationServices organizationServices, ITicketNotificationServices notificationServices)
+        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, ITenantContextServices tenantContext, IOrganizationResolver organizationServices, ITicketNotificationServices notificationServices)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
             _storageServices = storageServices;
             _tenantContext = tenantContext;
-            _organizationServices = organizationServices;
+            _organizationResolver = organizationServices;
             _notificationServices = notificationServices;
         }
 
@@ -40,7 +40,9 @@ namespace Fixeon.Domain.Application.Services
 
             var currentUser = await _tenantContext.GetCurrentUser();
 
-            var customer = new User { UserId = currentUser.UserId.ToString(), UserEmail = currentUser.UserEmail, OrganizationId = currentUser.Organization.OrganizationId, OrganizationName = currentUser.Organization.OrganizationName };
+            var organization = await _organizationResolver.GetOrganization(_tenantContext.OrganizationId.Value);
+
+            var customer = new User { UserId = currentUser.UserId.ToString(), UserEmail = currentUser.UserEmail, OrganizationId = organization.OrganizationId, OrganizationName = organization.OrganizationName };
 
             var ticket = TicketMapper.ToEntity(request, customer);
 
@@ -419,13 +421,13 @@ namespace Fixeon.Domain.Application.Services
         {
             if (_tenantContext.OrganizationId.HasValue)
             {
-                var SLAs = await _organizationServices.GetSLAByOrganization(_tenantContext.OrganizationId.Value);
+                var SLAs = await _organizationResolver.GetSLAByOrganization(_tenantContext.OrganizationId.Value);
 
-                var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
+                var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == (int)ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
                 if (firstInteractionSLA != null)
                     ticket.SetFirstInteractionDeadline(firstInteractionSLA.SLAInMinutes);
 
-                var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == ESLAType.Resolution && x.SLAPriority == ticket.Priority);
+                var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == (int)ESLAType.Resolution && x.SLAPriority == ticket.Priority);
                 if (resolutionSLA != null)
                     ticket.SetResolutionDeadline(resolutionSLA.SLAInMinutes);
             }

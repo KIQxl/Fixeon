@@ -5,11 +5,8 @@ namespace Fixeon.Shared.Models
 {
     public class TenantContextServices : ITenantContextServices
     {
-        private readonly IOrganizationResolver _orgResolver;
-
-        public TenantContextServices(IOrganizationResolver orgResolver)
+        public TenantContextServices()
         {
-            _orgResolver = orgResolver;
         }
 
         public Guid TenantId { get; set; }
@@ -19,13 +16,10 @@ namespace Fixeon.Shared.Models
 
         public async Task<CurrentUser> GetCurrentUser()
         {
-            var org = await _orgResolver.GetOrganization(this.OrganizationId.Value);
-
             return new CurrentUser
             {
                 UserId = UserId,
-                UserEmail = UserEmail,
-                Organization = org
+                UserEmail = UserEmail
             };
         }
     }

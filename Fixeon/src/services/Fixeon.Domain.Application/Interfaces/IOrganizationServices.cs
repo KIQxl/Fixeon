@@ -12,7 +12,6 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<Response<bool>> DeleteOrganization(Guid organizationId);
 
         //SLA
-        public Task<List<OrganizationsSLA>> GetSLAByOrganization(Guid organizationId);
         public Task<Response<bool>> CreateOrganizationSLA(CreateSLARequest request);
     }
 }

@@ -123,12 +123,5 @@ namespace Fixeon.Domain.Application.Services
                 return new Response<bool>(ex.InnerException.Message ?? ex.Message, EErrorType.ServerError);
             }
         }
-
-        public async Task<List<OrganizationsSLA>> GetSLAByOrganization(Guid organizationId)
-        {
-            var SLAs = await _organizationRepository.GetSLAByOrganization(organizationId);
-
-            return SLAs;
-        }
     }
 }
