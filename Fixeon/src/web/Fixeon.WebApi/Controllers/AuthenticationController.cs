@@ -142,7 +142,7 @@ namespace Fixeon.WebApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> GetAllAnalysts()
         {
-            var response = await _services.GetUserByRoleName("analyst");
+            var response = await _services.GetUserByRoleName("Analista");
 
             if (response.Success)
                 return Ok(response);
