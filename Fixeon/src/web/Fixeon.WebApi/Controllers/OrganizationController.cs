@@ -1,5 +1,6 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Domain.Application.Services;
 using Fixeon.WebApi.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,6 +77,58 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> CreateOrganizationSLA([FromBody] CreateSLARequest request)
         {
             var response = await _organizationServices.CreateOrganizationSLA(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpPost]
+        [Route("create-category")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequest request)
+        {
+            var response = await _organizationServices.CreateCategory(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpGet]
+        [Route("categories/{organizationId}")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        public async Task<IActionResult> GetAllCategories([FromRoute] Guid organizationId)
+        {
+            var response = await _organizationServices.GetCategories(organizationId);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpPost]
+        [Route("create-departament")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> CreateDepartament([FromBody] CreateDepartamentRequest request)
+        {
+            var response = await _organizationServices.CreateDepartament(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpGet]
+        [Route("departaments/{organizationId}")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        public async Task<IActionResult> GetAllDepartaments([FromRoute] Guid organizationId)
+        {
+            var response = await _organizationServices.GetDepartaments(organizationId);
 
             if (response.Success)
                 return Ok(response);

@@ -7,6 +7,16 @@ namespace Fixon.Tests.MockRepository
 {
     public class FakeOrganizationServices : IOrganizationServices
     {
+        public Task<Response<bool>> CreateCategory(CreateCategoryRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<bool>> CreateDepartament(CreateDepartamentRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request)
         {
             throw new NotImplementedException();
@@ -23,6 +33,16 @@ namespace Fixon.Tests.MockRepository
         }
 
         public Task<Response<List<OrganizationResponse>>> GetAllOrganizations()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<List<string>>> GetCategories(Guid organizationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<List<string>>> GetDepartaments(Guid organizationId)
         {
             throw new NotImplementedException();
         }

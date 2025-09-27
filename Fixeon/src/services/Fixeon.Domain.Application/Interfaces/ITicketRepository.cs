@@ -19,8 +19,5 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task CreateInteraction(Interaction interaction);
 
         public Task CreateAttachment(List<Attachment> attachments);
-
-        public Task<List<Category>> GetCategories();
-        public Task CreateCategory(Category category);
     }
 }

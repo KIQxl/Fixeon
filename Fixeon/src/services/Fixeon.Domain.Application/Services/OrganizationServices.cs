@@ -42,7 +42,7 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 var organization = await _organizationRepository.GetOrganizationById(organizationId);
-                return new Response<OrganizationResponse>( new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId, organization.SLAs) );
+                return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId, organization.SLAs));
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ namespace Fixeon.Domain.Application.Services
             {
                 var organization = new Organization(request.Name);
 
-                if (request.Slas.Any())
+                if (request.Slas != null && request.Slas.Any())
                 {
                     foreach (var sla in request.Slas)
                     {
@@ -104,7 +104,7 @@ namespace Fixeon.Domain.Application.Services
 
             var organization = await _organizationRepository.GetOrganizationById(request.OrganizationId);
 
-            if(organization is null)
+            if (organization is null)
                 return new Response<bool>("Cliente/Organização não encontrado.", EErrorType.BadRequest);
 
             var SLA = new OrganizationsSLA(request.OrganizationId, request.SLAInMinutes, request.SLAPriority.ToString(), request.Type);
@@ -121,6 +121,98 @@ namespace Fixeon.Domain.Application.Services
             catch (Exception ex)
             {
                 return new Response<bool>(ex.InnerException.Message ?? ex.Message, EErrorType.ServerError);
+            }
+        }
+
+        //CATEGORY
+        public async Task<Response<List<string>>> GetCategories(Guid organizationId)
+        {
+            try
+            {
+                var categories = await _organizationRepository.GetCategories(organizationId);
+
+                return new Response<List<string>>(categories.Select(c => c.Name).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<string>>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<bool>> CreateCategory(CreateCategoryRequest request)
+        {
+            try
+            {
+                var validationResult = request.Validate();
+
+                if (!validationResult.IsValid)
+                    return new Response<bool>(validationResult.Errors.Select(e => e.ErrorMessage).ToList(), EErrorType.BadRequest);
+
+                var organization = await _organizationRepository.GetOrganizationById(request.OrganizationId);
+
+                if (organization is null)
+                    return new Response<bool>("Não foi possivel cadastrar a categoria pois a organização não foi encontrada.", EErrorType.NotFound);
+
+                var category = new Category(request.CategoryName, organization.Id);
+
+                await _organizationRepository.CreateCategory(category);
+                var result = await _unitOfWork.Commit();
+
+                if (!result)
+                    return new Response<bool>("Não foi possivel cadastrar a categoria.", EErrorType.BadRequest);
+
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
+            }
+        }
+
+        // DEPARTAMENT
+        public async Task<Response<bool>> CreateDepartament(CreateDepartamentRequest request)
+        {
+            try
+            {
+                var validationResult = request.Validate();
+
+                if (!validationResult.IsValid)
+                    return new Response<bool>(validationResult.Errors.Select(e => e.ErrorMessage).ToList(), EErrorType.BadRequest);
+
+                var organization = await _organizationRepository.GetOrganizationById(request.OrganizationId);
+
+                if (organization is null)
+                    return new Response<bool>("Não foi possivel cadastrar o departamento pois a organização não foi encontrada.", EErrorType.NotFound);
+
+                var departament = new Departament(request.DepartamentName, organization.Id);
+
+                await _organizationRepository.CreateDepartament(departament);
+                var result = await _unitOfWork.Commit();
+
+                if (!result)
+                    return new Response<bool>("Não foi possivel cadastrar o departamento.", EErrorType.BadRequest);
+
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
+            }
+        }
+
+        public async Task<Response<List<string>>> GetDepartaments(Guid organizationId)
+        {
+            try
+            {
+                var departaments = await _organizationRepository.GetDepartaments(organizationId);
+
+                return new Response<List<string>>(departaments.Select(c => c.Name).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<string>>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
             }
         }
     }

@@ -138,31 +138,5 @@ namespace Fixeon.WebApi.Controllers
 
             return this.ReturnResponseWithStatusCode(response);
         }
-
-        [HttpPost]
-        [Route("create-category")]
-        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequest request)
-        {
-            var response = await _ticketServices.CreateCategory(request);
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
-
-        [HttpGet]
-        [Route("categories")]
-        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
-        public async Task<IActionResult> GetAllCategories()
-        {
-            var response = await _ticketServices.GetCategories();
-
-            if (response.Success)
-                return Ok(response);
-
-            return this.ReturnResponseWithStatusCode(response);
-        }
     }
 }

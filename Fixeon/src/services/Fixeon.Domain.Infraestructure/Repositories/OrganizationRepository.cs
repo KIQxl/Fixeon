@@ -1,10 +1,8 @@
 ﻿using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
-using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Entities;
 using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Sockets;
 
 namespace Fixeon.Domain.Infraestructure.Repositories
 {
@@ -32,7 +30,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _context.organizations.Include(o => o.SLAs).FirstOrDefaultAsync(x => x.Id == organizationId);
+                return await _context.organizations.Include(o => o.SLAs).Include(o => o.Categories).Include(o => o.Departaments).Include(o => o.Company).FirstOrDefaultAsync(x => x.Id == organizationId);
             }
             catch (Exception ex)
             {
@@ -59,6 +57,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task UpdateOrganization(Organization organization)
         {
             try
@@ -123,6 +122,57 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             catch (Exception ex)
             {
                 throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
+
+        //CATEGORIES
+
+        public async Task<List<Category>> GetCategories(Guid organizationId)
+        {
+            try
+            {
+                return await _context.categories.AsNoTracking().Where(x => x.OrganizationId == organizationId).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
+
+        public async Task CreateCategory(Category category)
+        {
+            try
+            {
+                await _context.categories.AddAsync(category);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        // DEPARTAMENTS
+        public async Task<List<Departament>> GetDepartaments(Guid organizationId)
+        {
+            try
+            {
+                return await _context.departaments.AsNoTracking().Where(x => x.OrganizationId == organizationId).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
+
+        public async Task CreateDepartament(Departament departament)
+        {
+            try
+            {
+                await _context.departaments.AddAsync(departament);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

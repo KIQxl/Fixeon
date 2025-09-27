@@ -15,7 +15,5 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<Response<TicketResponse>> ChangeTicketCategory(ChangeTicketCategory request);
         public Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol);
         public Task<Response<TicketDashboardResponse>> GetDashboardTickets();
-        public Task<Response<bool>> CreateCategory(CreateCategoryRequest request);
-        public Task<Response<List<string>>> GetCategories();
     }
 }

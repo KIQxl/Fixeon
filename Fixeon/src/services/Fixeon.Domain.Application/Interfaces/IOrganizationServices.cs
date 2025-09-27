@@ -1,6 +1,5 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Dtos.Responses;
-using Fixeon.Domain.Core.Entities;
 
 namespace Fixeon.Domain.Application.Interfaces
 {
@@ -13,5 +12,13 @@ namespace Fixeon.Domain.Application.Interfaces
 
         //SLA
         public Task<Response<bool>> CreateOrganizationSLA(CreateSLARequest request);
+
+        // CATEGORY
+        public Task<Response<bool>> CreateCategory(CreateCategoryRequest request);
+        public Task<Response<List<string>>> GetCategories(Guid organizationId);
+
+        // DEPARTAMENT
+        public Task<Response<bool>> CreateDepartament(CreateDepartamentRequest request);
+        public Task<Response<List<string>>> GetDepartaments(Guid organizationId);
     }
 }

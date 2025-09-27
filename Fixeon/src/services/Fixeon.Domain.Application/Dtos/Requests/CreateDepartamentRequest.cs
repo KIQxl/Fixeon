@@ -2,9 +2,9 @@
 
 namespace Fixeon.Domain.Application.Dtos.Requests
 {
-    public class CreateCategoryRequest : IRequest
+    public class CreateDepartamentRequest : IRequest
     {
         public Guid OrganizationId { get; set; }
-        public string CategoryName { get; set; }
+        public string DepartamentName { get; set; }
     }
 }

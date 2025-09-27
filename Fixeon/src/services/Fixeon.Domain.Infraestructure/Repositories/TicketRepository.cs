@@ -136,31 +136,6 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
-        //CATEGORIES
-        public async Task CreateCategory(Category category)
-        {
-            try
-            {
-                await _ctx.categories.AddAsync(category);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
-        public async Task<List<Category>> GetCategories()
-        {
-            try
-            {
-                return await _ctx.categories.AsNoTracking().ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
-            }
-        }
-
         public async Task<TicketAnalysisResponse> GetTicketsAnalysis()
         {
             try

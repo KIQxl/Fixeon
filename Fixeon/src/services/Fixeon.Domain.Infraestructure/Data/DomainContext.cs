@@ -19,6 +19,7 @@ namespace Fixeon.Domain.Infraestructure.Data
         public DbSet<Interaction> interactions { get; set; }
         public DbSet<Attachment> attachments { get; set; }
         public DbSet<Category> categories { get; set; }
+        public DbSet<Departament> departaments { get; set; }
         public DbSet<Company> companies { get; set; }
         public DbSet<Organization> organizations { get; set; }
         public DbSet<OrganizationsSLA> organizationsSLAs { get; set; }

@@ -17,5 +17,13 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<List<OrganizationsSLA>> GetSLAByOrganization(Guid organizationId);
         public Task AddOrganizationSLA(OrganizationsSLA organizationSLA);
         public Task UpdateSLA(OrganizationsSLA organizationSLA);
+
+        //CATEGORIES
+        public Task<List<Category>> GetCategories(Guid organizationId);
+        public Task CreateCategory(Category category);
+
+        //DEPARTAMENTS
+        public Task<List<Departament>> GetDepartaments(Guid organizationId);
+        public Task CreateDepartament(Departament departament);
     }
 }
