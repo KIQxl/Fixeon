@@ -1,6 +1,7 @@
 ﻿using Fixeon.Auth.Application.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Dtos.Requests;
 using Fixeon.Auth.Infraestructure.Dtos.Responses;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fixeon.Auth.Infraestructure.Interfaces
 {
@@ -12,7 +13,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<Response<bool>> CreateRole(string request);
         public Task<bool> FindUserByEmail(string email);
         public Task<Response<bool>> GenerateResetPasswordToken(string email);
-        public Task<Response<List<ApplicationUserResponse>>> GetAllUsers();
+        public Task<Response<List<ApplicationUserResponse>>> GetAllUsers(Guid? id, string? email, Guid? organization, string? username);
         public Task<Response<List<string>>> GetAllRoles();
         public Task<Response<ApplicationUserResponse>> GetuserById(string id);
         public Task<Response<LoginResponse>> Login(string email, string password);

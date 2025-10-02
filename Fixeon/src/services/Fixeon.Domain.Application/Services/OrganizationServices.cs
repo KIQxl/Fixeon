@@ -27,8 +27,17 @@ namespace Fixeon.Domain.Application.Services
                 var organizations = await _organizationRepository.GetAllOrganizations();
 
                 return new Response<List<OrganizationResponse>>(organizations
-                    .Select(o =>
-                        new OrganizationResponse(o.Id, o.Name, o.CompanyId, o.SLAs))
+                    .Select(organization =>
+                        new OrganizationResponse(
+                            organization.Id,
+                            organization.Name,
+                            organization.CompanyId,
+                            organization.CNPJ,
+                            organization.Email,
+                            organization.CreatedAt,
+                            organization.SLAs,
+                            organization.Categories?.Select(x => x.Name).ToList(),
+                            organization.Departaments?.Select(x => x.Name).ToList()))
                     .ToList());
             }
             catch (Exception ex)
@@ -42,7 +51,16 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 var organization = await _organizationRepository.GetOrganizationById(organizationId);
-                return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId, organization.SLAs));
+                return new Response<OrganizationResponse>(new OrganizationResponse(
+                            organization.Id,
+                            organization.Name,
+                            organization.CompanyId,
+                            organization.CNPJ,
+                            organization.Email,
+                            organization.CreatedAt,
+                            organization.SLAs,
+                            organization.Categories?.Select(x => x.Name).ToList(),
+                            organization.Departaments?.Select(x => x.Name).ToList()));
             }
             catch (Exception ex)
             {
@@ -54,7 +72,7 @@ namespace Fixeon.Domain.Application.Services
         {
             try
             {
-                var organization = new Organization(request.Name);
+                var organization = new Organization(request.Name, request.CNPJ, request.Email);
 
                 if (request.Slas != null && request.Slas.Any())
                 {
@@ -68,7 +86,16 @@ namespace Fixeon.Domain.Application.Services
 
                 await _organizationRepository.CreateOrganization(organization);
 
-                return new Response<OrganizationResponse>(new OrganizationResponse(organization.Id, organization.Name, organization.CompanyId, organization.SLAs));
+                return new Response<OrganizationResponse>(new OrganizationResponse(
+                            organization.Id,
+                            organization.Name,
+                            organization.CompanyId,
+                            organization.CNPJ,
+                            organization.Email,
+                            organization.CreatedAt,
+                            organization.SLAs,
+                            organization.Categories?.Select(x => x.Name).ToList(),
+                            organization.Departaments?.Select(x => x.Name).ToList()));
             }
             catch (Exception ex)
             {

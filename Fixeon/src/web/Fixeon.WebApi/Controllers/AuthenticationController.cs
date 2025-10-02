@@ -114,9 +114,9 @@ namespace Fixeon.WebApi.Controllers
         [HttpGet]
         [Route("get-all-users")]
         [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery] Guid? id, [FromQuery] string? email, [FromQuery] Guid? organization, [FromQuery] string? username)
         {
-            var response = await _services.GetAllUsers();
+            var response = await _services.GetAllUsers(id, email, organization, username);
 
             if (response.Success)
                 return Ok(response);

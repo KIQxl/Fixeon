@@ -3,6 +3,7 @@ using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Fixeon.Auth.Infraestructure.Repositories
 {
@@ -124,12 +125,26 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             return token;
         }
 
-        public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin)
+        public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin, Guid? id, string? email, Guid? organization, string? username)
         {
             if(masterAdmin)
                 return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync();
 
-            return await _userManager.Users.AsNoTracking().ToListAsync();
+            var query = _userManager.Users.AsQueryable();
+
+            if (id.HasValue)
+                query = query.Where(u => u.Id == id.Value.ToString());
+
+            if (!string.IsNullOrEmpty(email))
+                query = query.Where(u => u.Email == email);
+
+            if (organization.HasValue)
+                query = query.Where(u => u.OrganizationId == organization.Value);
+
+            if (!string.IsNullOrEmpty(username))
+                query = query.Where(u => u.UserName == username);
+
+            return await query.AsNoTracking().ToListAsync();
         }
 
         public async Task<List<IdentityRole>> GetAllRoles()
@@ -227,6 +242,13 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<List<ApplicationUser>> GetUsersByOrganization(Guid organizationId)
+        {
+            var result = await _userManager.Users.AsNoTracking().Where(u => u.OrganizationId == organizationId).ToListAsync();
+
+            return result.ToList();
         }
     }
 }

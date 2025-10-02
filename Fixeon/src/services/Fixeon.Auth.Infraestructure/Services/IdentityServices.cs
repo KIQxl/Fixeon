@@ -26,9 +26,9 @@ namespace Fixeon.Auth.Infraestructure.Services
         }
 
         // GET
-        public async Task<Response<List<ApplicationUserResponse>>> GetAllUsers()
+        public async Task<Response<List<ApplicationUserResponse>>> GetAllUsers(Guid? id, string? email, Guid? organization, string? username)
         {
-            var users = await _authRepository.GetAllUsers(false);
+            var users = await _authRepository.GetAllUsers(false, id, email, organization, username);
 
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
@@ -128,6 +128,32 @@ namespace Fixeon.Auth.Infraestructure.Services
             roles.Remove(roles.FirstOrDefault(r => r.Name == "MasterAdmin"));
 
             return new Response<List<string>>(roles.Select(r => r.Name).ToList(), true);
+        }
+
+        public async Task<Response<List<ApplicationUserResponse>>> GetUsersByOrganiztionId(Guid organizationId)
+        {
+            var users = await _authRepository.GetUsersByOrganization(organizationId);
+
+            if (users is null)
+                return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
+
+            var response = new List<ApplicationUserResponse>();
+
+            foreach (var u in users)
+            {
+                var roles = await _authRepository.GetRolesByUser(u);
+                var org = await _organizationResolver.GetOrganization(u.OrganizationId.Value);
+
+                UserOrganizationResponse organizationResponse = new UserOrganizationResponse
+                {
+                    OrganizationId = org.OrganizationId,
+                    OrganizationName = org.OrganizationName
+                };
+
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
+            }
+
+            return new Response<List<ApplicationUserResponse>>(response);
         }
 
         // CREATE
@@ -344,7 +370,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
         public async Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers()
         {
-            var users = await _authRepository.GetAllUsers(true);
+            var users = await _authRepository.GetAllUsers(true, null, null, null, null);
 
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
