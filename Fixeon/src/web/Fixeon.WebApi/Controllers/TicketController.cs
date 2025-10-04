@@ -32,6 +32,19 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
+        [Route("pending")]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        public async Task<IActionResult> GetAllPendingAndInProccessTickets()
+        {
+            var response = await _ticketServices.GetAllTicketsAsync();
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpGet]
         [Route("{id}")]
         [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetTicketById([FromRoute] Guid id)

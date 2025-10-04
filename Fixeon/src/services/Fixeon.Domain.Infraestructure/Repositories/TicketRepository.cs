@@ -21,7 +21,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Include(t => t.Interactions).Include(t => t.Attachments).ToListAsync();
+                return await _ctx.tickets.AsNoTracking().Where(x => x.Status != ETicketStatus.Resolved.ToString() && x.Status != ETicketStatus.Canceled.ToString()).Include(t => t.Interactions).Include(t => t.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {

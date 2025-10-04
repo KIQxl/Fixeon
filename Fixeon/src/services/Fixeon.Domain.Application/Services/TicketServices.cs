@@ -167,27 +167,27 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<IEnumerable<TicketResponse>>> GetAllTicketsAsync()
+        public async Task<Response<List<TicketResponse>>> GetAllTicketsAsync()
         {
             try
             {
                 var tickets = await _ticketRepository.GetAllTicketsAsync();
 
                 if (tickets is null)
-                    return new Response<IEnumerable<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
+                    return new Response<List<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);
 
                 var responses = tickets.Select(x =>
                 {
                     var urls = GetAttachmentsUrl(x.Attachments);
                     return x.ToResponse(urls.Result);
-                });
+                }).ToList();
 
-                return new Response<IEnumerable<TicketResponse>>(responses);
+                return new Response<List<TicketResponse>>(responses);
             }
             catch (Exception ex)
             {
                 var message = ex.InnerException?.Message ?? ex.Message;
-                return new Response<IEnumerable<TicketResponse>>($"{message}", EErrorType.ServerError);
+                return new Response<List<TicketResponse>>($"{message}", EErrorType.ServerError);
             }
         }
 
