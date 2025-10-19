@@ -243,6 +243,73 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
+        public async Task<List<TicketsByDayResponse>> GetTicketsByDayAsync()
+        {
+            var startDate = DateTime.Now.Date.AddDays(-6);
+            var endDate = DateTime.Now.Date.AddDays(1);
+
+            var createdQuery = await _ctx.tickets
+                .Where(t => t.CreateAt >= startDate && t.CreateAt < endDate)
+                .GroupBy(t => t.CreateAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Created = g.Count()
+                })
+                .ToListAsync();
+
+            var resolvedQuery = await _ctx.tickets
+                .Where(t => t.ResolvedAt.HasValue && t.ResolvedAt.Value >= startDate && t.ResolvedAt.Value < endDate)
+                .GroupBy(t => t.ResolvedAt.Value.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Resolved = g.Count()
+                })
+                .ToListAsync();
+
+            var result = Enumerable.Range(0, 7)
+                .Select(i => startDate.AddDays(i))
+                .Select(date => new TicketsByDayResponse
+                {
+                    Date = date,
+                    Created = createdQuery.FirstOrDefault(c => c.Date == date)?.Created ?? 0,
+                    Resolved = resolvedQuery.FirstOrDefault(r => r.Date == date)?.Resolved ?? 0
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+
+        public async Task<List<TicketsByHourResponse>> GetTicketsByHourAsync()
+        {
+            var startDate = DateTime.Now.Date.AddDays(-30);
+            var endDate = DateTime.Now.Date.AddDays(1);
+
+            var result = await _ctx.tickets
+                .Where(t => t.CreateAt >= startDate && t.CreateAt < endDate)
+                .GroupBy(t => t.CreateAt.Hour)
+                .Select(g => new TicketsByHourResponse
+                {
+                    Hour = g.Key,
+                    TicketsCreated = g.Count()
+                })
+                .OrderBy(x => x.Hour)
+                .ToListAsync();
+
+            var fullRange = Enumerable.Range(0, 24)
+                .Select(hour => new TicketsByHourResponse
+                {
+                    Hour = hour,
+                    TicketsCreated = result.FirstOrDefault(r => r.Hour == hour)?.TicketsCreated ?? 0
+                })
+                .ToList();
+
+            return fullRange;
+        }
+
+
         private string ConvertInHours(double average)
         {
             var avgTime = TimeSpan.FromHours(average);
