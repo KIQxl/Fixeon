@@ -125,6 +125,18 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
+        public async Task RemoveSla(OrganizationsSLA organizationSLA)
+        {
+            try
+            {
+                _context.organizationsSLAs.Remove(organizationSLA);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
+            }
+        }
+
         //CATEGORIES
 
         public async Task<List<Category>> GetCategories(Guid organizationId)

@@ -135,6 +135,13 @@ namespace Fixeon.Domain.Application.Services
                 return new Response<bool>("Cliente/Organização não encontrado.", EErrorType.BadRequest);
 
             var SLA = new OrganizationsSLA(request.OrganizationId, request.SLAInMinutes, request.SLAPriority.ToString(), request.Type);
+
+            var dbSla = organization.SLAs.Where(s => s.SLAPriority == request.SLAPriority.ToString() && s.Type == request.Type).FirstOrDefault();
+            if (dbSla != null)
+            {
+                await _organizationRepository.RemoveSla(dbSla);
+            }
+
             organization.NewSLAConfig(SLA);
 
             try

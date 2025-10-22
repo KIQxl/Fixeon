@@ -126,6 +126,16 @@ namespace Fixon.Tests.MockRepository
             }
         }
 
+        public Task<List<TicketsByDayResponse>> GetTicketsByDayAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<TicketsByHourResponse>> GetTicketsByHourAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<TopAnalystResponse>> GetTopAnalyst()
         {
             try

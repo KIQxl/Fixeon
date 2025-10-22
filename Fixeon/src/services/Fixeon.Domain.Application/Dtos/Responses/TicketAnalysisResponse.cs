@@ -8,6 +8,6 @@
         public int Canceled { get; set; }
         public int ReOpened { get; set; }
         public int Total { get; set; }
-        public double AverageResolutionTimeInHours { get; set; }
+        public string AverageResolutionTimeInHours { get; set; }
     }
 }

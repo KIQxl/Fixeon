@@ -140,7 +140,15 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                var analysis = await _ctx.tickets.GroupBy(x => 1)
+                var analysis = _ctx.tickets
+                    .Select(x => new
+                    {
+                        x.Status,
+                        x.ResolvedAt,
+                        x.CreateAt
+                    })
+                    .AsEnumerable()
+                    .GroupBy(x => 1)
                     .Select(x => new TicketAnalysisResponse
                     {
                         Pending = x.Count(t => t.Status == ETicketStatus.Pending.ToString()),
@@ -148,9 +156,13 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                         Resolved = x.Count(t => t.Status == ETicketStatus.Resolved.ToString()),
                         Canceled = x.Count(t => t.Status == ETicketStatus.Canceled.ToString()),
                         ReOpened = x.Count(t => t.Status == ETicketStatus.Reopened.ToString()),
-                        Total = x.Count()
-                    }
-                ).FirstOrDefaultAsync() ?? new TicketAnalysisResponse();
+                        Total = x.Count(),
+                        AverageResolutionTimeInHours = ConvertInHours(
+                                        x.Where(t => t.ResolvedAt.HasValue)
+                                         .Select(t => (t.ResolvedAt.Value - t.CreateAt).TotalHours)
+                                         .DefaultIfEmpty(0)
+                                         .Average())
+                    }).FirstOrDefault() ?? new TicketAnalysisResponse();
 
                 return analysis;
             }
@@ -314,7 +326,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             var avgTime = TimeSpan.FromHours(average);
 
-            return $"{(int)avgTime.TotalHours}h{(int)avgTime.TotalMinutes}m";
+            return $"{(int)avgTime.TotalHours}h{(int)avgTime.Minutes:D2}m";
         }
     }
 }
