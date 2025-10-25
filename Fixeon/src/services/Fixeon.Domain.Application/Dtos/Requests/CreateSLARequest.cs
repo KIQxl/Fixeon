@@ -3,7 +3,7 @@ using Fixeon.Domain.Core.Enums;
 
 namespace Fixeon.Domain.Application.Dtos.Requests
 {
-    public struct CreateSLARequest : IRequest
+    public class CreateSLARequest : IRequest
     {
         public Guid OrganizationId { get; set; }
         public int SLAInMinutes { get; set; }

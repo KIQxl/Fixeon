@@ -7,5 +7,6 @@
         public List<TopAnalystResponse> TopAnalystResponse { get; set; }
         public List<TicketsByDayResponse> TicketsByDay { get; set; }
         public List<TicketsByHourResponse> TicketsByHour { get; set; }
+        public List<TicketSLAAnalysisResponse> TicketSLAAnalysisResponse { get; set; }
     }
 }

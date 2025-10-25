@@ -332,13 +332,16 @@ namespace Fixeon.Domain.Application.Services
 
                 var ticketsByHour = await _ticketRepository.GetTicketsByHourAsync();
 
+                var ticketSLAAnalysis = await _ticketRepository.GetTicketsSLAAnalysisByOrganizationAsync();
+
                 var result = new TicketDashboardResponse
                 {
                     TicketAnalysisResponse = ticketAnalysis,
                     analystTicketsAnalyses = analystTicketAnalysis,
                     TopAnalystResponse = topAnalystAnalysis,
                     TicketsByDay = ticketsByDay,
-                    TicketsByHour = ticketsByHour
+                    TicketsByHour = ticketsByHour,
+                    TicketSLAAnalysisResponse = ticketSLAAnalysis.ToList()
                 };
 
                 return new Response<TicketDashboardResponse>(result);

@@ -16,6 +16,7 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<List<TopAnalystResponse>> GetTopAnalyst();
         public Task<List<TicketsByHourResponse>> GetTicketsByHourAsync();
         public Task<List<TicketsByDayResponse>> GetTicketsByDayAsync();
+        public Task<IEnumerable<TicketSLAAnalysisResponse>> GetTicketsSLAAnalysisByOrganizationAsync();
 
         public Task<IEnumerable<Interaction>> GetInteractionsByTicketIdAsync(Guid ticketId);
         public Task CreateInteraction(Interaction interaction);

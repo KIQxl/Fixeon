@@ -172,6 +172,61 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
+        public async Task<IEnumerable<TicketSLAAnalysisResponse>> GetTicketsSLAAnalysisByOrganizationAsync()
+        {
+            try
+            {
+                var tickets = await _ctx.tickets.Include(t => t.SLAInfo)
+                    .AsNoTracking()
+                    .Select(t => new
+                    {
+                        t.CreatedByUser.OrganizationId,
+                        t.CreatedByUser.OrganizationName,
+                        HasResolutionDeadline = t.SLAInfo != null && t.SLAInfo.Resolution.Deadline.HasValue,
+                        ResolutionWithinDeadline = t.SLAInfo != null ? t.SLAInfo.Resolution.WithinDeadline : null as bool?,
+                        HasFirstInteractionDeadline = t.SLAInfo != null && t.SLAInfo.FirstInteraction.Deadline.HasValue,
+                        FirstInteractionWithinDeadline = t.SLAInfo != null ? t.SLAInfo.FirstInteraction.WithinDeadline : null as bool?
+                    })
+                    .ToListAsync();
+
+                var grouped = tickets
+                    .GroupBy(t => new { t.OrganizationId, t.OrganizationName })
+                    .Select(g =>
+                    {
+                        var totalTickets = g.Count();
+
+                        var resolutionWithSLA = g.Count(t => t.HasResolutionDeadline);
+                        var resolutionWithin = g.Count(t => t.ResolutionWithinDeadline == true);
+                        var resolutionPercentage = resolutionWithSLA == 0 ? 0 : Math.Round((double)resolutionWithin / resolutionWithSLA * 100, 2);
+
+                        var firstInteractionWithSLA = g.Count(t => t.HasFirstInteractionDeadline);
+                        var firstInteractionWithin = g.Count(t => t.FirstInteractionWithinDeadline == true);
+                        var firstInteractionPercentage = firstInteractionWithSLA == 0 ? 0 : Math.Round((double)firstInteractionWithin / firstInteractionWithSLA * 100, 2);
+
+                        return new TicketSLAAnalysisResponse
+                        {
+                            OrganizationId = g.Key.OrganizationId.Value,
+                            OrganizationName = g.Key.OrganizationName,
+                            TotalTickets = totalTickets,
+                            ResolutionTicketsWithSLA = resolutionWithSLA,
+                            ResolutionWithinSLA = resolutionWithin,
+                            ResolutionWithinSLAPercentage = resolutionPercentage,
+                            FirstInteractionTicketsWithSLA = firstInteractionWithSLA,
+                            FirstInteractionWithinSLA = firstInteractionWithin,
+                            FirstInteractionWithinSLAPercentage = firstInteractionPercentage
+                        };
+                    })
+                    .ToList();
+
+                return grouped;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao obter análise de SLA: {ex.Message}");
+            }
+        }
+
+
         public async Task<List<AnalystTicketsAnalysis>> GetAnalystTicketsAnalysis()
         {
             try
