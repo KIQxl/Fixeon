@@ -163,6 +163,18 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             }
         }
 
+        public async Task DeleteCategory(Category category)
+        {
+            try
+            {
+                _context.categories.Remove(category);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         // DEPARTAMENTS
         public async Task<List<Departament>> GetDepartaments(Guid organizationId)
         {
@@ -181,6 +193,18 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             try
             {
                 await _context.departaments.AddAsync(departament);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task DeleteDepartament(Departament departament)
+        {
+            try
+            {
+                _context.departaments.Remove(departament);
             }
             catch (Exception ex)
             {

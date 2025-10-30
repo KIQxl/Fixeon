@@ -16,9 +16,11 @@ namespace Fixeon.Domain.Application.Interfaces
         // CATEGORY
         public Task<Response<bool>> CreateCategory(CreateCategoryRequest request);
         public Task<Response<List<string>>> GetCategories(Guid organizationId);
+        public Task<Response<bool>> DeleteCategory(DeleteCategoryOrDepartament request);
 
         // DEPARTAMENT
         public Task<Response<bool>> CreateDepartament(CreateDepartamentRequest request);
         public Task<Response<List<string>>> GetDepartaments(Guid organizationId);
+        public Task<Response<bool>> DeleteDepartament(DeleteCategoryOrDepartament request);
     }
 }

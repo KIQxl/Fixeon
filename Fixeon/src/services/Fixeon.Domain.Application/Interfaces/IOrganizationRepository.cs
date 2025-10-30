@@ -22,9 +22,11 @@ namespace Fixeon.Domain.Application.Interfaces
         //CATEGORIES
         public Task<List<Category>> GetCategories(Guid organizationId);
         public Task CreateCategory(Category category);
+        public Task DeleteCategory(Category category);
 
         //DEPARTAMENTS
         public Task<List<Departament>> GetDepartaments(Guid organizationId);
         public Task CreateDepartament(Departament departament);
+        public Task DeleteDepartament(Departament departament);
     }
 }

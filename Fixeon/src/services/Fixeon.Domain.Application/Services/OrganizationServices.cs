@@ -36,8 +36,8 @@ namespace Fixeon.Domain.Application.Services
                             organization.Email,
                             organization.CreatedAt,
                             organization.SLAs,
-                            organization.Categories?.Select(x => x.Name).ToList(),
-                            organization.Departaments?.Select(x => x.Name).ToList()))
+                            organization.Categories?.ToList(),
+                            organization.Departaments?.ToList()))
                     .ToList());
             }
             catch (Exception ex)
@@ -51,6 +51,10 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 var organization = await _organizationRepository.GetOrganizationById(organizationId);
+
+                if(organization is null)
+                    return new Response<OrganizationResponse>("Não encontramos sua organização, verifique com seu suporte se ela não foi desativada ou excluída.", EErrorType.NotFound);
+
                 return new Response<OrganizationResponse>(new OrganizationResponse(
                             organization.Id,
                             organization.Name,
@@ -59,12 +63,12 @@ namespace Fixeon.Domain.Application.Services
                             organization.Email,
                             organization.CreatedAt,
                             organization.SLAs,
-                            organization.Categories?.Select(x => x.Name).ToList(),
-                            organization.Departaments?.Select(x => x.Name).ToList()));
+                            organization.Categories?.ToList(),
+                            organization.Departaments?.ToList()));
             }
             catch (Exception ex)
             {
-                return new Response<OrganizationResponse>(ex.Message, EErrorType.ServerError);
+                return new Response<OrganizationResponse>(ex.Message, EErrorType.NotFound);
             }
         }
 
@@ -73,6 +77,22 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 var organization = new Organization(request.Name, request.CNPJ, request.Email);
+
+                if (request.Categories.Any())
+                {
+                    foreach(var category in request.Categories)
+                    {
+                        organization.AddCategory(new Category(category, organization.Id));
+                    }
+                }
+
+                if (request.Departaments.Any())
+                {
+                    foreach (var departament in request.Departaments)
+                    {
+                        organization.AddDepartament(new Departament(departament, organization.Id));
+                    }
+                }
 
                 if (request.Slas != null && request.Slas.Any())
                 {
@@ -94,8 +114,8 @@ namespace Fixeon.Domain.Application.Services
                             organization.Email,
                             organization.CreatedAt,
                             organization.SLAs,
-                            organization.Categories?.Select(x => x.Name).ToList(),
-                            organization.Departaments?.Select(x => x.Name).ToList()));
+                            organization.Categories?.ToList(),
+                            organization.Departaments?.ToList()));
             }
             catch (Exception ex)
             {
@@ -204,6 +224,36 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
+        public async Task<Response<bool>> DeleteCategory(DeleteCategoryOrDepartament request)
+        {
+            try
+            {
+                var organization = await _organizationRepository.GetOrganizationById(request.OrganizationId);
+
+                if (organization is null)
+                    return new Response<bool>("Não foi possivel remover a categoria pois a organização não foi encontrada.", EErrorType.NotFound);
+
+                var category = organization.Categories.FirstOrDefault(x => x.Id == request.CategoryOrDepartamentId);
+
+                if (category is null)
+                    return new Response<bool>("Não foi possivel remover a categoria pois a mesma não foi encontrada.", EErrorType.NotFound);
+
+                await _organizationRepository.DeleteCategory(category);
+
+                var result = await _unitOfWork.Commit();
+
+                if (!result)
+                    return new Response<bool>("Não foi possivel remover a categoria.", EErrorType.BadRequest);
+
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
+            }
+        }
+
         // DEPARTAMENT
         public async Task<Response<bool>> CreateDepartament(CreateDepartamentRequest request)
         {
@@ -247,6 +297,36 @@ namespace Fixeon.Domain.Application.Services
             catch (Exception ex)
             {
                 return new Response<List<string>>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<bool>> DeleteDepartament(DeleteCategoryOrDepartament request)
+        {
+            try
+            {
+                var organization = await _organizationRepository.GetOrganizationById(request.OrganizationId);
+
+                if (organization is null)
+                    return new Response<bool>("Não foi possivel remover o departamento pois a organização não foi encontrada.", EErrorType.NotFound);
+
+                var departament = organization.Departaments.FirstOrDefault(x => x.Id == request.CategoryOrDepartamentId);
+
+                if (departament is null)
+                    return new Response<bool>("Não foi possivel remover o departamento pois o mesmo não foi encontrada.", EErrorType.NotFound);
+
+                await _organizationRepository.DeleteDepartament(departament);
+
+                var result = await _unitOfWork.Commit();
+
+                if (!result)
+                    return new Response<bool>("Não foi possivel remover o departamento.", EErrorType.BadRequest);
+
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
             }
         }
     }

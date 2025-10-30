@@ -20,8 +20,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet]
-        //[Route("")]
-        //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetAllOrganizations()
         {
             var response = await _organizationServices.GetAllOrganizations();
@@ -33,8 +32,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpPost]
-        //[Route("")]
-        //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
         {
             var response = await _organizationServices.CreateOrganization(request);
@@ -47,7 +45,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
         public async Task<IActionResult> GetOrganizationById([FromRoute] Guid id)
         {
             var response = await _organizationServices.GetOrganizationById(id);
@@ -60,7 +58,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> DeleteOganization([FromRoute] Guid id)
         {
             var response = await _organizationServices.DeleteOrganization(id);
@@ -73,7 +71,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Route("create-sla")]
-        //[Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
         public async Task<IActionResult> CreateOrganizationSLA([FromBody] CreateSLARequest request)
         {
             var response = await _organizationServices.CreateOrganizationSLA(request);
@@ -90,6 +88,19 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequest request)
         {
             var response = await _organizationServices.CreateCategory(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpDelete]
+        [Route("delete-category")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> DeleteCategory([FromBody] DeleteCategoryOrDepartament request)
+        {
+            var response = await _organizationServices.DeleteCategory(request);
 
             if (response.Success)
                 return Ok(response);
@@ -116,6 +127,19 @@ namespace Fixeon.WebApi.Controllers
         public async Task<IActionResult> CreateDepartament([FromBody] CreateDepartamentRequest request)
         {
             var response = await _organizationServices.CreateDepartament(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
+
+        [HttpDelete]
+        [Route("delete-departament")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> DeleteDepartament([FromBody] DeleteCategoryOrDepartament request)
+        {
+            var response = await _organizationServices.DeleteDepartament(request);
 
             if (response.Success)
                 return Ok(response);

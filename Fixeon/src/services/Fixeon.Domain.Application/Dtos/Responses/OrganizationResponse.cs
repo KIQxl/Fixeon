@@ -4,7 +4,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
 {
     public class OrganizationResponse
     {
-        public OrganizationResponse(Guid id, string name, Guid companyId, string cNPJ, string email, DateTime createdAt, List<OrganizationsSLA> SLAs, List<string> categories, List<string> departaments)
+        public OrganizationResponse(Guid id, string name, Guid companyId, string cNPJ, string email, DateTime createdAt, List<OrganizationsSLA> SLAs, List<Category> categories, List<Departament> departaments)
         {
             Id = id;
             Name = name;
@@ -23,8 +23,8 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid CompanyId { get; set; }
-        public List<string> Categories { get; set; } = new List<string>();
-        public List<string> Departaments { get; set; } = new List<string>();
+        public List<Category> Categories { get; set; } = new List<Category>();
+        public List<Departament> Departaments { get; set; } = new List<Departament>();
         public List<OrganizationsSLA> OrganizationSLAs { get; set; } = new List<OrganizationsSLA>();
     }
 }
