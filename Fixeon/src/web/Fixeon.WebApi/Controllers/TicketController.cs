@@ -142,9 +142,9 @@ namespace Fixeon.WebApi.Controllers
         [HttpPut]
         [Route("change-ticket-category")]
         [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
-        public async Task<IActionResult> ChangeTicketCategory([FromBody] ChangeTicketCategory request)
+        public async Task<IActionResult> ChangeTicketCategory([FromBody] ChangeTicketCategoryAndDepartament request)
         {
-            var response = await _ticketServices.ChangeTicketCategory(request);
+            var response = await _ticketServices.ChangeTicketCategoryAndDepartament(request);
 
             if (response.Success)
                 return Ok(response);

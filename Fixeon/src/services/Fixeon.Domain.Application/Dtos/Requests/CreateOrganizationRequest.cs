@@ -9,7 +9,7 @@ namespace Fixeon.Domain.Application.Dtos.Requests
         public string Email { get; set; }
         public List<string> Categories { get; set; } = new List<string>();
         public List<string> Departaments { get; set; } = new List<string>();
-        public List<CreateSLAInOrganizationRequest>? Slas { get; set; }
+        public List<CreateSLAInOrganizationRequest> Slas { get; set; } = new List<CreateSLAInOrganizationRequest>();
 
         public CreateOrganizationRequest(string name, string cNPJ, string email, List<string> categories, List<string> departaments, List<CreateSLAInOrganizationRequest>? slas)
         {

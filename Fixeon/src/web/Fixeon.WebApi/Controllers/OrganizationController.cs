@@ -33,7 +33,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateOrganization(CreateOrganizationRequest request)
+        public async Task<IActionResult> CreateOrganization([FromBody] CreateOrganizationRequest request)
         {
             var response = await _organizationServices.CreateOrganization(request);
 

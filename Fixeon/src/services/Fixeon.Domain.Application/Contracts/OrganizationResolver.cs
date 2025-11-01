@@ -24,6 +24,8 @@ namespace Fixeon.Domain.Application.Contracts
             {
                 OrganizationId = organizationId,
                 OrganizationName = organization.Name,
+                Categories = organization.Categories.Select(x => new CategoryOrDepartamentOrganizationResolverView { Id = x.Id, Name = x.Name }).ToList(),
+                Departaments = organization.Departaments.Select(x => new CategoryOrDepartamentOrganizationResolverView { Id = x.Id, Name = x.Name }).ToList()
             };
         }
 

@@ -97,15 +97,15 @@ namespace Fixon.Tests.Domain.Tests
         {
             var ticket = TicketsMock.Tickets[8];
 
-            var request = new ChangeTicketCategory
+            var request = new ChangeTicketCategoryAndDepartament
             {
                 Id = ticket.Id,
-                Category = "Nova categoria de ticket"
+                CategoryId = Guid.NewGuid()
             };
 
-            var result = await _services.ChangeTicketCategory(request);
+            var result = await _services.ChangeTicketCategoryAndDepartament(request);
 
-            Assert.IsTrue(result.Success && result.Data.Category.Equals(request.Category));
+            Assert.IsTrue(result.Success && result.Data.Category.Equals(request.CategoryId));
         }
     }
 }

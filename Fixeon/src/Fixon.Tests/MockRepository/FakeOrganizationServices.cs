@@ -27,6 +27,16 @@ namespace Fixon.Tests.MockRepository
             throw new NotImplementedException();
         }
 
+        public Task<Response<bool>> DeleteCategory(DeleteCategoryOrDepartament request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<bool>> DeleteDepartament(DeleteCategoryOrDepartament request)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Response<bool>> DeleteOrganization(Guid organizationId)
         {
             throw new NotImplementedException();

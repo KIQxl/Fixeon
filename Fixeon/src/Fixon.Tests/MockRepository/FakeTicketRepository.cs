@@ -136,6 +136,11 @@ namespace Fixon.Tests.MockRepository
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<TicketSLAAnalysisResponse>> GetTicketsSLAAnalysisByOrganizationAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<TopAnalystResponse>> GetTopAnalyst()
         {
             try

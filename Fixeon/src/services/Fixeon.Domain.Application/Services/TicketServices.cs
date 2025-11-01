@@ -72,7 +72,7 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<TicketResponse>> ChangeTicketCategory(ChangeTicketCategory request)
+        public async Task<Response<TicketResponse>> ChangeTicketCategoryAndDepartament(ChangeTicketCategoryAndDepartament request)
         {
             try
             {
@@ -80,9 +80,21 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado", EErrorType.NotFound);
 
-                ticket.ChangeCategory(request.Category);
+                var organization = await _organizationResolver.GetOrganization(request.OrganizationId);
 
-                await _ticketRepository.UpdateTicket(ticket);
+                if (organization is null)
+                    return new Response<TicketResponse>("Organização não encontrada", EErrorType.NotFound);
+
+                if (organization.Categories.Any(x => x.Id == request.CategoryId) && organization.Departaments.Any(x => x.Id == request.DepartamentId))
+                {
+                    ticket.ChangeCategory(organization.Categories.FirstOrDefault(x => x.Id == request.CategoryId)!.Name);
+                    ticket.ChanceDepartament(organization.Departaments.FirstOrDefault(x => x.Id == request.DepartamentId)!.Name);
+
+                    await _ticketRepository.UpdateTicket(ticket);
+                    await _unitOfWork.Commit();
+                }
+                else
+                    return new Response<TicketResponse>("Categoria ou departamento não cadastrados para essa organização.", EErrorType.NotFound);
 
                 return new Response<TicketResponse>(ticket.ToResponse());
             }

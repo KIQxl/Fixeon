@@ -134,6 +134,11 @@ namespace Fixeon.Domain.Core.Entities
             this.Category = category;
         }
 
+        public void ChanceDepartament(string departament)
+        {
+            this.Departament = departament;
+        }
+
         public void SetFirstInteractionDeadline(int deadlineInMinutes)
             => SLAInfo.SetFirstInteractionDeadline(deadlineInMinutes);
 
