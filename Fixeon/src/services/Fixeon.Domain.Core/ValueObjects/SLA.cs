@@ -20,5 +20,11 @@
             if(!Deadline.HasValue)
                 Deadline = DateTime.Now.AddMinutes(deadlineInMinutes);
         }
+
+        public void RestartResolutionDate()
+        {
+            if (Accomplished.HasValue)
+                Accomplished = null;
+        }
     }
 }

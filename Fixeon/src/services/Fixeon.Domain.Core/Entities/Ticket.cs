@@ -87,7 +87,9 @@ namespace Fixeon.Domain.Core.Entities
             if (this.Status != ETicketStatus.Resolved.ToString())
                 return false;
 
-            this.Status = ETicketStatus.Reopened.ToString();
+            RestartResolutionDate();
+
+            this.Status = ETicketStatus.InProgress.ToString();
             this.ModifiedAt = DateTime.Now;
 
             return true;
@@ -150,5 +152,9 @@ namespace Fixeon.Domain.Core.Entities
 
         private void SetResolutionAccomplished()
             => SLAInfo.SetResolutionAccomplished();
+
+        private void RestartResolutionDate()
+            => SLAInfo.RestartResolutionDate();
+
     }
 }

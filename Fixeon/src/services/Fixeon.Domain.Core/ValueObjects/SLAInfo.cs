@@ -17,5 +17,8 @@
 
         public void SetResolutionDeadline(int? deadlineInMinutes)
             => Resolution.SetDeadline(deadlineInMinutes.Value);
+
+        public void RestartResolutionDate()
+            => Resolution.RestartResolutionDate();
     }
 }
