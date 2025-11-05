@@ -24,7 +24,8 @@ namespace Fixeon.Domain.Application.Contracts
             {
                 CompanyId = companyId,
                 CompanyName = company.Name,
-                CompanyEmail = company.Email
+                CompanyEmail = company.Email,
+                Tags = company.Tags.Select(t => new CompanyTagResolverView { Id = t.Id, Name = t.Name}).ToList()
             };
         }
     }

@@ -20,8 +20,16 @@ namespace Fixeon.Domain.Application.Services
         private readonly ITenantContextServices _tenantContext;
         private readonly IOrganizationResolver _organizationResolver;
         private readonly ITicketNotificationServices _notificationServices;
+        private readonly ICompanyResolver _companyresolver;
 
-        public TicketServices(ITicketRepository ticketRepository, IUnitOfWork unitOfWork, IStorageServices storageServices, ITenantContextServices tenantContext, IOrganizationResolver organizationServices, ITicketNotificationServices notificationServices)
+        public TicketServices(
+            ITicketRepository ticketRepository,
+            IUnitOfWork unitOfWork,
+            IStorageServices storageServices,
+            ITenantContextServices tenantContext,
+            IOrganizationResolver organizationServices,
+            ITicketNotificationServices notificationServices,
+            ICompanyResolver companyResolver)
         {
             _ticketRepository = ticketRepository;
             _unitOfWork = unitOfWork;
@@ -29,6 +37,7 @@ namespace Fixeon.Domain.Application.Services
             _tenantContext = tenantContext;
             _organizationResolver = organizationServices;
             _notificationServices = notificationServices;
+            _companyresolver = companyResolver;
         }
 
         public async Task<Response<TicketResponse>> CreateTicket(CreateTicketRequest request)
@@ -361,6 +370,34 @@ namespace Fixeon.Domain.Application.Services
             catch (Exception ex)
             {
                 return new Response<TicketDashboardResponse>(ex.InnerException?.Message ?? ex.Message, EErrorType.ServerError);
+            }
+        }
+
+        public async Task<Response<bool>> AddTagInTicket(AddTagInTicketRequest request)
+        {
+            var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
+
+            if (ticket is null)
+                return new Response<bool>("Ticket não encontrado", EErrorType.NotFound);
+
+            var company = await _companyresolver.GetCompany(_tenantContext.TenantId);
+
+            var tag = company.Tags.FirstOrDefault(t => t.Id == request.TagId);
+
+            if (tag is null)
+                return new Response<bool>("Tag não encontrada", EErrorType.NotFound);
+
+            ticket.AddTag(tag.Id);
+
+            try
+            {
+                await _ticketRepository.UpdateTicket(ticket);
+
+                return new Response<bool>(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(new List<string> { "Tag não encontrada", ex.Message }, EErrorType.BadRequest);
             }
         }
 

@@ -151,5 +151,18 @@ namespace Fixeon.WebApi.Controllers
 
             return this.ReturnResponseWithStatusCode(response);
         }
+
+        [HttpPost]
+        [Route("add-tag")]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
+        public async Task<IActionResult> AddTagInTicket([FromBody] AddTagInTicketRequest request)
+        {
+            var response = await _ticketServices.AddTagInTicket(request);
+
+            if (response.Success)
+                return Ok(response);
+
+            return this.ReturnResponseWithStatusCode(response);
+        }
     }
 }

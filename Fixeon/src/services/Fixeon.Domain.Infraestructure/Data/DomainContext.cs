@@ -23,6 +23,7 @@ namespace Fixeon.Domain.Infraestructure.Data
         public DbSet<Company> companies { get; set; }
         public DbSet<Organization> organizations { get; set; }
         public DbSet<OrganizationsSLA> organizationsSLAs { get; set; }
+        public DbSet<Tag> tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +43,9 @@ namespace Fixeon.Domain.Infraestructure.Data
 
             modelBuilder.Entity<Organization>()
                 .HasQueryFilter(u => u.CompanyId == _currentTenant);
+
+            modelBuilder.Entity<Tag>()
+                .HasQueryFilter(t => t.CompanyId == _currentTenant);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DomainContext).Assembly);
         }

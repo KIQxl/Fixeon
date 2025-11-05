@@ -18,6 +18,8 @@ namespace Fixeon.Shared.Models
         {
             return new CurrentUser
             {
+                TenantId = TenantId,
+                OrganizationId = OrganizationId.HasValue ? OrganizationId.Value : Guid.Empty,
                 UserId = UserId,
                 UserEmail = UserEmail
             };

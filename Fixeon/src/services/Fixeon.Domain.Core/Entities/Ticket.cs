@@ -44,6 +44,7 @@ namespace Fixeon.Domain.Core.Entities
         public Analyst? ClosedBy { get; private set; }
         public Guid CompanyId { get; private set; }
         public SLAInfo SLAInfo { get; private set; }
+        public List<Tag> Tags { get; private set; }
 
         public bool ResolveTicket(Analyst analyst)
         {
@@ -156,5 +157,9 @@ namespace Fixeon.Domain.Core.Entities
         private void RestartResolutionDate()
             => SLAInfo.RestartResolutionDate();
 
+        public void AddTag(Guid id)
+        {
+            this.Tags.Add(new Tag("") { Id = id });
+        }
     }
 }

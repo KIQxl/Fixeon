@@ -32,7 +32,7 @@ namespace Fixeon.WebApi.SeedData
 
             if (masterCompany is null)
             {
-                masterCompany = new Company(companyName, "00000000000000", "fixeon.company@email.com");
+                masterCompany = new Company(companyName, "00000000000000", "fixeon.company@email.com", null);
                 await domainDbContext.companies.AddAsync(masterCompany);
                 await domainDbContext.SaveChangesAsync();
             }
