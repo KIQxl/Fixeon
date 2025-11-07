@@ -41,5 +41,42 @@ namespace Fixeon.WebApi.Controllers
 
             return BadRequest(result);
         }
+
+        [HttpGet("get-tags")]
+        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
+
+        public async Task<IActionResult> GetAllTags()
+        {
+            var result = await _companyApplicationServices.GetAllTags();
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpPost("create-tag")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> CreateTag([FromBody] CreateTagRequest request)
+        {
+            var result = await _companyApplicationServices.CreateTag(request);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpDelete("remove-tag/{id}")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
+        public async Task<IActionResult> RemoveTag([FromRoute] Guid id)
+        {
+            var result = await _companyApplicationServices.RemoveTag(id);
+
+            if (result.Success)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
     }
 }

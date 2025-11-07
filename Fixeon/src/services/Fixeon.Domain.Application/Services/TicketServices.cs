@@ -392,6 +392,7 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 await _ticketRepository.UpdateTicket(ticket);
+                await _unitOfWork.Commit();
 
                 return new Response<bool>(true);
             }

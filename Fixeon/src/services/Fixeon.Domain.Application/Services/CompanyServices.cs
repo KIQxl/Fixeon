@@ -10,10 +10,12 @@ namespace Fixeon.Domain.Application.Services
     public class CompanyServices : ICompanyServices
     {
         private readonly ICompanyRepository _repository;
+        private readonly IUnitOfWork _UoW;
 
-        public CompanyServices(ICompanyRepository repository)
+        public CompanyServices(ICompanyRepository repository, IUnitOfWork uoW)
         {
             _repository = repository;
+            _UoW = uoW;
         }
 
         public async Task<Response<CompanyResponse>> CreateCompany(CreateCompanyRequest request)
@@ -49,6 +51,20 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
+        public async Task<Response<List<TicketTag>>> GetAllTags()
+        {
+            try
+            {
+                var tags = await _repository.GetAllTagsByCompany();
+
+                return new Response<List<TicketTag>>(tags.Select(t => new TicketTag { Id = t.Id, Name = t.Name}).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<List<TicketTag>>(new List<string> { "Não foi possivel encontrar as tags.", ex.Message }, EErrorType.BadRequest);
+            }
+        }
+
         public async Task<Response<bool>> CreateTag(CreateTagRequest request)
         {
             var tag = new Tag(request.Name);
@@ -56,6 +72,7 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 await _repository.CreateTag(tag);
+                await _UoW.Commit();
 
                 return new Response<bool>(true);
             }
@@ -75,6 +92,7 @@ namespace Fixeon.Domain.Application.Services
             try
             {
                 await _repository.RemoveTag(tag);
+                await _UoW.Commit();
 
                 return new Response<bool>(true);
             }

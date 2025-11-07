@@ -23,5 +23,6 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public TimeSpan? Duration { get; set; }
         public List<string> Attachments { get; set; } = new List<string>();
         public Analyst ClosedBy { get; set; }
+        public List<TicketTag> Tags { get; set; }
     }
 }

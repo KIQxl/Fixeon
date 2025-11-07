@@ -9,6 +9,7 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<Response<List<CompanyResponse>>> GetAllCompanies();
 
         // TAGS
+        public Task<Response<List<TicketTag>>> GetAllTags();
         public Task<Response<bool>> CreateTag(CreateTagRequest request);
         public Task<Response<bool>> RemoveTag(Guid tagId);
     }

@@ -42,7 +42,8 @@ namespace Fixeon.Domain.Application.Mapper
                 Duration = ticket.Duration,
                 Attachments = attachmentsUrls,
                 ClosedBy = ticket.ClosedBy ?? new Analyst(),
-                SLAInfo = ticket.SLAInfo
+                SLAInfo = ticket.SLAInfo,
+                Tags = ticket.Tags.Select(t => new TicketTag { Id = t.Id, Name = t.Name }).ToList()
             };
         }
 
