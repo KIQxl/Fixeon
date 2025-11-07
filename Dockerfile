@@ -2,8 +2,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
-RUN dotnet restore
-# CORREÇÃO: Incluindo a pasta Fixeon/ no caminho do projeto
+# CORREÇÃO: Apontar o dotnet restore para o caminho correto do arquivo .sln
+RUN dotnet restore Fixeon/Fixeon.sln 
+# CORREÇÃO: Apontar o dotnet publish para o caminho correto do .csproj
 RUN dotnet publish ./Fixeon/src/web/Fixeon.WebApi/Fixeon.WebApi.csproj -c Release -o /app/publish
 
 # Stage 2: Runtime
