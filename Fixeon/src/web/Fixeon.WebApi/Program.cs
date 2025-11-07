@@ -17,15 +17,24 @@ using (var scope = app.Services.CreateScope())
     await SeedMasterData.SeedData(scope.ServiceProvider);
 }
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://fixeon.netlify.app",
+                "http://localhost:4200"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors(c =>
-{
-    c.AllowAnyOrigin();
-    c.AllowAnyHeader();
-    c.AllowAnyMethod();
-});
+app.UseCors("AllowSpecificOrigins");
 
 app.RegisterApp();
 
