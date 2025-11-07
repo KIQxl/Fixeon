@@ -20,4 +20,12 @@ namespace Fixon.Tests.MockRepository
             throw new NotImplementedException();
         }
     }
+
+    internal class FakeCompanyResolver : ICompanyResolver
+    {
+        public Task<CompanyResolverView> GetCompany(Guid companyId)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

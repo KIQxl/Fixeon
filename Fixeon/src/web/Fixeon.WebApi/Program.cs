@@ -22,9 +22,9 @@ app.UseSwaggerUI();
 
 app.UseCors(c =>
 {
+    c.AllowAnyOrigin();
     c.AllowAnyHeader();
     c.AllowAnyMethod();
-    c.AllowAnyOrigin();
 });
 
 app.RegisterApp();
