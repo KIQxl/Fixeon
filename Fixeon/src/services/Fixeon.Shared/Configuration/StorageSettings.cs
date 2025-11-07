@@ -8,7 +8,7 @@
         public string Region { get; set; }
         public string EndPoint { get; set; }
         public bool UseSSL { get; set; }
-        public bool ForcePathStyle { get; set; }
+        public bool ForcePathStyle { get; set; } = true;
         public string BucketName { get; set; }
     }
 }
