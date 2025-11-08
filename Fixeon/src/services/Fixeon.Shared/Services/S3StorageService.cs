@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Fixeon.Shared.Configuration;
+using Fixeon.Shared.Core.Interfaces;
 
 namespace Fixeon.Shared.Services
 {
@@ -8,7 +9,8 @@ namespace Fixeon.Shared.Services
     {
         private readonly AmazonS3Client _client;
         private readonly StorageSettings _settings;
-        public S3StorageService(StorageSettings settings)
+        private readonly ITenantContextServices _tenantContext;
+        public S3StorageService(StorageSettings settings, ITenantContextServices tenantContext)
         {
             _settings = settings;
             var config = new AmazonS3Config
@@ -39,9 +41,10 @@ namespace Fixeon.Shared.Services
             var request = new PutObjectRequest
             {
                 BucketName = _settings.BucketName,
-                Key = filename,
+                Key = $"{_tenantContext.TenantId}/{filename}",
+                InputStream = content,
                 ContentType = contentType,
-                InputStream = content
+                AutoCloseStream = true
             };
 
             await _client.PutObjectAsync(request);
