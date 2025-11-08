@@ -8,15 +8,6 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<Program>();
 }
 
-builder.Services.RegisterServices(builder.Configuration);
-
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    await SeedMasterData.SeedData(scope.ServiceProvider);
-}
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
@@ -30,6 +21,15 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+builder.Services.RegisterServices(builder.Configuration);
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await SeedMasterData.SeedData(scope.ServiceProvider);
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();
