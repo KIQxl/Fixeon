@@ -44,7 +44,7 @@ namespace Fixeon.Domain.Core.Entities
         public Analyst? ClosedBy { get; private set; }
         public Guid CompanyId { get; private set; }
         public SLAInfo SLAInfo { get; private set; }
-        public List<Tag> Tags { get; private set; }
+        public List<Tag> Tags { get; private set; } = new List<Tag>();
 
         public bool ResolveTicket(Analyst analyst)
         {
