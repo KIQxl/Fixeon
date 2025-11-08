@@ -21,6 +21,7 @@ namespace Fixeon.Shared.Services
             };
 
             _client = new AmazonS3Client(settings.AccessKey, settings.SecretKey, config);
+            _tenantContext = tenantContext;
         }
 
         public override async Task<string> GetPresignedUrl(string filename)
