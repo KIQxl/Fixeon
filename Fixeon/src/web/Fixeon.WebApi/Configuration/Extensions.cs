@@ -146,6 +146,8 @@ namespace Fixeon.WebApi.Configuration
 
             app.UseHttpsRedirection();
 
+            app.UseCors("AllowSpecificOrigins");
+
             app.UseAuthentication();
             app.UseMiddleware<TenantMiddleware>();
             app.UseAuthorization();
