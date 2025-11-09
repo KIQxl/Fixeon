@@ -373,33 +373,45 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<bool>> AddTagInTicket(AddTagInTicketRequest request)
+        public async Task<Response<bool>> ManageTagInTicket(AddTagInTicketRequest request)
         {
             var ticket = await _ticketRepository.GetTicketByIdAsync(request.TicketId);
 
             if (ticket is null)
                 return new Response<bool>("Ticket não encontrado", EErrorType.NotFound);
 
-            var company = await _companyresolver.GetCompany(_tenantContext.TenantId);
-
-            var tag = company.Tags.FirstOrDefault(t => t.Id == request.TagId);
-
-            if (tag is null)
-                return new Response<bool>("Tag não encontrada", EErrorType.NotFound);
-
-            ticket.AddTag(tag.Id);
-
-            try
+            if(ticket.Tags.Any(x => x.Id == request.TagId))
             {
-                await _ticketRepository.UpdateTicket(ticket);
-                await _unitOfWork.Commit();
-
-                return new Response<bool>(true);
+                try
+                {
+                    await _ticketRepository.DetachTagInTicket(request.TicketId, request.TagId);
+                }
+                catch (Exception ex)
+                {
+                    return new Response<bool>(new List<string> { "Erro ao atualizar tags do ticket", ex.Message }, EErrorType.BadRequest);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return new Response<bool>(new List<string> { "Tag não encontrada", ex.Message }, EErrorType.BadRequest);
+                var company = await _companyresolver.GetCompany(_tenantContext.TenantId);
+
+                var tag = company.Tags.FirstOrDefault(t => t.Id == request.TagId);
+
+                if (tag is null)
+                    return new Response<bool>("Tag não encontrada", EErrorType.NotFound);
+
+                try
+                {
+                    await _ticketRepository.AttachTagInTicket(request.TicketId, request.TagId);
+                }
+                catch (Exception ex)
+                {
+                    return new Response<bool>(new List<string> { "Erro ao atualizar tags do ticket", ex.Message }, EErrorType.BadRequest);
+                }
             }
+
+            await _unitOfWork.Commit();
+            return new Response<bool>(true);
         }
 
         private async Task<List<string>> GetAttachmentsUrl(List<Attachment> attachments)

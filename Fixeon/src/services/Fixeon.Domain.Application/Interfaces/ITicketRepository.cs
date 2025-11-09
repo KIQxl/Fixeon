@@ -10,6 +10,8 @@ namespace Fixeon.Domain.Application.Interfaces
         public Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol);
         public Task CreateTicket(Ticket ticket);
         public Task UpdateTicket(Ticket ticket);
+        public Task AttachTagInTicket(Guid ticketId, Guid tagId);
+        public Task DetachTagInTicket(Guid ticketId, Guid tagId);
 
         public Task<TicketAnalysisResponse> GetTicketsAnalysis();
         public Task<List<AnalystTicketsAnalysis>> GetAnalystTicketsAnalysis();

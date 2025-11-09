@@ -157,7 +157,7 @@ namespace Fixeon.WebApi.Controllers
         [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
         public async Task<IActionResult> AddTagInTicket([FromBody] AddTagInTicketRequest request)
         {
-            var response = await _ticketServices.AddTagInTicket(request);
+            var response = await _ticketServices.ManageTagInTicket(request);
 
             if (response.Success)
                 return Ok(response);

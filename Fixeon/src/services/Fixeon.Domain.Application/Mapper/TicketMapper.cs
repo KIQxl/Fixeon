@@ -2,7 +2,6 @@
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.ValueObjects;
-using Fixeon.Shared.Core.Interfaces;
 
 namespace Fixeon.Domain.Application.Mapper
 {

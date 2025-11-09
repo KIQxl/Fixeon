@@ -3,6 +3,7 @@ using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Infraestructure.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fixeon.Domain.Infraestructure.Repositories
@@ -65,7 +66,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             try
             {
-                return await _ctx.tickets.Include(i => i.Interactions).ThenInclude(i => i.Attachments).Include(a => a.Attachments).FirstOrDefaultAsync(t => t.Id.Equals(id));
+                return await _ctx.tickets.Include(i => i.Interactions).ThenInclude(i => i.Attachments).Include(a => a.Attachments).Include(t => t.Tags).FirstOrDefaultAsync(t => t.Id.Equals(id));
             }
             catch (Exception ex)
             {
@@ -97,6 +98,23 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                 throw new Exception($"Ocorreu um erro ao acessar a base de dados: {ex.Message}");
             }
         }
+
+        public async Task AttachTagInTicket(Guid ticketId, Guid tagId)
+        {
+            var sql = "INSERT INTO TicketTags (TicketId, TagId) VALUES (@ticketId, @tagId)";
+            await _ctx.Database.ExecuteSqlRawAsync(sql,
+                new SqlParameter("@ticketId", ticketId),
+                new SqlParameter("@tagId", tagId));
+        }
+
+        public async Task DetachTagInTicket(Guid ticketId, Guid tagId)
+        {
+            var sql = "DELETE FROM TicketTags WHERE TicketId = @ticketId AND TagId = @tagId";
+            await _ctx.Database.ExecuteSqlRawAsync(sql,
+                new SqlParameter("@ticketId", ticketId),
+                new SqlParameter("@tagId", tagId));
+        }
+
 
         // INTERACTIONS
         public async Task CreateInteraction(Interaction interaction)
@@ -232,7 +250,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
             try
             {
                 var analysis = _ctx.tickets
-                                .Where(x => x.AssignedTo != null)
+                                .Where(x => x.AssignedTo != null && x.Status == ETicketStatus.Resolved.ToString())
                                 .Select(t => new
                                 {
                                     t.AssignedTo.AnalystId,

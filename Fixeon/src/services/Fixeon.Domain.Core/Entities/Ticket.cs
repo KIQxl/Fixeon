@@ -156,10 +156,5 @@ namespace Fixeon.Domain.Core.Entities
 
         private void RestartResolutionDate()
             => SLAInfo.RestartResolutionDate();
-
-        public void AddTag(Guid id)
-        {
-            this.Tags.Add(new Tag("") { Id = id });
-        }
     }
 }
