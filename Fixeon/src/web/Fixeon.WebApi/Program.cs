@@ -15,7 +15,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "https://fixeon.netlify.app",
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://fixeon.com.br"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
