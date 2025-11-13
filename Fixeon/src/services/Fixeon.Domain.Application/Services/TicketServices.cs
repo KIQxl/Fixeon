@@ -188,11 +188,11 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<List<TicketResponse>>> GetAllTicketsAsync()
+        public async Task<Response<List<TicketResponse>>> GetAllTicketsAsync(Guid? userId)
         {
             try
             {
-                var tickets = await _ticketRepository.GetAllTicketsAsync();
+                var tickets = await _ticketRepository.GetAllTicketsAsync(userId);
 
                 if (tickets is null)
                     return new Response<List<TicketResponse>>("Tickets não encontrados.", EErrorType.NotFound);

@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace Fixeon.Auth.Infraestructure.Services
 {
@@ -37,11 +38,11 @@ namespace Fixeon.Auth.Infraestructure.Services
                 claims.Add(new Claim("organizationId", string.Empty));
             }
 
-            if (roles != null)
-                foreach (var role in roles)
-                {
-                    claims.Add(new Claim("roles", role));
-                }
+            if (roles != null && roles.Any())
+            {
+                var rolesJson = JsonSerializer.Serialize(roles);
+                claims.Add(new Claim("roles", rolesJson, JsonClaimValueTypes.JsonArray));
+            }
 
             var claimsIdentity = new ClaimsIdentity(claims);
 

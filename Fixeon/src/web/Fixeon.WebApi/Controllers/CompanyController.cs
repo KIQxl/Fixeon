@@ -43,7 +43,7 @@ namespace Fixeon.WebApi.Controllers
         }
 
         [HttpGet("get-tags")]
-        [Authorize(Policy = AuthorizationPolicies.AnalystPolicy)]
+        [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
 
         public async Task<IActionResult> GetAllTags()
         {

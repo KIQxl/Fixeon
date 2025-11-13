@@ -1,5 +1,6 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Interfaces;
+using Fixeon.WebApi.Attributes;
 using Fixeon.WebApi.Configuration;
 using Fixeon.WebApi.Dtos.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpGet]
         [Authorize( Policy = AuthorizationPolicies.CommonUserPolicy)]
+        [ServiceFilter(typeof(EnforceUserResourceFilter))]
         public async Task<IActionResult> GetAllTicketsAsync([FromQuery] string? category, [FromQuery] string? status, [FromQuery] string? priority, [FromQuery] Guid? analyst, [FromQuery] Guid? user, [FromQuery] string? protocol)
         {
             var response = await _ticketServices.GetAllTicketsFilterAsync(category, status, priority, analyst, user, protocol);
@@ -34,9 +36,10 @@ namespace Fixeon.WebApi.Controllers
         [HttpGet]
         [Route("pending")]
         [Authorize(Policy = AuthorizationPolicies.CommonUserPolicy)]
-        public async Task<IActionResult> GetAllPendingAndInProccessTickets()
+        [ServiceFilter(typeof(EnforceUserResourceFilter))]
+        public async Task<IActionResult> GetAllPendingAndInProccessTickets([FromQuery] Guid? user)
         {
-            var response = await _ticketServices.GetAllTicketsAsync();
+            var response = await _ticketServices.GetAllTicketsAsync(user);
 
             if (response.Success)
                 return Ok(response);

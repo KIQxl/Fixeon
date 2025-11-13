@@ -18,11 +18,16 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         }
         
         // TICKETS
-        public async Task<IEnumerable<Ticket>> GetAllTicketsAsync()
+        public async Task<IEnumerable<Ticket>> GetAllTicketsAsync(Guid? userId)
         {
             try
             {
-                return await _ctx.tickets.AsNoTracking().Where(x => x.Status != ETicketStatus.Resolved.ToString() && x.Status != ETicketStatus.Canceled.ToString()).Include(t => t.Interactions).Include(t => t.Attachments).ToListAsync();
+                var query = _ctx.tickets.AsNoTracking().Where(x => x.Status != ETicketStatus.Resolved.ToString() && x.Status != ETicketStatus.Canceled.ToString()).AsQueryable();
+
+                if (userId.HasValue)
+                    query = query.Where(x => x.CreatedByUser.UserId == userId.ToString());
+
+                return await query.Include(t => t.Interactions).Include(t => t.Attachments).ToListAsync();
             }
             catch (Exception ex)
             {

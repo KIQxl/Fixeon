@@ -8,5 +8,7 @@
         public string Password { get; set; } = string.Empty;
         public string SenderName { get; set; } = "Equipe Fixeon";
         public string SenderEmail { get; set; } = string.Empty;
+        public string RequestSendEmailUrl { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
     }
 }

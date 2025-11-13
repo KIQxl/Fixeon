@@ -15,6 +15,7 @@ using Fixeon.Shared.Configuration;
 using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Models;
 using Fixeon.Shared.Services;
+using Fixeon.WebApi.Attributes;
 using Fixeon.WebApi.Middlewares;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
@@ -91,6 +92,7 @@ namespace Fixeon.WebApi.Configuration
                 .RegisterBackgroundServices(configuration);
 
             services.AddHttpContextAccessor();
+            services.AddScoped<EnforceUserResourceFilter>();
             services.AddScoped<ITenantContextServices, TenantContextServices>();
             services.AddScoped<IOrganizationResolver, OrganizationResolver>();
             services.AddScoped<ICompanyResolver, CompanyResolver>();
@@ -99,6 +101,8 @@ namespace Fixeon.WebApi.Configuration
             services.Configure<SmtpSettings>(smtpSection);
 
             var smtpSettings = smtpSection.Get<SmtpSettings>();
+
+            services.AddHttpClient();
 
             var storageProvider = configuration.GetValue<string>("StorageProvider");
 
