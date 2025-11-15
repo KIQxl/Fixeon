@@ -41,7 +41,11 @@ namespace Fixeon.Domain.Infraestructure.Repositories
 
         public async Task<Company> GetCompanyById(Guid companyId)
         {
-            return await _context.companies.AsNoTracking().Include(c => c.Tags).FirstOrDefaultAsync(x => x.Id == companyId);
+            return await _context.companies
+                .Where(c => c.Id == companyId)
+                .Include(c => c.Tags)
+                .Include(c => c.Organizations)
+                .FirstOrDefaultAsync(x => x.Id == companyId);
         }
 
         public async Task<List<Tag>> GetAllTagsByCompany()

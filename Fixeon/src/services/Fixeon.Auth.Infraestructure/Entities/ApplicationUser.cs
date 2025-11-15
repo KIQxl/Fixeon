@@ -11,11 +11,13 @@ namespace Fixeon.Auth.Infraestructure.Entities
             Email = email;
             UserName = username;
             CreatedAt = DateTime.Now;
+            Active = true;
         }
 
-        public Guid CompanyId {  get; private set; }
+        public Guid? CompanyId {  get; private set; }
         public Guid? OrganizationId { get; private set; }
         public DateTime CreatedAt { get; private set; }
+        public bool Active { get; private set; }
 
         public void AssignCompany(Guid companyId) => CompanyId = companyId;
 

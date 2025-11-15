@@ -43,6 +43,7 @@ namespace Fixeon.WebApi.Configuration
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                     options.JsonSerializerOptions.WriteIndented = true;
                 });

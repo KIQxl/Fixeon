@@ -1,7 +1,5 @@
 ﻿using Fixeon.Auth.Infraestructure.Data;
 using Fixeon.Auth.Infraestructure.Entities;
-using Fixeon.Domain.Entities;
-using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +13,6 @@ namespace Fixeon.WebApi.SeedData
             var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
             var authDbContext = provider.GetRequiredService<DataContext>();
-            var domainDbContext = provider.GetRequiredService<DomainContext>();
 
             authDbContext.IgnoreTenantInterceptor = true;
 
@@ -26,24 +23,12 @@ namespace Fixeon.WebApi.SeedData
                 await roleManager.CreateAsync(new IdentityRole(masterRole));
             }
 
-            var companyName = "Fixeon Master Company";
-
-            var masterCompany = await domainDbContext.companies.AsNoTracking().FirstOrDefaultAsync(x => x.Name == companyName);
-
-            if (masterCompany is null)
-            {
-                masterCompany = new Company(companyName, "00000000000000", "fixeon.company@email.com", null);
-                await domainDbContext.companies.AddAsync(masterCompany);
-                await domainDbContext.SaveChangesAsync();
-            }
-
-            string masterEmail = "fixeon-company@fixeon.com.br";
+            string masterEmail = "admin@fixeon.com.br";
             var masterUser = await userManager.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == masterEmail);
 
             if (masterUser is null)
             {
                 masterUser = new ApplicationUser(masterEmail, "Fixeon");
-                masterUser.AssignCompany(masterCompany.Id);
 
                 var createUserResult = await userManager.CreateAsync(masterUser, "F1X3oN@2025");
                 if (createUserResult.Succeeded)

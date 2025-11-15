@@ -24,10 +24,17 @@ namespace Fixeon.WebApi.Controllers
         {
             var result = await _companyApplicationServices.GetAllCompanies();
 
-            if (result.Success)
-                return Ok(result);
+            return Ok(result);
+        }
 
-            return BadRequest(result);
+        [HttpGet("get-by-id/{id}")]
+        [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
+
+        public async Task<IActionResult> GetCompanyById([FromRoute] Guid id)
+        {
+            var result = await _companyApplicationServices.GetCompanyById(id);
+
+            return Ok(result);
         }
 
         [HttpPost]
@@ -36,10 +43,7 @@ namespace Fixeon.WebApi.Controllers
         {
             var result = await _companyApplicationServices.CreateCompany(request);
 
-            if(result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpGet("get-tags")]
@@ -49,10 +53,7 @@ namespace Fixeon.WebApi.Controllers
         {
             var result = await _companyApplicationServices.GetAllTags();
 
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpPost("create-tag")]
@@ -61,10 +62,7 @@ namespace Fixeon.WebApi.Controllers
         {
             var result = await _companyApplicationServices.CreateTag(request);
 
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpDelete("remove-tag/{id}")]
@@ -73,10 +71,7 @@ namespace Fixeon.WebApi.Controllers
         {
             var result = await _companyApplicationServices.RemoveTag(id);
 
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return Ok(result);
         }
     }
 }

@@ -11,6 +11,12 @@ namespace Fixon.Tests.MockRepository
         private readonly List<Ticket> fakeTickets = TicketsMock.GetTickets();
         private readonly List<Analyst> fakeAnalysts = TicketsMock.Analysts;
         private readonly List<Interaction> fakeInteractions = TicketsMock.Interactions();
+
+        public Task AttachTagInTicket(Guid ticketId, Guid tagId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task CreateAttachment(List<Attachment> attachments)
         {
             return Task.CompletedTask;
@@ -31,9 +37,19 @@ namespace Fixon.Tests.MockRepository
             return Task.CompletedTask;
         }
 
+        public Task DetachTagInTicket(Guid ticketId, Guid tagId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<Ticket>> GetAllTicketsAsync()
         {
             return fakeTickets;
+        }
+
+        public Task<IEnumerable<Ticket>> GetAllTicketsAsync(Guid? userId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketsFilterAsync(string? category, string? status, string? priority, Guid? analyst, Guid? user, string? protocol)

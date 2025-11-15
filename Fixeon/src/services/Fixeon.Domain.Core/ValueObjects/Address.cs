@@ -1,13 +1,7 @@
-﻿using Fixeon.Domain.Application.Interfaces;
-
-namespace Fixeon.Domain.Application.Dtos.Requests
+﻿namespace Fixeon.Domain.Core.ValueObjects
 {
-    public class CreateCompanyRequest : IRequest
+    public class Address
     {
-        public string Name { get; set; }
-        public string CNPJ { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
         public string Street { get; set; }
         public string Number { get; set; }
         public string Neighborhood { get; set; }

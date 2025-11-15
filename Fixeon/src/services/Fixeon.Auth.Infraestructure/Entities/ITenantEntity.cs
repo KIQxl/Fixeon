@@ -2,6 +2,6 @@
 {
     public interface ITenantEntity
     {
-        public Guid CompanyId { get; }
+        public Guid? CompanyId { get; }
     }
 }

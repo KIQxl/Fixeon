@@ -368,6 +368,32 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
         }
 
+        public async Task<Response<bool>> CreateMasterAdmin(CreateAccountRequest request)
+        {
+            try
+            {
+                var applicationUser = new ApplicationUser(request.Email, request.Username);
+
+                var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
+
+                if (result.Succeeded)
+                {
+
+                    var roleResult = await _authRepository.AssociateRole(applicationUser, "MasterAdmin");
+
+                    //_backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = applicationUser.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
+
+                    return new Response<bool>(true);
+                }
+
+                return new Response<bool>(result.Errors.Select(e => e.Description).ToList());
+            }
+            catch (Exception ex)
+            {
+                return new Response<bool>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
         public async Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers()
         {
             var users = await _authRepository.GetAllUsers(true, null, null, null, null);
