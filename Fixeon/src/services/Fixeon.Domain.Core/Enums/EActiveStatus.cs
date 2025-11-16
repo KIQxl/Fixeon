@@ -5,6 +5,7 @@
         Active,
         Inactive,
         Trial,
-        Suspended
+        Suspended,
+        Onboarding
     }
 }

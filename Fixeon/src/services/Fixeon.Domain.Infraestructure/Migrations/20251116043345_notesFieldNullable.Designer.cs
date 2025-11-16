@@ -4,6 +4,7 @@ using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    partial class DomainContextModelSnapshot : ModelSnapshot
+    [Migration("20251116043345_notesFieldNullable")]
+    partial class notesFieldNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,9 +264,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(13)");
 
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("varchar(1000)");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("varchar(25)");
@@ -306,9 +306,6 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("varchar(13)");
-
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("varchar(1000)");
 
                     b.Property<string>("Status")
                         .IsRequired()

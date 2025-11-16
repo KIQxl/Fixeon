@@ -7,7 +7,7 @@ namespace Fixeon.Domain.Entities
     public class Company : Entity
     {
         protected Company() { }
-        public Company(string name, string cNPJ, string email, string phoneNumber, Address address, List<Tag>? tags)
+        public Company(string name, string cNPJ, string email, string phoneNumber, Address address, List<Tag>? tags, string? profilePictureUrl)
         {
             Id = Guid.NewGuid();
             Name = name;
@@ -18,6 +18,7 @@ namespace Fixeon.Domain.Entities
             Tags = tags ?? new List<Tag>();
             PhoneNumber = phoneNumber;
             Address = address;
+            ProfilePictureUrl = profilePictureUrl;
         }
 
         public string Name { get; private set; }
@@ -27,6 +28,7 @@ namespace Fixeon.Domain.Entities
         public string PhoneNumber { get; private set; }
         public Address Address { get; private set; }
         public EActiveStatus Status { get; private set; }
+        public string? ProfilePictureUrl { get; set; }
         public List<Tag> Tags { get; private set; } = new List<Tag>();
         public List<Organization> Organizations { get; private set; }
 

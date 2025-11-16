@@ -4,6 +4,7 @@ using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Application.Validator;
 using Fixeon.Domain.Core.Entities;
+using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Domain.Entities;
 
 namespace Fixeon.Domain.Application.Services
@@ -34,6 +35,10 @@ namespace Fixeon.Domain.Application.Services
                             organization.CompanyId,
                             organization.CNPJ,
                             organization.Email,
+                            organization.PhoneNumber,
+                            organization.Notes,
+                            organization.Address,
+                            organization.Status,
                             organization.CreatedAt,
                             organization.SLAs,
                             organization.Categories?.ToList(),
@@ -61,6 +66,10 @@ namespace Fixeon.Domain.Application.Services
                             organization.CompanyId,
                             organization.CNPJ,
                             organization.Email,
+                            organization.PhoneNumber,
+                            organization.Notes,
+                            organization.Address,
+                            organization.Status,
                             organization.CreatedAt,
                             organization.SLAs,
                             organization.Categories?.ToList(),
@@ -76,7 +85,12 @@ namespace Fixeon.Domain.Application.Services
         {
             try
             {
-                var organization = new Organization(request.Name, request.CNPJ, request.Email);
+                var validationResult = request.Validate();
+                if(!validationResult.IsValid)
+                    return new Response<OrganizationResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.ServerError);
+
+                var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.State, PostalCode = request.PostalCode, Country = request.Country };
+                var organization = new Organization(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, request.Notes, request.ProfilePictureUrl);
 
                 if (request.Categories.Any())
                 {
@@ -112,6 +126,10 @@ namespace Fixeon.Domain.Application.Services
                             organization.CompanyId,
                             organization.CNPJ,
                             organization.Email,
+                            organization.PhoneNumber,
+                            organization.Notes,
+                            organization.Address,
+                            organization.Status,
                             organization.CreatedAt,
                             organization.SLAs,
                             organization.Categories?.ToList(),

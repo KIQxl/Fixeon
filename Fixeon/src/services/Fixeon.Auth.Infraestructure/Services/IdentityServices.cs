@@ -59,6 +59,9 @@ namespace Fixeon.Auth.Infraestructure.Services
                     u.Id,
                     u.UserName,
                     u.Email,
+                    u.PhoneNumber,
+                    u.JobTitle,
+                    u.ProfilePictureUrl,
                     organizationResponse,
                     roles
                 ));
@@ -84,7 +87,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                 OrganizationName = org.OrganizationName
             };
 
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, organizationResponse, roles));
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, organizationResponse, roles));
         }
 
         public async Task<Response<List<ApplicationUserResponse>>> GetUserByRoleName(string role)
@@ -107,7 +110,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     OrganizationName = org.OrganizationName
                 };
 
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, u.ProfilePictureUrl, organizationResponse, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -150,7 +153,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     OrganizationName = org.OrganizationName
                 };
 
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, organizationResponse, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, u.ProfilePictureUrl, organizationResponse, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -161,7 +164,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var user = new ApplicationUser(request.Email, request.Username);
+                var user = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
 
                 if (request.OrganizationId.HasValue)
                     user.AssignOrganization(request.OrganizationId.Value);
@@ -185,7 +188,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, organizationResponse, roles.Select(r => r.Name).ToList()));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, organizationResponse, roles.Select(r => r.Name).ToList()));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -216,7 +219,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                     var result = await _authRepository.UpdateAccount(user);
 
                     if (result.Succeeded)
-                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null, null));
+                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, null, null));
 
                     return new Response<ApplicationUserResponse>(result.Errors
                         .Select(e => e.Description)
@@ -292,7 +295,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 if (result.Succeeded)
                 {
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null, roles.Select(r => r.Name).ToList()));
+                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, null, roles.Select(r => r.Name).ToList()));
                 }
 
                 return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
@@ -330,7 +333,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             var result = await _authRepository.ResetPassword(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
-                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, null, null));
+                return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, null, null));
 
             return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
         }
@@ -340,7 +343,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
                 applicationUser.AssignCompany(request.CompanyId.Value);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
@@ -356,6 +359,9 @@ namespace Fixeon.Auth.Infraestructure.Services
                         applicationUser.Id,
                         applicationUser.UserName,
                         applicationUser.Email,
+                        applicationUser.PhoneNumber,
+                        applicationUser.JobTitle,
+                        applicationUser.ProfilePictureUrl,
                         null,
                         new List<string> { "Admin" }));
                 }
@@ -372,7 +378,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
 
@@ -406,7 +412,7 @@ namespace Fixeon.Auth.Infraestructure.Services
             foreach (var u in users)
             {
                 var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, null, roles));
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, u.ProfilePictureUrl, null, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);

@@ -15,5 +15,6 @@ namespace Fixeon.Domain.Application.Dtos.Requests
         public string State { get; set; }
         public string PostalCode { get; set; }
         public string Country { get; set; }
+        public string ProfilePicture { get; set; }
     }
 }

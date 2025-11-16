@@ -69,6 +69,9 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .IsRequired();
             });
 
+            builder.Property(x => x.ProfilePictureUrl)
+                .HasColumnType("varchar(1000)");
+
             builder.HasIndex(x => x.CNPJ).IsUnique();
         }
     }

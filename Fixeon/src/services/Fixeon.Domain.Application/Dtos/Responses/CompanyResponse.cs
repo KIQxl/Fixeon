@@ -7,7 +7,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
 {
     public class CompanyResponse
     {
-        public CompanyResponse(Guid id, string name, string cnpj, string email, Address address, string phoneNumber, EActiveStatus status, DateTime createdAt, List<Tag>? tags = null, List<OrganizationResponse>? organizations = null)
+        public CompanyResponse(Guid id, string name, string cnpj, string email, Address address, string phoneNumber, string? profilePictureUrl, EActiveStatus status, DateTime createdAt, List<Tag>? tags = null, List<OrganizationResponse>? organizations = null)
         {
             Id = id;
             Name = name;
@@ -15,6 +15,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
             Email = email;
             Address = address;
             PhoneNumber = phoneNumber;
+            ProfilePictureUrl = profilePictureUrl;
             Status = status;
             CreatedAt = createdAt;
             Tags = tags ?? new List<Tag>();
@@ -27,6 +28,7 @@ namespace Fixeon.Domain.Application.Dtos.Responses
         public string Email { get; set; }
         public Address Address { get; set; }
         public string PhoneNumber { get; set; }
+        public string? ProfilePictureUrl { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public EActiveStatus Status { get; set; }

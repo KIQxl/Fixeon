@@ -11,6 +11,11 @@ namespace Fixeon.Auth.Infraestructure.Dtos.Requests
         [Required(ErrorMessage = "O campo Username obrigatório")]
         public string Username { get; set; }
 
+        [Required(ErrorMessage = "O campo Telefone obrigatório")]
+        public string PhoneNumber { get; set; }
+        public string? JobTitle { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+
         [Required(ErrorMessage = "O campo Senha obrigatório")]
         [MinLength(8, ErrorMessage = "A senha precisa conter pelo menos 8 caracteres")]
         public string Password { get; set; }

@@ -36,6 +36,7 @@ namespace Fixeon.Domain.Application.Services
                     company.Email,
                     company.Address, 
                     company.PhoneNumber, 
+                    company.ProfilePictureUrl,
                     company.Status,
                     company.CreatedAt,
                     company.Tags, 
@@ -48,6 +49,10 @@ namespace Fixeon.Domain.Application.Services
                                 x.CompanyId,
                                 x.CNPJ,
                                 x.Email,
+                                x.PhoneNumber,
+                                x.Notes,
+                                x.Address,
+                                x.Status,
                                 x.CreatedAt,
                                 new List<OrganizationsSLA>(),
                                 new List<Category>(),
@@ -71,8 +76,8 @@ namespace Fixeon.Domain.Application.Services
                 if (!validationResult.IsValid)
                     return new Response<bool>(validationResult.Errors.Select(e => e.ErrorMessage).ToList(), EErrorType.BadRequest);
 
-                var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.Street, PostalCode = request.PostalCode, Country = request.Country };
-                var company = new Company(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, null);
+                var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.State, PostalCode = request.PostalCode, Country = request.Country };
+                var company = new Company(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, null, request.ProfilePicture);
 
                 await _repository.CreateCompany(company);
 
@@ -90,7 +95,7 @@ namespace Fixeon.Domain.Application.Services
             {
                 var companies = await _repository.GetAllCompanies();
 
-                var result = companies.Select(c => new CompanyResponse(c.Id, c.Name, c.CNPJ, c.Email, c.Address, c.PhoneNumber, c.Status, c.CreatedAt, null, null)).ToList();
+                var result = companies.Select(c => new CompanyResponse(c.Id, c.Name, c.CNPJ, c.Email, c.Address, c.PhoneNumber, c.ProfilePictureUrl, c.Status, c.CreatedAt, null, null)).ToList();
 
                 return new Response<List<CompanyResponse>>(result);
             }
