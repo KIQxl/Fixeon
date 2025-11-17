@@ -15,14 +15,16 @@ namespace Fixeon.Auth.Infraestructure.Services
         private readonly IUrlEncoder _urlEncoder;
         private readonly ITokenGeneratorService _tokenGeneratorService;
         private readonly IOrganizationResolver _organizationResolver;
+        private readonly IStorageServices _storageServices;
 
-        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, IOrganizationResolver organizationResolver)
+        public IdentityServices(IIdentityRepository authRepository, IBackgroundEmailJobWrapper backgroundEmailJobWrapper, IUrlEncoder urlEncoder, ITokenGeneratorService tokenGeneratorService, IOrganizationResolver organizationResolver, IStorageServices storageServices)
         {
             _authRepository = authRepository;
             _backgroundEmailJobWrapper = backgroundEmailJobWrapper;
             _urlEncoder = urlEncoder;
             _tokenGeneratorService = tokenGeneratorService;
             _organizationResolver = organizationResolver;
+            _storageServices = storageServices;
         }
 
         // GET
@@ -55,13 +57,15 @@ namespace Fixeon.Auth.Infraestructure.Services
                     organizationResponse = new UserOrganizationResponse { OrganizationId = org.OrganizationId, OrganizationName = org.OrganizationName };
                 }
 
+                var urlImage = await GetPresignedUrl(u.ProfilePictureUrl);
+
                 response.Add(new ApplicationUserResponse(
                     u.Id,
                     u.UserName,
                     u.Email,
                     u.PhoneNumber,
                     u.JobTitle,
-                    u.ProfilePictureUrl,
+                    urlImage,
                     organizationResponse,
                     roles
                 ));
@@ -87,7 +91,9 @@ namespace Fixeon.Auth.Infraestructure.Services
                 OrganizationName = org.OrganizationName
             };
 
-            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, organizationResponse, roles));
+            var urlImage = await GetPresignedUrl(user.ProfilePictureUrl);
+
+            return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, urlImage, organizationResponse, roles));
         }
 
         public async Task<Response<List<ApplicationUserResponse>>> GetUserByRoleName(string role)
@@ -110,7 +116,9 @@ namespace Fixeon.Auth.Infraestructure.Services
                     OrganizationName = org.OrganizationName
                 };
 
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, u.ProfilePictureUrl, organizationResponse, roles));
+                var urlImage = await GetPresignedUrl(u.ProfilePictureUrl);
+
+                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, urlImage, organizationResponse, roles));
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
@@ -160,11 +168,11 @@ namespace Fixeon.Auth.Infraestructure.Services
         }
 
         // CREATE
-        public async Task<Response<ApplicationUserResponse>> CreateIdentityUser(CreateAccountRequest request)
+        public async Task<Response<bool>> CreateIdentityUser(CreateAccountRequest request)
         {
             try
             {
-                var user = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
+                var user = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
 
                 if (request.OrganizationId.HasValue)
                     user.AssignOrganization(request.OrganizationId.Value);
@@ -173,6 +181,8 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 if (result.Succeeded)
                 {
+                    await SaveFile(request.ProfilePictureUrl);
+
                     var roles = await _authRepository.GetRolesByName(request.Roles);
 
                     if (roles.Any())
@@ -188,18 +198,18 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, organizationResponse, roles.Select(r => r.Name).ToList()));
+                    return new Response<bool>(true);
                 }
 
-                return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+                return new Response<bool>(result.Errors.Select(e => e.Description).ToList());
             }
             catch (Exception ex)
             {
-                return new Response<ApplicationUserResponse>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
+                return new Response<bool>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
             }
         }
 
-        public async Task<Response<ApplicationUserResponse>> UpdateApplicationUser(UpdateApplicationUserRequest request)
+        public async Task<Response<bool>> UpdateApplicationUser(UpdateApplicationUserRequest request)
         {
             try
             {
@@ -219,19 +229,19 @@ namespace Fixeon.Auth.Infraestructure.Services
                     var result = await _authRepository.UpdateAccount(user);
 
                     if (result.Succeeded)
-                        return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, user.ProfilePictureUrl, null, null));
+                        return new Response<bool>(true);
 
-                    return new Response<ApplicationUserResponse>(result.Errors
+                    return new Response<bool>(result.Errors
                         .Select(e => e.Description)
                         .ToList());
                 }
 
-                return new Response<ApplicationUserResponse>("Usuário não encontrado.");
+                return new Response<bool>("Usuário não encontrado.");
 
             }
             catch (Exception ex)
             {
-                return new Response<ApplicationUserResponse>(ex.Message);
+                return new Response<bool>(ex.Message);
             }
         }
 
@@ -339,38 +349,31 @@ namespace Fixeon.Auth.Infraestructure.Services
         }
 
         //MASTER ADMIN ACTIONS
-        public async Task<Response<ApplicationUserResponse>> MasterAdminCreateFirstForCompany(CreateAccountRequest request)
+        public async Task<Response<bool>> MasterAdminCreateFirstForCompany(CreateAccountRequest request)
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
                 applicationUser.AssignCompany(request.CompanyId.Value);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
 
                 if (result.Succeeded)
                 {
+                    await SaveFile(request.ProfilePictureUrl);
 
                     var roleResult = await _authRepository.AssociateRole(applicationUser, "Admin");
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = applicationUser.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
-                    return new Response<ApplicationUserResponse>(new ApplicationUserResponse(
-                        applicationUser.Id,
-                        applicationUser.UserName,
-                        applicationUser.Email,
-                        applicationUser.PhoneNumber,
-                        applicationUser.JobTitle,
-                        applicationUser.ProfilePictureUrl,
-                        null,
-                        new List<string> { "Admin" }));
+                    return new Response<bool>(true);
                 }
 
-                return new Response<ApplicationUserResponse>(result.Errors.Select(e => e.Description).ToList());
+                return new Response<bool>(result.Errors.Select(e => e.Description).ToList());
             }
             catch (Exception ex)
             {
-                return new Response<ApplicationUserResponse>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
+                return new Response<bool>(new List<string> { "Ocorreu um erro.", ex.InnerException?.Message ?? ex.Message });
             }
         }
 
@@ -378,13 +381,13 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
 
                 if (result.Succeeded)
                 {
-
+                    await SaveFile(request.ProfilePictureUrl);
                     var roleResult = await _authRepository.AssociateRole(applicationUser, "MasterAdmin");
 
                     //_backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = applicationUser.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
@@ -416,6 +419,25 @@ namespace Fixeon.Auth.Infraestructure.Services
             }
 
             return new Response<List<ApplicationUserResponse>>(response);
+        }
+
+        private async Task<string> GetPresignedUrl(string filename)
+        {
+            var presignedUrl = await _storageServices.GetPresignedUrl(filename);
+
+            return presignedUrl;
+        }
+
+        private async Task SaveFile(FormFileAdapterDto file)
+        {
+            try
+            {
+                await _storageServices.UploadFile("profile_pictures", file.FileName, file.ContentType, file.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao salvar anexos." + ex.Message);
+            }
         }
     }
 }

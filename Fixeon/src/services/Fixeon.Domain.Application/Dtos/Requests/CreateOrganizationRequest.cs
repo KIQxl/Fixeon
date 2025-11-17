@@ -1,4 +1,5 @@
 ﻿using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.Domain.Application.Dtos.Requests
 {
@@ -16,7 +17,7 @@ namespace Fixeon.Domain.Application.Dtos.Requests
         public string State { get; set; }
         public string PostalCode { get; set; }
         public string Country { get; set; }
-        public string? ProfilePictureUrl { get; set; }
+        public FormFileAdapterDto? ProfilePictureUrl { get; set; }
         public List<string> Categories { get; set; } = new List<string>();
         public List<string> Departaments { get; set; } = new List<string>();
         public List<CreateSLAInOrganizationRequest> Slas { get; set; } = new List<CreateSLAInOrganizationRequest>();

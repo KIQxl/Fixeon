@@ -7,7 +7,7 @@ namespace Fixeon.Domain.Application.Interfaces
     {
         public Task<Response<List<OrganizationResponse>>> GetAllOrganizations();
         public Task<Response<OrganizationResponse>> GetOrganizationById(Guid organizationId);
-        public Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request);
+        public Task<Response<bool>> CreateOrganization(CreateOrganizationRequest request);
         public Task<Response<bool>> DeleteOrganization(Guid organizationId);
 
         //SLA

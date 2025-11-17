@@ -6,6 +6,8 @@ using Fixeon.Domain.Application.Validator;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Domain.Entities;
+using Fixeon.Shared.Core.Interfaces;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -13,11 +15,13 @@ namespace Fixeon.Domain.Application.Services
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IStorageServices _storageServices;
 
-        public OrganizationServices(IOrganizationRepository organizationRepository, IUnitOfWork unitOfWork)
+        public OrganizationServices(IOrganizationRepository organizationRepository, IUnitOfWork unitOfWork, IStorageServices storageServices)
         {
             _organizationRepository = organizationRepository;
             _unitOfWork = unitOfWork;
+            _storageServices = storageServices;
         }
 
         // ORGANIZATIONS
@@ -27,23 +31,31 @@ namespace Fixeon.Domain.Application.Services
             {
                 var organizations = await _organizationRepository.GetAllOrganizations();
 
-                return new Response<List<OrganizationResponse>>(organizations
-                    .Select(organization =>
-                        new OrganizationResponse(
-                            organization.Id,
-                            organization.Name,
-                            organization.CompanyId,
-                            organization.CNPJ,
-                            organization.Email,
-                            organization.PhoneNumber,
-                            organization.Notes,
-                            organization.Address,
-                            organization.Status,
-                            organization.CreatedAt,
-                            organization.SLAs,
-                            organization.Categories?.ToList(),
-                            organization.Departaments?.ToList()))
-                    .ToList());
+                var tasks = organizations.Select(async organization =>
+                {
+                    var presignedUrl = await GetPresignedUrl(organization.ProfilePictureUrl);
+
+                    return new OrganizationResponse(
+                        organization.Id,
+                        organization.Name,
+                        organization.CompanyId,
+                        organization.CNPJ,
+                        organization.Email,
+                        presignedUrl,
+                        organization.PhoneNumber,
+                        organization.Notes,
+                        organization.Address,
+                        organization.Status,
+                        organization.CreatedAt,
+                        organization.SLAs,
+                        organization.Categories?.ToList(),
+                        organization.Departaments?.ToList()
+                    );
+                });
+
+                var results = await Task.WhenAll(tasks);
+
+                return new Response<List<OrganizationResponse>>(results.ToList());
             }
             catch (Exception ex)
             {
@@ -60,12 +72,15 @@ namespace Fixeon.Domain.Application.Services
                 if(organization is null)
                     return new Response<OrganizationResponse>("Não encontramos sua organização, verifique com seu suporte se ela não foi desativada ou excluída.", EErrorType.NotFound);
 
+                var profileImageUrl = await GetPresignedUrl(organization.ProfilePictureUrl);
+
                 return new Response<OrganizationResponse>(new OrganizationResponse(
                             organization.Id,
                             organization.Name,
                             organization.CompanyId,
                             organization.CNPJ,
                             organization.Email,
+                            organization.ProfilePictureUrl,
                             organization.PhoneNumber,
                             organization.Notes,
                             organization.Address,
@@ -81,16 +96,19 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        public async Task<Response<OrganizationResponse>> CreateOrganization(CreateOrganizationRequest request)
+        public async Task<Response<bool>> CreateOrganization(CreateOrganizationRequest request)
         {
             try
             {
                 var validationResult = request.Validate();
                 if(!validationResult.IsValid)
-                    return new Response<OrganizationResponse>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.ServerError);
+                    return new Response<bool>(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), EErrorType.ServerError);
+
+                if (request.ProfilePictureUrl != null)
+                    await SaveFile(request.ProfilePictureUrl);
 
                 var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.State, PostalCode = request.PostalCode, Country = request.Country };
-                var organization = new Organization(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, request.Notes, request.ProfilePictureUrl);
+                var organization = new Organization(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, request.Notes, request.ProfilePictureUrl.FileName);
 
                 if (request.Categories.Any())
                 {
@@ -120,24 +138,11 @@ namespace Fixeon.Domain.Application.Services
 
                 await _organizationRepository.CreateOrganization(organization);
 
-                return new Response<OrganizationResponse>(new OrganizationResponse(
-                            organization.Id,
-                            organization.Name,
-                            organization.CompanyId,
-                            organization.CNPJ,
-                            organization.Email,
-                            organization.PhoneNumber,
-                            organization.Notes,
-                            organization.Address,
-                            organization.Status,
-                            organization.CreatedAt,
-                            organization.SLAs,
-                            organization.Categories?.ToList(),
-                            organization.Departaments?.ToList()));
+                return new Response<bool>(true);
             }
             catch (Exception ex)
             {
-                return new Response<OrganizationResponse>(ex.Message, EErrorType.ServerError);
+                return new Response<bool>(ex.Message, EErrorType.ServerError);
             }
         }
 
@@ -345,6 +350,25 @@ namespace Fixeon.Domain.Application.Services
             catch (Exception ex)
             {
                 return new Response<bool>(ex.Message ?? ex.InnerException.Message, EErrorType.BadRequest);
+            }
+        }
+
+        private async Task<string> GetPresignedUrl(string filename)
+        {
+            var presignedUrl = await _storageServices.GetPresignedUrl(filename);
+
+            return presignedUrl;
+        }
+
+        private async Task SaveFile(FormFileAdapterDto file)
+        {
+            try
+            {
+                await _storageServices.UploadFile("profile_pictures", file.FileName, file.ContentType, file.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao salvar anexos." + ex.Message);
             }
         }
     }

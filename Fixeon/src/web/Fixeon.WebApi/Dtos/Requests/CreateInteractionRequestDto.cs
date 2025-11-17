@@ -1,6 +1,7 @@
 ﻿using Fixeon.Domain.Application.Dtos;
 using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Core.Enums;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.WebApi.Dtos.Requests
 {

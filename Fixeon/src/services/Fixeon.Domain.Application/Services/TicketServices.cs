@@ -1,5 +1,4 @@
-﻿using Fixeon.Domain.Application.Dtos;
-using Fixeon.Domain.Application.Dtos.Enums;
+﻿using Fixeon.Domain.Application.Dtos.Enums;
 using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Dtos.Responses;
 using Fixeon.Domain.Application.Interfaces;
@@ -9,6 +8,7 @@ using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -431,8 +431,8 @@ namespace Fixeon.Domain.Application.Services
         {
             foreach (var file in attachments)
             {
-                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
-                var attachment = file.ToAttachment(_tenantContext.UserId, ticket.Id, null);
+                await _storageServices.UploadFile("tickets", file.FileName, file.ContentType, file.Content);
+                var attachment = new Attachment(file.FileName, file.GetExtension(), _tenantContext.UserId, ticket.Id, null);
                 ticket.AddAttachment(attachment);
             }
         }
@@ -441,9 +441,9 @@ namespace Fixeon.Domain.Application.Services
         {
             foreach (var file in attachments)
             {
-                await _storageServices.UploadFile(file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile("interactions", file.FileName, file.ContentType, file.Content);
 
-                var attachment = file.ToAttachment(_tenantContext.UserId, null, interaction.Id);
+                var attachment = new Attachment(file.FileName, file.GetExtension(), _tenantContext.UserId, null, interaction.Id);
                 interaction.AddAttachment(attachment);
             }
         }

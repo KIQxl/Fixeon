@@ -66,5 +66,10 @@ namespace Fixon.Tests.MockRepository
         {
             throw new NotImplementedException();
         }
+
+        Task<Response<bool>> IOrganizationServices.CreateOrganization(CreateOrganizationRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

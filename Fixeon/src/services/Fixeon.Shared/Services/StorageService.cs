@@ -6,6 +6,6 @@ namespace Fixeon.Shared.Services
     {
         public abstract Task<string> GetPresignedUrl(string filename);
 
-        public abstract Task UploadFile(string filename, string contentType, Stream content);
+        public abstract Task UploadFile(string folder, string filename, string contentType, Stream content);
     }
 }

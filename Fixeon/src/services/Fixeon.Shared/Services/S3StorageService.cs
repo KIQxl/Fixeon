@@ -30,19 +30,19 @@ namespace Fixeon.Shared.Services
             {
                 BucketName = _settings.BucketName,
                 Key = filename,
-                Expires = System.DateTime.Now.AddHours(1)
+                Expires = DateTime.Now.AddHours(1)
             };
 
             string url = await _client.GetPreSignedURLAsync(request);
             return url;
         }
 
-        public override async Task UploadFile(string filename, string contentType, Stream content)
+        public override async Task UploadFile(string folder, string filename, string contentType, Stream content)
         {
             var request = new PutObjectRequest
             {
                 BucketName = _settings.BucketName,
-                Key = $"{_tenantContext.TenantId}/{filename}",
+                Key = $"{_tenantContext.TenantId}/{folder}/{filename}",
                 InputStream = content,
                 ContentType = contentType,
                 AutoCloseStream = true

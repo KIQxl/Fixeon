@@ -1,5 +1,6 @@
 ﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Application.Interfaces;
+using Fixeon.WebApi.Dtos.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,9 +40,11 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
-        public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequest request)
+        public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequestDto request)
         {
-            var result = await _companyApplicationServices.CreateCompany(request);
+            var appRequest = request.ToApplicationRequest();
+
+            var result = await _companyApplicationServices.CreateCompany(appRequest);
 
             return Ok(result);
         }

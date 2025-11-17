@@ -2,6 +2,7 @@
 using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Application.Services;
 using Fixeon.WebApi.Configuration;
+using Fixeon.WebApi.Dtos.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,9 +34,11 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateOrganization([FromBody] CreateOrganizationRequest request)
+        public async Task<IActionResult> CreateOrganization([FromBody] CreateOrganizationRequestDto request)
         {
-            var response = await _organizationServices.CreateOrganization(request);
+            var appRequest = request.ToApplicationRequest();
+
+            var response = await _organizationServices.CreateOrganization(appRequest);
 
             if (response.Success)
                 return Ok(response);

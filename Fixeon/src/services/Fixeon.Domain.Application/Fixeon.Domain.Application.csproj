@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Services\CompanyServices.cs~RFf50c9a.TMP" />
+    <None Remove="Services\TicketServices.cs~RF4eb143.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
   </ItemGroup>
 

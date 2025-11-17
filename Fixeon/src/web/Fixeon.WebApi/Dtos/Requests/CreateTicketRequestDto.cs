@@ -1,10 +1,10 @@
-﻿using Fixeon.Domain.Application.Dtos;
-using Fixeon.Domain.Application.Dtos.Requests;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Domain.Core.Enums;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.WebApi.Dtos.Requests
 {
-    public class CreateTicketRequestDto
+    public class  CreateTicketRequestDto
     {
         public string Title { get; set; }
         public string Description { get; set; }

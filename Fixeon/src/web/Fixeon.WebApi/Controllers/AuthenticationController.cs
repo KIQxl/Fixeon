@@ -2,6 +2,7 @@
 using Fixeon.Auth.Infraestructure.Dtos.Requests;
 using Fixeon.Auth.Infraestructure.Dtos.Responses;
 using Fixeon.Auth.Infraestructure.Interfaces;
+using Fixeon.WebApi.Dtos.Requests;
 using Fixeon.WebApi.Dtos.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace Fixeon.WebApi.Controllers
         [HttpPost]
         [Route("create-account")]
         [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountRequest request)
+        public async Task<IActionResult> CreateAccount([FromForm] CreateApplicationUserDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new Response<LoginResponse>(
@@ -50,7 +51,9 @@ namespace Fixeon.WebApi.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList()));
 
-            var response = await _services.CreateIdentityUser(request);
+            var requestDto = request.ToApplicationRequest();
+
+            var response = await _services.CreateIdentityUser(requestDto);
 
             if(response.Success)
                 return Ok(response);

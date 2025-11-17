@@ -1,4 +1,5 @@
 ﻿using Fixeon.Domain.Application.Interfaces;
+using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.Domain.Application.Dtos.Requests
 {

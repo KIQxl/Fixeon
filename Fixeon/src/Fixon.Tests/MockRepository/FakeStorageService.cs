@@ -9,9 +9,9 @@ namespace Fixon.Tests.MockRepository
             return string.Empty;
         }
 
-        public async Task UploadFile(string filename, string contentType, Stream content)
+        public Task UploadFile(string folder, string filename, string contentType, Stream content)
         {
-            await Task.CompletedTask;
+            throw new NotImplementedException();
         }
     }
 }
