@@ -22,6 +22,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<IdentityResult> ResetPassword(ApplicationUser user, string token, string newPassword);
         public Task<List<ApplicationUser>> GetUsersByRoleName(string roleName);
         public Task<List<string>> GetRolesByUser(ApplicationUser user);
+        public Task<Dictionary<string, List<string>>> GetRolesForUsers(IEnumerable<string> userIds);
         public Task<IdentityRole> GetRole(string roleName);
         public Task<ApplicationUser> FindByEmailWithoutFilter(string email);
         public Task<List<ApplicationUser>> GetUsersByOrganization(Guid organizationId);

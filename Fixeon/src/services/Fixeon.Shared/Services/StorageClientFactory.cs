@@ -19,8 +19,8 @@ namespace Fixeon.Shared.Services
         {
             return (_storageSettings.ProviderName switch
             {
-                "S3" => new S3StorageService(_storageSettings, _tenantContext),
-                "MinIO" => new MinIOStorageService(_storageSettings, _tenantContext)
+                "S3" => new S3StorageService(_storageSettings),
+                "MinIO" => new MinIOStorageService(_storageSettings)
             });
         }
     }

@@ -1,5 +1,4 @@
-﻿using Fixeon.Auth.Infraestructure.Dtos.Requests;
-using Fixeon.Domain.Application.Dtos.Requests;
+﻿using Fixeon.Domain.Application.Dtos.Requests;
 using Fixeon.Shared.Core.Models;
 
 namespace Fixeon.WebApi.Dtos.Requests
@@ -25,20 +24,22 @@ namespace Fixeon.WebApi.Dtos.Requests
 
         public CreateOrganizationRequest ToApplicationRequest()
         {
-            var profilePicture = new FormFileAdapterDto
+            var profilePicture = ProfilePictureUrl != null ? new FormFileAdapterDto
             {
                 FileName = ProfilePictureUrl.FileName,
                 ContentType = ProfilePictureUrl.ContentType,
                 Length = ProfilePictureUrl.Length,
                 Content = ProfilePictureUrl.OpenReadStream()
-            };
+            }
+            : null;
 
             var request = new CreateOrganizationRequest
             {
                 Name = this.Name,
                 CNPJ = this.CNPJ,
-                Email = this.PhoneNumber,
+                Email = this.Email,
                 PhoneNumber = this.PhoneNumber,
+                Notes = this.Notes,
                 Street = Street,
                 Number = this.Number,
                 Neighborhood = this.Neighborhood,
@@ -46,7 +47,10 @@ namespace Fixeon.WebApi.Dtos.Requests
                 State = this.State,
                 PostalCode = this.PostalCode,
                 Country = this.Country,
-                ProfilePictureUrl = profilePicture
+                ProfilePictureUrl = profilePicture,
+                Categories = this.Categories,
+                Departaments = this.Departaments,
+                Slas = this.Slas
             };
 
             return request;

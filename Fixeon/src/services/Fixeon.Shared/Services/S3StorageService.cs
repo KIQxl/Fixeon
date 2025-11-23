@@ -9,8 +9,7 @@ namespace Fixeon.Shared.Services
     {
         private readonly AmazonS3Client _client;
         private readonly StorageSettings _settings;
-        private readonly ITenantContextServices _tenantContext;
-        public S3StorageService(StorageSettings settings, ITenantContextServices tenantContext)
+        public S3StorageService(StorageSettings settings)
         {
             _settings = settings;
             var config = new AmazonS3Config
@@ -21,15 +20,14 @@ namespace Fixeon.Shared.Services
             };
 
             _client = new AmazonS3Client(settings.AccessKey, settings.SecretKey, config);
-            _tenantContext = tenantContext;
         }
 
-        public override async Task<string> GetPresignedUrl(string filename)
+        public override async Task<string> GetPresignedUrl(string path, string filename)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _settings.BucketName,
-                Key = filename,
+                Key = $"{path}/{filename}",
                 Expires = DateTime.Now.AddHours(1)
             };
 
@@ -37,12 +35,12 @@ namespace Fixeon.Shared.Services
             return url;
         }
 
-        public override async Task UploadFile(string folder, string filename, string contentType, Stream content)
+        public override async Task UploadFile(string path, string filename, string contentType, Stream content)
         {
             var request = new PutObjectRequest
             {
                 BucketName = _settings.BucketName,
-                Key = $"{_tenantContext.TenantId}/{folder}/{filename}",
+                Key = $"{path}/{filename}",
                 InputStream = content,
                 ContentType = contentType,
                 AutoCloseStream = true

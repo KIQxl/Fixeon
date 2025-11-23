@@ -34,7 +34,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.AdminPolicy)]
-        public async Task<IActionResult> CreateOrganization([FromBody] CreateOrganizationRequestDto request)
+        public async Task<IActionResult> CreateOrganization([FromForm] CreateOrganizationRequestDto request)
         {
             var appRequest = request.ToApplicationRequest();
 

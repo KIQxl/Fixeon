@@ -35,6 +35,9 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
+            var userIds = users.Select(u => u.Id).ToList();
+            var rolesDictionary = await _authRepository.GetRolesForUsers(userIds);
+
             var response = new List<ApplicationUserResponse>();
 
             var orgIds = users
@@ -46,32 +49,42 @@ namespace Fixeon.Auth.Infraestructure.Services
             var organizations = await _organizationResolver.GetOrganizations(orgIds);
             var orgDict = organizations.ToDictionary(o => o.OrganizationId, o => o);
 
-            foreach (var u in users)
+            var responseTasks = users.Select(async u =>
             {
-                var roles = await _authRepository.GetRolesByUser(u);
+                var userRoles = rolesDictionary.GetValueOrDefault(u.Id.ToString(), new List<string>());
 
+                // b. Pegar a organização do dicionário (em memória).
                 UserOrganizationResponse? organizationResponse = null;
-
                 if (u.OrganizationId.HasValue && orgDict.TryGetValue(u.OrganizationId.Value, out var org))
                 {
-                    organizationResponse = new UserOrganizationResponse { OrganizationId = org.OrganizationId, OrganizationName = org.OrganizationName };
+                    organizationResponse = new UserOrganizationResponse
+                    {
+                        OrganizationId = org.OrganizationId,
+                        OrganizationName = org.OrganizationName
+                    };
                 }
 
-                var urlImage = await GetPresignedUrl(u.ProfilePictureUrl);
+                string profilePictureUrl = null;
+                if (!string.IsNullOrEmpty(u.ProfilePictureUrl))
+                {
+                    profilePictureUrl = await GetPresignedUrl("users/profile_pictures", u.ProfilePictureUrl);
+                }
 
-                response.Add(new ApplicationUserResponse(
+                return new ApplicationUserResponse(
                     u.Id,
                     u.UserName,
                     u.Email,
                     u.PhoneNumber,
                     u.JobTitle,
-                    urlImage,
+                    profilePictureUrl,
                     organizationResponse,
-                    roles
-                ));
-            }
+                    userRoles
+                );
+            });
 
-            return new Response<List<ApplicationUserResponse>>(response);
+            var responseList = (await Task.WhenAll(responseTasks)).ToList();
+
+            return new Response<List<ApplicationUserResponse>>(responseList);
         }
 
         public async Task<Response<ApplicationUserResponse>> GetuserById(string id)
@@ -91,7 +104,7 @@ namespace Fixeon.Auth.Infraestructure.Services
                 OrganizationName = org.OrganizationName
             };
 
-            var urlImage = await GetPresignedUrl(user.ProfilePictureUrl);
+            var urlImage = await GetPresignedUrl($"users/profile_pictures", user.ProfilePictureUrl);
 
             return new Response<ApplicationUserResponse>(new ApplicationUserResponse(user.Id, user.UserName, user.Email, user.PhoneNumber, user.JobTitle, urlImage, organizationResponse, roles));
         }
@@ -103,23 +116,37 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
-            var response = new List<ApplicationUserResponse>();
+            var usersId = users.Select(u => u.Id).ToList();
+            var roles = await _authRepository.GetRolesForUsers(usersId);
 
-            foreach (var u in users)
+            var orgsId = users
+                            .Where(u => u.OrganizationId.HasValue)
+                            .Select(u => u.OrganizationId.Value)
+                            .Distinct()
+                            .ToList();
+
+            var orgs = await _organizationResolver.GetOrganizations(orgsId);
+
+            var orgsDict = orgs.ToDictionary(o => o.OrganizationId, o => o);
+
+            var responseTasks = users.Select(async u =>
             {
-                var roles = await _authRepository.GetRolesByUser(u);
-                var org = await _organizationResolver.GetOrganization(u.OrganizationId.Value);
+                var userRoles = roles.GetValueOrDefault(u.Id.ToString(), new List<string>());
 
-                UserOrganizationResponse organizationResponse = new UserOrganizationResponse
-                {
-                    OrganizationId = org.OrganizationId,
-                    OrganizationName = org.OrganizationName
-                };
+                UserOrganizationResponse? userOrg = null;
+                if (u.OrganizationId.HasValue && orgsDict.TryGetValue(u.OrganizationId.Value, out var org))
+                    userOrg = new UserOrganizationResponse
+                    {
+                        OrganizationId = org.OrganizationId,
+                        OrganizationName = org.OrganizationName
+                    };
 
-                var urlImage = await GetPresignedUrl(u.ProfilePictureUrl);
+                string profilePicture = await GetPresignedUrl("users/profile_pictures", u.ProfilePictureUrl);
 
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, urlImage, organizationResponse, roles));
-            }
+                return new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, profilePicture, userOrg, userRoles);
+            });
+
+            var response = (await Task.WhenAll(responseTasks)).ToList();
 
             return new Response<List<ApplicationUserResponse>>(response);
         }
@@ -410,20 +437,43 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
 
+            var userIds = users.Select(u => u.Id).ToList();
+
+            var rolesDictionary = await _authRepository.GetRolesForUsers(userIds);
+
             var response = new List<ApplicationUserResponse>();
 
-            foreach (var u in users)
+            var responseTasks = users.Select(async u =>
             {
-                var roles = await _authRepository.GetRolesByUser(u);
-                response.Add(new ApplicationUserResponse(u.Id, u.UserName, u.Email, u.PhoneNumber, u.JobTitle, u.ProfilePictureUrl, null, roles));
-            }
+                // a. Pega os papéis do dicionário (operação em memória).
+                var userRoles = rolesDictionary.GetValueOrDefault<string, List<string>>(u.Id, new List<string>());
 
-            return new Response<List<ApplicationUserResponse>>(response);
+                // b. Gera a URL da foto de perfil de forma assíncrona.
+                string profilePictureUrl = null;
+                if (!string.IsNullOrEmpty(u.ProfilePictureUrl))
+                    profilePictureUrl = await GetPresignedUrl("users/profile_pictures", u.ProfilePictureUrl);
+
+                // c. Retorna o objeto de resposta construído.
+                return new ApplicationUserResponse(
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    u.PhoneNumber,
+                    u.JobTitle,
+                    profilePictureUrl,
+                    null,
+                    userRoles
+                );
+            });
+
+            var responseList = (await Task.WhenAll(responseTasks)).ToList();
+
+            return new Response<List<ApplicationUserResponse>>(responseList);
         }
 
-        private async Task<string> GetPresignedUrl(string filename)
+        private async Task<string> GetPresignedUrl(string path, string filename)
         {
-            var presignedUrl = await _storageServices.GetPresignedUrl(filename);
+            var presignedUrl = await _storageServices.GetPresignedUrl(path, filename);
 
             return presignedUrl;
         }
@@ -432,7 +482,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                await _storageServices.UploadFile("profile_pictures", file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile("users/profile_pictures", file.FileName, file.ContentType, file.Content);
             }
             catch (Exception ex)
             {

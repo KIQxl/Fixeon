@@ -33,7 +33,7 @@ namespace Fixeon.Domain.Application.Services
 
                 var tasks = organizations.Select(async organization =>
                 {
-                    var presignedUrl = await GetPresignedUrl(organization.ProfilePictureUrl);
+                    var presignedUrl = await GetPresignedUrl("organizations/profile_pictures", organization.ProfilePictureUrl);
 
                     return new OrganizationResponse(
                         organization.Id,
@@ -72,7 +72,7 @@ namespace Fixeon.Domain.Application.Services
                 if(organization is null)
                     return new Response<OrganizationResponse>("Não encontramos sua organização, verifique com seu suporte se ela não foi desativada ou excluída.", EErrorType.NotFound);
 
-                var profileImageUrl = await GetPresignedUrl(organization.ProfilePictureUrl);
+                var profileImageUrl = await GetPresignedUrl("organizations/profile_pictures", organization.ProfilePictureUrl);
 
                 return new Response<OrganizationResponse>(new OrganizationResponse(
                             organization.Id,
@@ -80,7 +80,7 @@ namespace Fixeon.Domain.Application.Services
                             organization.CompanyId,
                             organization.CNPJ,
                             organization.Email,
-                            organization.ProfilePictureUrl,
+                            profileImageUrl,
                             organization.PhoneNumber,
                             organization.Notes,
                             organization.Address,
@@ -353,9 +353,9 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        private async Task<string> GetPresignedUrl(string filename)
+        private async Task<string> GetPresignedUrl(string path, string filename)
         {
-            var presignedUrl = await _storageServices.GetPresignedUrl(filename);
+            var presignedUrl = await _storageServices.GetPresignedUrl(path, filename);
 
             return presignedUrl;
         }
@@ -364,7 +364,7 @@ namespace Fixeon.Domain.Application.Services
         {
             try
             {
-                await _storageServices.UploadFile("profile_pictures", file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile("organizations/profile_pictures", file.FileName, file.ContentType, file.Content);
             }
             catch (Exception ex)
             {

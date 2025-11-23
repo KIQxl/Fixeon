@@ -28,11 +28,11 @@ namespace Fixeon.Domain.Infraestructure.Data
                     entry.Property("CompanyId").CurrentValue = tenantId;
                 }
 
-                foreach (var entry in context.ChangeTracker.Entries()
-                    .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added && e.Entity is Attachment))
-                {
-                    entry.Property("Name").CurrentValue = $"{tenantId}/{entry.Property("Name").CurrentValue}";
-                }
+                //foreach (var entry in context.ChangeTracker.Entries()
+                //    .Where(e => e.State == Microsoft.EntityFrameworkCore.EntityState.Added && e.Entity is Attachment))
+                //{
+                //    entry.Property("Name").CurrentValue = $"{tenantId}/{entry.Property("Name").CurrentValue}";
+                //}
             }
 
             return base.SavingChangesAsync(eventData, result, cancellationToken);

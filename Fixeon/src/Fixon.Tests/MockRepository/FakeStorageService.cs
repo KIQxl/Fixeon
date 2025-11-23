@@ -4,7 +4,7 @@ namespace Fixon.Tests.MockRepository
 {
     public class FakeStorageService : IStorageServices
     {
-        public async Task<string> GetPresignedUrl(string filename)
+        public async Task<string> GetPresignedUrl(string path, string filename)
         {
             return string.Empty;
         }

@@ -16,12 +16,14 @@ namespace Fixeon.Domain.Application.Services
         private readonly ICompanyRepository _repository;
         private readonly IUnitOfWork _UoW;
         private readonly IStorageServices _storageServices;
+        private readonly ITenantContextServices _tenantServices;
 
-        public CompanyServices(ICompanyRepository repository, IUnitOfWork uoW, IStorageServices storageServices)
+        public CompanyServices(ICompanyRepository repository, IUnitOfWork uoW, IStorageServices storageServices, ITenantContextServices tenantServices)
         {
             _repository = repository;
             _UoW = uoW;
             _storageServices = storageServices;
+            _tenantServices = tenantServices;
         }
 
         public async Task<Response<CompanyResponse>> GetCompanyById(Guid id)
@@ -33,12 +35,12 @@ namespace Fixeon.Domain.Application.Services
                 if (company is null)
                     return new Response<CompanyResponse>("Empresa não encontrada.", EErrorType.BadRequest);
 
-                var profileImageUrl = await GetPresignedUrl(company.ProfilePictureUrl);
+                var profileImageUrl = await GetPresignedUrl("companies/profile_pictures", company.ProfilePictureUrl);
 
                 var orgTasks = (company.Organizations ?? Enumerable.Empty<Organization>())
                     .Select(async x =>
                     {
-                        var orgImageUrl = await GetPresignedUrl(x.ProfilePictureUrl);
+                        var orgImageUrl = await GetPresignedUrl("organizations/profile_pictures", x.ProfilePictureUrl);
 
                         return new OrganizationResponse(x.Id,
                             x.Name,
@@ -113,7 +115,7 @@ namespace Fixeon.Domain.Application.Services
 
                 var tasks = companies.Select(async c =>
                 {
-                    var url = await GetPresignedUrl(c.ProfilePictureUrl);
+                    var url = await GetPresignedUrl("companies/profile_pictures", c.ProfilePictureUrl);
 
                     return new CompanyResponse(
                         c.Id,
@@ -191,9 +193,9 @@ namespace Fixeon.Domain.Application.Services
             }
         }
 
-        private async Task<string> GetPresignedUrl(string filename)
+        private async Task<string> GetPresignedUrl(string path, string filename)
         {
-            var presignedUrl = await _storageServices.GetPresignedUrl(filename);
+            var presignedUrl = await _storageServices.GetPresignedUrl(path, filename);
 
             return presignedUrl;
         }
@@ -202,7 +204,7 @@ namespace Fixeon.Domain.Application.Services
         {
             try
             {
-                await _storageServices.UploadFile("profile_pictures", file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile("companies/profile_pictures", file.FileName, file.ContentType, file.Content);
             }
             catch (Exception ex)
             {

@@ -9,6 +9,7 @@ using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Core.ValueObjects;
 using Fixeon.Shared.Core.Interfaces;
 using Fixeon.Shared.Core.Models;
+using System.Net.Sockets;
 
 namespace Fixeon.Domain.Application.Services
 {
@@ -167,12 +168,12 @@ namespace Fixeon.Domain.Application.Services
                 if (ticket is null)
                     return new Response<TicketResponse>("Ticket não encontrado.", EErrorType.NotFound);
 
-                var attachmentsUrl = await GetAttachmentsUrl(ticket.Attachments);
+                var attachmentsUrl = await GetAttachmentsUrl($"{ticket.CompanyId}/tickets", ticket.Attachments);
                 var response = new Response<TicketResponse>(ticket.ToResponse(attachmentsUrl));
 
                 var interactions = ticket.Interactions.Select(i =>
                 {
-                    var interactionsAttachments = GetAttachmentsUrl(i.Attachments);
+                    var interactionsAttachments = GetAttachmentsUrl($"{ticket.CompanyId}/interactions", i.Attachments);
                     return i.ToInteractionResponse(interactionsAttachments.Result);
 
                 }).ToList();
@@ -199,8 +200,7 @@ namespace Fixeon.Domain.Application.Services
 
                 var responses = tickets.Select(x =>
                 {
-                    var urls = GetAttachmentsUrl(x.Attachments);
-                    return x.ToResponse(urls.Result);
+                    return x.ToResponse();
                 }).ToList();
 
                 return new Response<List<TicketResponse>>(responses);
@@ -216,14 +216,15 @@ namespace Fixeon.Domain.Application.Services
         {
             try
             {
-                var interactions = await _ticketRepository.GetInteractionsByTicketIdAsync(ticketId);
+                var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+                var interactions = ticket.Interactions;
 
                 if (interactions is null)
                     return new Response<IEnumerable<InteractionResponse>>("Interações não encontradas.", EErrorType.NotFound);
 
                 var responses = interactions.Select(x =>
                 {
-                    var urls = GetAttachmentsUrl(x.Attachments);
+                    var urls = GetAttachmentsUrl($"{ticket.CompanyId}/interactions", x.Attachments);
                     return x.ToInteractionResponse(urls.Result);
                 });
 
@@ -325,8 +326,7 @@ namespace Fixeon.Domain.Application.Services
 
                 var responses = tickets.Select(t =>
                 {
-                    var ticketAttachmentsUrls = GetAttachmentsUrl(t.Attachments);
-                    return t.ToResponse(ticketAttachmentsUrls.Result);
+                    return t.ToResponse();
                 })
                 .ToList();
 
@@ -414,13 +414,13 @@ namespace Fixeon.Domain.Application.Services
             return new Response<bool>(true);
         }
 
-        private async Task<List<string>> GetAttachmentsUrl(List<Attachment> attachments)
+        private async Task<List<string>> GetAttachmentsUrl(string path, List<Attachment> attachments)
         {
             var urls = new List<string>();
 
             foreach (var attachment in attachments)
             {
-                var presignedUrl = await _storageServices.GetPresignedUrl(attachment.Name);
+                var presignedUrl = await _storageServices.GetPresignedUrl(path, attachment.Name);
                 urls.Add(presignedUrl);
             }
 
@@ -431,7 +431,7 @@ namespace Fixeon.Domain.Application.Services
         {
             foreach (var file in attachments)
             {
-                await _storageServices.UploadFile("tickets", file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile($"{_tenantContext.TenantId}/tickets", file.FileName, file.ContentType, file.Content);
                 var attachment = new Attachment(file.FileName, file.GetExtension(), _tenantContext.UserId, ticket.Id, null);
                 ticket.AddAttachment(attachment);
             }
@@ -441,7 +441,7 @@ namespace Fixeon.Domain.Application.Services
         {
             foreach (var file in attachments)
             {
-                await _storageServices.UploadFile("interactions", file.FileName, file.ContentType, file.Content);
+                await _storageServices.UploadFile($"{_tenantContext.TenantId}/interactions", file.FileName, file.ContentType, file.Content);
 
                 var attachment = new Attachment(file.FileName, file.GetExtension(), _tenantContext.UserId, null, interaction.Id);
                 interaction.AddAttachment(attachment);

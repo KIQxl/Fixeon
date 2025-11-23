@@ -200,9 +200,11 @@ namespace Fixeon.WebApi.Controllers
         [HttpPost]
         [Route("create-account-master")]
         [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
-        public async Task<IActionResult> CreateFirstUserForCompany([FromBody] CreateAccountRequest request)
+        public async Task<IActionResult> CreateFirstUserForCompany([FromForm] CreateApplicationUserDto request)
         {
-            var response = await _services.MasterAdminCreateFirstForCompany(request);
+            var applicationRequest = request.ToApplicationRequest();
+
+            var response = await _services.MasterAdminCreateFirstForCompany(applicationRequest);
 
             if (response.Success)
                 return Ok(response);

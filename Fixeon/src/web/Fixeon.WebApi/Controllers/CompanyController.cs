@@ -40,7 +40,7 @@ namespace Fixeon.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.MasterAdminPolicy)]
-        public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyRequestDto request)
+        public async Task<IActionResult> CreateCompany([FromForm] CreateCompanyRequestDto request)
         {
             var appRequest = request.ToApplicationRequest();
 

@@ -32,7 +32,7 @@ namespace Fixeon.WebApi.Dtos.Requests
             {
                 Name = this.Name,
                 CNPJ = this.CNPJ,
-                Email = this.PhoneNumber,
+                Email = this.Email,
                 PhoneNumber = this.PhoneNumber,
                 Street = Street,
                 Number = this.Number,
