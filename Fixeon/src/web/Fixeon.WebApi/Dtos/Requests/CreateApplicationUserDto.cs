@@ -31,13 +31,14 @@ namespace Fixeon.WebApi.Dtos.Requests
 
         public CreateAccountRequest ToApplicationRequest()
         {
-            var profilePicture = new FormFileAdapterDto
+            var profilePicture = ProfilePictureUrl != null ? new FormFileAdapterDto
             {
                 FileName = ProfilePictureUrl.FileName,
                 ContentType = ProfilePictureUrl.ContentType,
                 Length = ProfilePictureUrl.Length,
                 Content = ProfilePictureUrl.OpenReadStream()
-            };
+            }
+            : null;
 
             var request = new CreateAccountRequest
             {

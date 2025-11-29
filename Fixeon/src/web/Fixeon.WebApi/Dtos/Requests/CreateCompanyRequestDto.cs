@@ -20,13 +20,14 @@ namespace Fixeon.WebApi.Dtos.Requests
 
         public CreateCompanyRequest ToApplicationRequest()
         {
-            var profilePicture = new FormFileAdapterDto
+            var profilePicture = ProfilePicture != null ? new FormFileAdapterDto
             {
                 FileName = ProfilePicture.FileName,
                 ContentType = ProfilePicture.ContentType,
                 Length = ProfilePicture.Length,
                 Content = ProfilePicture.OpenReadStream()
-            };
+            }
+            : null;
 
             var request = new CreateCompanyRequest
             {

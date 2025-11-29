@@ -96,13 +96,17 @@ namespace Fixeon.Auth.Infraestructure.Services
 
             var roles = await _authRepository.GetRolesByUser(user);
 
-            var org = await _organizationResolver.GetOrganization(user.OrganizationId.Value);
-
-            UserOrganizationResponse organizationResponse = new UserOrganizationResponse
+            UserOrganizationResponse organizationResponse = null;
+            if (user.OrganizationId.HasValue)
             {
-                OrganizationId = org.OrganizationId,
-                OrganizationName = org.OrganizationName
-            };
+                var org = await _organizationResolver.GetOrganization(user.OrganizationId.Value);
+
+                organizationResponse = new UserOrganizationResponse
+                {
+                    OrganizationId = org.OrganizationId,
+                    OrganizationName = org.OrganizationName
+                };
+            }
 
             var urlImage = await GetPresignedUrl($"users/profile_pictures", user.ProfilePictureUrl);
 
@@ -199,7 +203,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var user = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
+                var user = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl?.FileName);
 
                 if (request.OrganizationId.HasValue)
                     user.AssignOrganization(request.OrganizationId.Value);
@@ -208,20 +212,16 @@ namespace Fixeon.Auth.Infraestructure.Services
 
                 if (result.Succeeded)
                 {
-                    await SaveFile(request.ProfilePictureUrl);
+                    if(request.ProfilePictureUrl != null)
+                        await SaveFile(request.ProfilePictureUrl);
 
-                    var roles = await _authRepository.GetRolesByName(request.Roles);
-
-                    if (roles.Any())
-                        await _authRepository.AssociateRoles(user, roles.Select(r => r.Name).ToList());
-
-                    var org = await _organizationResolver.GetOrganization(user.OrganizationId.Value);
-
-                    UserOrganizationResponse organizationResponse = new UserOrganizationResponse
+                    if (request.Roles != null && request.Roles.Any())
                     {
-                        OrganizationId = org.OrganizationId,
-                        OrganizationName = org.OrganizationName
-                    };
+                        var roles = await _authRepository.GetRolesByName(request.Roles);
+
+                        if (roles.Any())
+                            await _authRepository.AssociateRoles(user, roles.Select(r => r.Name).ToList());
+                    }
 
                     _backgroundEmailJobWrapper.SendEmail(new EmailMessage { To = user.Email, Subject = "Bem-vindo! - Fixeon", Body = EmailDictionary.WelcomeEmail });
 
@@ -380,14 +380,15 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl?.FileName);
                 applicationUser.AssignCompany(request.CompanyId.Value);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
 
                 if (result.Succeeded)
                 {
-                    await SaveFile(request.ProfilePictureUrl);
+                    if(request.ProfilePictureUrl != null)
+                        await SaveFile(request.ProfilePictureUrl);
 
                     var roleResult = await _authRepository.AssociateRole(applicationUser, "Admin");
 
@@ -408,7 +409,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         {
             try
             {
-                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl.FileName);
+                var applicationUser = new ApplicationUser(request.Email, request.Username, request.PhoneNumber, request.JobTitle, request.ProfilePictureUrl?.FileName);
 
                 var result = await _authRepository.CreateAccount(applicationUser, request.Password, true);
 

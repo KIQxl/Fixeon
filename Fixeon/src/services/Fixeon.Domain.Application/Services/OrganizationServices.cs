@@ -108,7 +108,7 @@ namespace Fixeon.Domain.Application.Services
                     await SaveFile(request.ProfilePictureUrl);
 
                 var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.State, PostalCode = request.PostalCode, Country = request.Country };
-                var organization = new Organization(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, request.Notes, request.ProfilePictureUrl.FileName);
+                var organization = new Organization(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, request.Notes, request.ProfilePictureUrl?.FileName);
 
                 if (request.Categories.Any())
                 {

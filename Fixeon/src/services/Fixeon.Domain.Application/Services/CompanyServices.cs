@@ -95,7 +95,7 @@ namespace Fixeon.Domain.Application.Services
                     await SaveFile(request.ProfilePicture);
 
                 var address = new Address { Street = request.Street, Number = request.Number, Neighborhood = request.Neighborhood, City = request.City, State = request.State, PostalCode = request.PostalCode, Country = request.Country };
-                var company = new Company(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, null, request.ProfilePicture.FileName);
+                var company = new Company(request.Name, request.CNPJ, request.Email, request.PhoneNumber, address, null, request.ProfilePicture?.FileName);
 
                 await _repository.CreateCompany(company);
 
