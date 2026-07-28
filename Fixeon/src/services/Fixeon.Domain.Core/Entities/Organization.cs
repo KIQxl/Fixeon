@@ -17,7 +17,7 @@ namespace Fixeon.Domain.Entities
             PhoneNumber = phoneNumber;
             Address = address;
             Notes = notes ?? string.Empty;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             Status = EActiveStatus.Onboarding;
             SLAs = new List<OrganizationsSLA>();
             Categories = new List<Category>();

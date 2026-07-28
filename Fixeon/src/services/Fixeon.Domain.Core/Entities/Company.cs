@@ -13,7 +13,7 @@ namespace Fixeon.Domain.Entities
             Name = name;
             CNPJ = cNPJ;
             Email = email;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             Status = EActiveStatus.Trial;
             Tags = tags ?? new List<Tag>();
             PhoneNumber = phoneNumber;

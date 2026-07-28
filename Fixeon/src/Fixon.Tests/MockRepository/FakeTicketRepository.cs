@@ -171,7 +171,7 @@ namespace Fixon.Tests.MockRepository
                                         .Select(x => new TopAnalystResponse
                                         {
                                             AnalystName = x.Key.analystName,
-                                            TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.Now.AddDays(-30) && t.Status == ETicketStatus.Resolved.ToString()),
+                                            TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.UtcNow.AddDays(-30) && t.Status == ETicketStatus.Resolved.ToString()),
                                             AverageTime = ConvertInHours(x.Where(t => t.Duration.HasValue)
                                                             .Select(t => t.Duration.Value.TotalHours)
                                                             .DefaultIfEmpty(0) // se vazio, retorna 0

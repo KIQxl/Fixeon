@@ -28,7 +28,7 @@ namespace Fixeon.Shared.Services
             {
                 BucketName = _settings.BucketName,
                 Key = $"{path}/{filename}",
-                Expires = DateTime.Now.AddHours(1)
+                Expires = DateTime.UtcNow.AddHours(1)
             };
 
             string url = await _client.GetPreSignedURLAsync(request);

@@ -313,7 +313,7 @@ namespace Fixeon.Domain.Infraestructure.Repositories
                                         .Select(x => new TopAnalystResponse
                                         {
                                             AnalystName = x.Key.analystName,
-                                            TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.Now.AddDays(-30) && t.Status == ETicketStatus.Resolved.ToString()),
+                                            TicketsLast30Days = x.Count(t => t.CreateAt >= DateTime.UtcNow.AddDays(-30) && t.Status == ETicketStatus.Resolved.ToString()),
                                             AverageTime = ConvertInHours(x.Where(t => t.ResolvedAt.HasValue)
                                                             .Select(t => (t.ResolvedAt.Value - t.CreateAt).TotalHours)
                                                             .DefaultIfEmpty(0)
@@ -335,8 +335,8 @@ namespace Fixeon.Domain.Infraestructure.Repositories
 
         public async Task<List<TicketsByDayResponse>> GetTicketsByDayAsync()
         {
-            var startDate = DateTime.Now.Date.AddDays(-6);
-            var endDate = DateTime.Now.Date.AddDays(1);
+            var startDate = DateTime.UtcNow.Date.AddDays(-6);
+            var endDate = DateTime.UtcNow.Date.AddDays(1);
 
             var createdQuery = await _ctx.tickets
                 .Where(t => t.CreateAt >= startDate && t.CreateAt < endDate)
@@ -374,8 +374,8 @@ namespace Fixeon.Domain.Infraestructure.Repositories
 
         public async Task<List<TicketsByHourResponse>> GetTicketsByHourAsync()
         {
-            var startDate = DateTime.Now.Date.AddDays(-30);
-            var endDate = DateTime.Now.Date.AddDays(1);
+            var startDate = DateTime.UtcNow.Date.AddDays(-30);
+            var endDate = DateTime.UtcNow.Date.AddDays(1);
 
             var result = await _ctx.tickets
                 .Where(t => t.CreateAt >= startDate && t.CreateAt < endDate)

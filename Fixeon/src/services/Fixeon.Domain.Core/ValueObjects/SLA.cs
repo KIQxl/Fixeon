@@ -13,12 +13,12 @@
         public void Accomplish()
         {
             if(!Accomplished.HasValue && Deadline.HasValue)
-                Accomplished = DateTime.Now;
+                Accomplished = DateTime.UtcNow;
         }
         public void SetDeadline(int deadlineInMinutes)
         {
             if(!Deadline.HasValue)
-                Deadline = DateTime.Now.AddMinutes(deadlineInMinutes);
+                Deadline = DateTime.UtcNow.AddMinutes(deadlineInMinutes);
         }
 
         public void RestartResolutionDate()

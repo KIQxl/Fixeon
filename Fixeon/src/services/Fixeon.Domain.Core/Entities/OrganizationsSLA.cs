@@ -12,7 +12,7 @@ namespace Fixeon.Domain.Core.Entities
             SLAInMinutes = sLAInMinutes;
             SLAPriority = sLAPriority;
             Type = type;
-            CreateAt = DateTime.Now;
+            CreateAt = DateTime.UtcNow;
         }
 
         public Organization Organization { get; private set; }

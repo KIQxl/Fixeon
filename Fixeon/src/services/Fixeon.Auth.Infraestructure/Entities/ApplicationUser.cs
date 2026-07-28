@@ -10,7 +10,7 @@ namespace Fixeon.Auth.Infraestructure.Entities
         {
             Email = email;
             UserName = username;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             Active = true;
             PhoneNumber = phoneNumber;
             JobTitle = jobTitle;

@@ -14,7 +14,7 @@ namespace Fixeon.Domain.Core.Entities
             Description = description;
             Category = category;
             Departament = departament;
-            CreateAt = DateTime.Now;
+            CreateAt = DateTime.UtcNow;
             Status = ETicketStatus.Pending.ToString();
             Priority = priority;
             CreatedByUser = user;
@@ -51,8 +51,8 @@ namespace Fixeon.Domain.Core.Entities
             if (this.Status.Equals(ETicketStatus.InProgress.ToString()) || this.Status.Equals(ETicketStatus.Reopened.ToString()))
             {
                 this.Status = ETicketStatus.Resolved.ToString();
-                this.ResolvedAt = DateTime.Now;
-                this.ModifiedAt = DateTime.Now;
+                this.ResolvedAt = DateTime.UtcNow;
+                this.ModifiedAt = DateTime.UtcNow;
                 ClosedBy = analyst;
 
                 SetResolutionAccomplished();
@@ -70,7 +70,7 @@ namespace Fixeon.Domain.Core.Entities
 
             this.AssignedTo = assignTo;
             this.Status = ETicketStatus.InProgress.ToString();
-            this.ModifiedAt = DateTime.Now;
+            this.ModifiedAt = DateTime.UtcNow;
 
             SetFirstResponseAccomplished();
 
@@ -80,7 +80,7 @@ namespace Fixeon.Domain.Core.Entities
         public void CancelTicket()
         {
             this.Status = ETicketStatus.Canceled.ToString();
-            this.ModifiedAt = DateTime.Now;
+            this.ModifiedAt = DateTime.UtcNow;
         }
 
         public bool ReOpenTicket()
@@ -91,7 +91,7 @@ namespace Fixeon.Domain.Core.Entities
             RestartResolutionDate();
 
             this.Status = ETicketStatus.InProgress.ToString();
-            this.ModifiedAt = DateTime.Now;
+            this.ModifiedAt = DateTime.UtcNow;
 
             return true;
         }
@@ -102,7 +102,7 @@ namespace Fixeon.Domain.Core.Entities
                 return false;
 
             this.Interactions.Add(interaction);
-            this.ModifiedAt = DateTime.Now;
+            this.ModifiedAt = DateTime.UtcNow;
 
             return true;
         }
@@ -113,7 +113,7 @@ namespace Fixeon.Domain.Core.Entities
                 return false;
 
             this.AssignedTo = assignTo;
-            this.ModifiedAt = DateTime.Now;
+            this.ModifiedAt = DateTime.UtcNow;
 
             return true;
         }

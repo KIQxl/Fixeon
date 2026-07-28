@@ -10,7 +10,7 @@ namespace Fixeon.Domain.Core.Entities
             TicketId = ticketId;
             Message = message;
             CreatedBy = user;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
         }
 
         public Guid TicketId { get; set; }
