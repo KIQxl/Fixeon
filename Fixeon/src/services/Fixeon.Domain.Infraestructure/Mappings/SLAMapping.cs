@@ -11,27 +11,22 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             builder.HasKey(s => s.Id);
 
             builder.Property(s => s.OrganizationId)
-                .IsRequired()
-                .HasColumnType("uniqueidentifier");
+                .IsRequired();
 
             builder.Property(s => s.SLAPriority)
                 .IsRequired()
-                .HasColumnType("varchar(30)");
+                .HasMaxLength(30);
 
             builder.Property(s => s.SLAInMinutes)
-                .IsRequired()
-                .HasColumnType("int");
+                .IsRequired();
 
             builder.Property(s => s.Type)
-                .IsRequired()
-                .HasColumnType("int");
+                .IsRequired();
 
             builder.Property(s => s.CreateAt)
-                .IsRequired()
-                .HasColumnType("datetime");
+                .IsRequired();
 
-            builder.Property(s => s.ModifiedAt)
-                .HasColumnType("datetime");
+            builder.Property(s => s.ModifiedAt);
         }
     }
 }

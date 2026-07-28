@@ -12,11 +12,10 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(i => i.Message)
                 .IsRequired()
-                .HasColumnType("varchar(3000)");
+                .HasMaxLength(3000);
 
             builder.Property(i => i.CreatedAt)
-                .IsRequired()
-                .HasColumnType("datetime");
+                .IsRequired();
 
             builder.Property(i => i.TicketId)
                 .IsRequired();
@@ -25,12 +24,12 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             {
                 interactionUser.Property(u => u.UserId)
                 .IsRequired()
-                .HasColumnType("varchar(36)")
+                .HasMaxLength(36)
                 .HasColumnName("userId");
 
                 interactionUser.Property(u => u.UserEmail)
                 .IsRequired()
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .HasColumnName("userEmail");
             });
 

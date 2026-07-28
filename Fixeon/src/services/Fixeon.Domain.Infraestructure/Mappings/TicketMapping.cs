@@ -12,86 +12,83 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(t => t.Title)
                 .IsRequired()
-                .HasColumnType("varchar(100)");
+                .HasMaxLength(100);
 
             builder.Property(t => t.Protocol)
                 .IsRequired()
-                .HasColumnType("varchar(6)");
+                .HasMaxLength(6);
 
             builder.Property(t => t.Description)
                 .IsRequired()
-                .HasColumnType("varchar(3000)");
+                .HasMaxLength(3000);
 
             builder.Property(t => t.Category)
                 .IsRequired()
-                .HasColumnType("varchar(50)");
+                .HasMaxLength(50);
 
             builder.Property(t => t.Departament)
                 .IsRequired()
-                .HasColumnType("varchar(50)");
+                .HasMaxLength(50);
 
             builder.Property(t => t.Priority)
                 .IsRequired()
-                .HasColumnType("varchar(20)");
+                .HasMaxLength(20);
 
             builder.Property(t => t.Status)
                 .IsRequired()
-                .HasColumnType("varchar(30)");
+                .HasMaxLength(30);
 
             builder.OwnsOne(t => t.CreatedByUser, user =>
             {
                 user.Property(u => u.UserId)
                     .IsRequired()
-                    .HasColumnType("varchar(36)")
+                    .HasMaxLength(36)
                     .HasColumnName("userId");
 
                 user.Property(u => u.UserEmail)
                     .IsRequired()
-                    .HasColumnType("varchar(100)")
+                    .HasMaxLength(100)
                     .HasColumnName("userEmail");
 
                 user.Property(u => u.OrganizationId)
                     .HasColumnName("OrganizationId")
-                    .HasColumnType("varchar(36)");
+                    .HasMaxLength(36);
 
                 user.Property(u => u.OrganizationName)
                     .HasColumnName("OrganizationName")
-                    .HasColumnType("varchar(50)");
+                    .HasMaxLength(36);
             });
 
             builder.OwnsOne(t => t.AssignedTo, analyst =>
             {
                 analyst.Property(u => u.AnalystId)
                     .IsRequired()
-                    .HasColumnType("varchar(36)")
+                    .HasMaxLength(36)
                     .HasColumnName("analystId");
 
                 analyst.Property(u => u.AnalystEmail)
                     .IsRequired()
-                    .HasColumnType("varchar(100)")
+                    .HasMaxLength(100)
                     .HasColumnName("analystEmail");
             });
 
             builder.Property(t => t.CreateAt)
-                .IsRequired()
-                .HasColumnType("datetime");
+                .IsRequired();
 
-            builder.Property(t => t.ModifiedAt)
-                .HasColumnType("datetime");
+            builder.Property(t => t.ModifiedAt);
 
-            builder.Property(t => t.ResolvedAt)
-                .HasColumnType("datetime");
+            builder.Property(t => t.ResolvedAt);
 
             builder.OwnsOne(t => t.ClosedBy, analyst =>
             {
                 analyst.Property(u => u.AnalystId)
                     .IsRequired()
-                    .HasColumnType("varchar(36)")
+                    .HasMaxLength(36)
                     .HasColumnName("closedById");
 
                 analyst.Property(u => u.AnalystEmail)
                     .IsRequired()
-                    .HasColumnType("varchar(100)")
+                    .HasMaxLength(100)
                     .HasColumnName("closedByName");
             });
 
@@ -100,11 +97,9 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 SLA.OwnsOne(s => s.FirstInteraction, FI =>
                 {
                     FI.Property(x => x.Deadline)
-                    .HasColumnType("datetime")
                     .HasColumnName("FirstInteractionDeadline");
 
                     FI.Property(x => x.Accomplished)
-                    .HasColumnType("datetime")
                     .HasColumnName("FirstInteractionAccomplished");
 
                 });
@@ -112,11 +107,9 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 SLA.OwnsOne(s => s.Resolution, R =>
                 {
                     R.Property(x => x.Deadline)
-                    .HasColumnType("datetime")
                     .HasColumnName("ResolutionDeadline");
 
                     R.Property(x => x.Accomplished)
-                    .HasColumnType("datetime")
                     .HasColumnName("ResolutionAccomplished");
 
                 });

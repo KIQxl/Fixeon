@@ -3,8 +3,8 @@ using Fixeon.Domain.Application.Interfaces;
 using Fixeon.Domain.Core.Entities;
 using Fixeon.Domain.Core.Enums;
 using Fixeon.Domain.Infraestructure.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Fixeon.Domain.Infraestructure.Repositories
 {
@@ -108,16 +108,16 @@ namespace Fixeon.Domain.Infraestructure.Repositories
         {
             var sql = "INSERT INTO TicketTags (TicketId, TagId) VALUES (@ticketId, @tagId)";
             await _ctx.Database.ExecuteSqlRawAsync(sql,
-                new SqlParameter("@ticketId", ticketId),
-                new SqlParameter("@tagId", tagId));
+                new NpgsqlParameter("@ticketId", ticketId),
+                new NpgsqlParameter("@tagId", tagId));
         }
 
         public async Task DetachTagInTicket(Guid ticketId, Guid tagId)
         {
             var sql = "DELETE FROM TicketTags WHERE TicketId = @ticketId AND TagId = @tagId";
             await _ctx.Database.ExecuteSqlRawAsync(sql,
-                new SqlParameter("@ticketId", ticketId),
-                new SqlParameter("@tagId", tagId));
+                new NpgsqlParameter("@ticketId", ticketId),
+                new NpgsqlParameter("@tagId", tagId));
         }
 
 

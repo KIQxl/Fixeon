@@ -176,7 +176,7 @@ namespace Fixeon.WebApi.Configuration
             services.AddDbContext<DomainContext>((serviceProvider, opts) =>
             {
                 opts
-                .UseSqlServer(configuration["ConnectionStrings:FixeonDefaultConnection"])
+                .UseNpgsql(configuration["ConnectionStrings:FixeonDefaultConnection"])
                 .AddInterceptors(serviceProvider.GetRequiredService<Fixeon.Domain.Infraestructure.Data.TenantSaveChangesInterceptor>());
             });
 
@@ -202,7 +202,7 @@ namespace Fixeon.WebApi.Configuration
         {
             services.AddDbContext<DataContext>((serviceProvider, opts) =>
             {
-                opts.UseSqlServer(configuration["ConnectionStrings:FixeonDefaultConnection"])
+                opts.UseNpgsql(configuration["ConnectionStrings:FixeonDefaultConnection"])
                 .AddInterceptors(serviceProvider.GetRequiredService<Fixeon.Auth.Infraestructure.Data.TenantSaveChangesInterceptor>());
             });
 

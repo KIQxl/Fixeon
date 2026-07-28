@@ -11,7 +11,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             builder.HasKey(t => t.Id);
 
             builder.Property(t => t.Name)
-                .HasColumnType("varchar(100)")
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.HasOne(t => t.Company)

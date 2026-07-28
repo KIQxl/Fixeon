@@ -30,7 +30,7 @@ namespace Fixeon.WebApi.SeedData
             {
                 masterUser = new ApplicationUser(masterEmail, "Fixeon", "xxxxxxxxxxxxx", "System Owner", null);
 
-                var createUserResult = await userManager.CreateAsync(masterUser, "F1X3oN@2025");
+                var createUserResult = await userManager.CreateAsync(masterUser, "F1X3oN@2026");
                 if (createUserResult.Succeeded)
                     await userManager.AddToRoleAsync(masterUser, masterRole);
                 else

@@ -13,7 +13,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasColumnName("Name")
-                .HasColumnType("varchar(50)");
+                .HasMaxLength(50);
 
             builder.HasOne(c => c.Organization)
                 .WithMany(o => o.Categories)

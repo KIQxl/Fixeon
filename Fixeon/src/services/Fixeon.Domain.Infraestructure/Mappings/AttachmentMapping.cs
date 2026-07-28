@@ -13,20 +13,19 @@ namespace Fixeon.Domain.Infraestructure.Mappings
 
             builder.Property(a => a.Name)
                 .IsRequired()
-                .HasColumnType("varchar(200)")
+                .HasMaxLength(200)
                 .HasColumnName("Filename");
 
             builder.Property(a => a.Extension)
                 .IsRequired()
-                .HasColumnType("varchar(6)");
+                .HasMaxLength(6);
 
             builder.Property(a => a.UploadedAt)
-                .HasColumnType("datetime")
                 .IsRequired();
 
             builder.Property(a => a.SenderId)
                     .IsRequired()
-                    .HasColumnType("varchar(36)");
+                    .HasMaxLength(36);
 
             builder.Property(a => a.TicketId);
 
@@ -36,7 +35,7 @@ namespace Fixeon.Domain.Infraestructure.Mappings
             {
                 tb.HasCheckConstraint(
                     "CK_Attachment_Ticket_Or_Interaction",
-                    "(TicketId IS NOT NULL AND InteractionId IS NULL) OR (TicketId IS NULL AND InteractionId IS NOT NULL)"
+                    "(\"TicketId\" IS NOT NULL AND \"InteractionId\" IS NULL) OR (\"TicketId\" IS NULL AND \"InteractionId\" IS NOT NULL)"
                 );
             });
         }

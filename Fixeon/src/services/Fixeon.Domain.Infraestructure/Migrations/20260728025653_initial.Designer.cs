@@ -3,17 +3,17 @@ using System;
 using Fixeon.Domain.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Fixeon.Domain.Infraestructure.Migrations
 {
     [DbContext(typeof(DomainContext))]
-    [Migration("20251116043129_organizationNewFields")]
-    partial class organizationNewFields
+    [Migration("20260728025653_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,37 +21,39 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Fixeon.Domain.Core.Entities.Attachment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Extension")
                         .IsRequired()
-                        .HasColumnType("varchar(6)");
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<Guid?>("InteractionId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(200)")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("Filename");
 
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("SenderId")
+                        .HasMaxLength(36)
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("TicketId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -61,7 +63,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
 
                     b.ToTable("attachments", t =>
                         {
-                            t.HasCheckConstraint("CK_Attachment_Ticket_Or_Interaction", "(TicketId IS NOT NULL AND InteractionId IS NULL) OR (TicketId IS NULL AND InteractionId IS NOT NULL)");
+                            t.HasCheckConstraint("CK_Attachment_Ticket_Or_Interaction", "(\"TicketId\" IS NOT NULL AND \"InteractionId\" IS NULL) OR (\"TicketId\" IS NULL AND \"InteractionId\" IS NOT NULL)");
                         });
                 });
 
@@ -69,18 +71,19 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("Name");
 
                     b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -93,18 +96,19 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(100)")
                         .HasColumnName("Name");
 
                     b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -117,17 +121,18 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("varchar(3000)");
+                        .HasMaxLength(3000)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<Guid>("TicketId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -140,26 +145,27 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("SLAInMinutes")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("SLAPriority")
                         .IsRequired()
-                        .HasColumnType("varchar(30)");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -172,13 +178,14 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
@@ -192,46 +199,53 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Departament")
                         .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("varchar(3000)");
+                        .HasMaxLength(3000)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Priority")
                         .IsRequired()
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Protocol")
                         .IsRequired()
-                        .HasColumnType("varchar(6)");
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(30)");
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
@@ -243,30 +257,39 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CNPJ")
                         .IsRequired()
-                        .HasColumnType("varchar(14)");
+                        .HasMaxLength(14)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(200)");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("varchar(13)");
+                        .HasMaxLength(13)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(25)");
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)");
 
                     b.HasKey("Id");
 
@@ -280,37 +303,46 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("CNPJ")
                         .IsRequired()
-                        .HasColumnType("varchar(14)");
+                        .HasMaxLength(14)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("varchar(1000)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("varchar(13)");
+                        .HasMaxLength(13)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(25)");
+                        .HasMaxLength(25)
+                        .HasColumnType("character varying(25)");
 
                     b.HasKey("Id");
 
@@ -322,10 +354,10 @@ namespace Fixeon.Domain.Infraestructure.Migrations
             modelBuilder.Entity("TicketTags", b =>
                 {
                     b.Property<Guid>("TagId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TicketId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("TagId", "TicketId");
 
@@ -384,16 +416,18 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.InteractionUser", "CreatedBy", b1 =>
                         {
                             b1.Property<Guid>("InteractionId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("UserEmail")
                                 .IsRequired()
+                                .HasMaxLength(100)
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("userEmail");
 
                             b1.Property<string>("UserId")
                                 .IsRequired()
-                                .HasColumnType("varchar(36)")
+                                .HasMaxLength(36)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("userId");
 
                             b1.HasKey("InteractionId");
@@ -438,16 +472,18 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Analyst", "AssignedTo", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("AnalystEmail")
                                 .IsRequired()
+                                .HasMaxLength(100)
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("analystEmail");
 
                             b1.Property<string>("AnalystId")
                                 .IsRequired()
-                                .HasColumnType("varchar(36)")
+                                .HasMaxLength(36)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("analystId");
 
                             b1.HasKey("TicketId");
@@ -461,16 +497,18 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Analyst", "ClosedBy", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("AnalystEmail")
                                 .IsRequired()
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("closedByName");
 
                             b1.Property<string>("AnalystId")
                                 .IsRequired()
-                                .HasColumnType("varchar(36)")
+                                .HasMaxLength(36)
+                                .HasColumnType("character varying(36)")
                                 .HasColumnName("closedById");
 
                             b1.HasKey("TicketId");
@@ -484,7 +522,7 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLAInfo", "SLAInfo", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.HasKey("TicketId");
 
@@ -496,14 +534,14 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                             b1.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLA", "FirstInteraction", b2 =>
                                 {
                                     b2.Property<Guid>("SLAInfoTicketId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<DateTime?>("Accomplished")
-                                        .HasColumnType("datetime")
+                                        .HasColumnType("timestamp with time zone")
                                         .HasColumnName("FirstInteractionAccomplished");
 
                                     b2.Property<DateTime?>("Deadline")
-                                        .HasColumnType("datetime")
+                                        .HasColumnType("timestamp with time zone")
                                         .HasColumnName("FirstInteractionDeadline");
 
                                     b2.HasKey("SLAInfoTicketId");
@@ -517,14 +555,14 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                             b1.OwnsOne("Fixeon.Domain.Core.ValueObjects.SLA", "Resolution", b2 =>
                                 {
                                     b2.Property<Guid>("SLAInfoTicketId")
-                                        .HasColumnType("uniqueidentifier");
+                                        .HasColumnType("uuid");
 
                                     b2.Property<DateTime?>("Accomplished")
-                                        .HasColumnType("datetime")
+                                        .HasColumnType("timestamp with time zone")
                                         .HasColumnName("ResolutionAccomplished");
 
                                     b2.Property<DateTime?>("Deadline")
-                                        .HasColumnType("datetime")
+                                        .HasColumnType("timestamp with time zone")
                                         .HasColumnName("ResolutionDeadline");
 
                                     b2.HasKey("SLAInfoTicketId");
@@ -545,24 +583,28 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.User", "CreatedByUser", b1 =>
                         {
                             b1.Property<Guid>("TicketId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
-                            b1.Property<string>("OrganizationId")
-                                .HasColumnType("varchar(36)")
+                            b1.Property<Guid?>("OrganizationId")
+                                .HasMaxLength(36)
+                                .HasColumnType("uuid")
                                 .HasColumnName("OrganizationId");
 
                             b1.Property<string>("OrganizationName")
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(36)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("OrganizationName");
 
                             b1.Property<string>("UserEmail")
                                 .IsRequired()
+                                .HasMaxLength(100)
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("userEmail");
 
                             b1.Property<string>("UserId")
                                 .IsRequired()
-                                .HasColumnType("varchar(36)")
+                                .HasMaxLength(36)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("userId");
 
                             b1.HasKey("TicketId");
@@ -589,40 +631,47 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("CompanyId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("City");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("Country");
 
                             b1.Property<string>("Neighborhood")
                                 .IsRequired()
+                                .HasMaxLength(100)
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("Neighborhood");
 
                             b1.Property<string>("Number")
                                 .IsRequired()
-                                .HasColumnType("varchar(6)")
+                                .HasMaxLength(6)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("Number");
 
                             b1.Property<string>("PostalCode")
                                 .IsRequired()
-                                .HasColumnType("varchar(8)")
+                                .HasMaxLength(8)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("PostalCode");
 
                             b1.Property<string>("State")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("varchar(100)")
                                 .HasColumnName("State");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
+                                .HasMaxLength(100)
                                 .HasColumnType("varchar(100)")
                                 .HasColumnName("Street");
 
@@ -649,41 +698,48 @@ namespace Fixeon.Domain.Infraestructure.Migrations
                     b.OwnsOne("Fixeon.Domain.Core.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("OrganizationId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
                                 .HasColumnName("City");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
                                 .HasColumnName("Country");
 
                             b1.Property<string>("Neighborhood")
                                 .IsRequired()
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("Neighborhood");
 
                             b1.Property<string>("Number")
                                 .IsRequired()
-                                .HasColumnType("varchar(6)")
+                                .HasMaxLength(6)
+                                .HasColumnType("character varying(6)")
                                 .HasColumnName("Number");
 
                             b1.Property<string>("PostalCode")
                                 .IsRequired()
-                                .HasColumnType("varchar(8)")
+                                .HasMaxLength(8)
+                                .HasColumnType("character varying(8)")
                                 .HasColumnName("PostalCode");
 
                             b1.Property<string>("State")
                                 .IsRequired()
-                                .HasColumnType("varchar(50)")
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
                                 .HasColumnName("State");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
-                                .HasColumnType("varchar(100)")
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
                                 .HasColumnName("Street");
 
                             b1.HasKey("OrganizationId");
