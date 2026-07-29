@@ -27,13 +27,12 @@ namespace Fixeon.Domain.Infraestructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach (var property in modelBuilder.Model
+            foreach(var property in modelBuilder.Model
                 .GetEntityTypes()
                 .SelectMany(
                     e => e.GetProperties()
                     .Where(
                         p => p.ClrType == typeof(string))))
-                property.SetColumnType("varchar(100)");
 
             modelBuilder.Entity<Ticket>()
                 .HasQueryFilter(t => t.CompanyId == _currentTenant);
@@ -48,6 +47,13 @@ namespace Fixeon.Domain.Infraestructure.Data
                 .HasQueryFilter(t => t.CompanyId == _currentTenant);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DomainContext).Assembly);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder
+                .Properties<string>()
+                .HaveMaxLength(100);
         }
     }
 }

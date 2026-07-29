@@ -177,7 +177,9 @@ namespace Fixeon.WebApi.Configuration
             {
                 opts
                 .UseNpgsql(configuration["ConnectionStrings:FixeonDefaultConnection"])
-                .AddInterceptors(serviceProvider.GetRequiredService<Fixeon.Domain.Infraestructure.Data.TenantSaveChangesInterceptor>());
+                .AddInterceptors(serviceProvider.GetRequiredService<Fixeon.Domain.Infraestructure.Data.TenantSaveChangesInterceptor>())
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
             });
 
             return services;

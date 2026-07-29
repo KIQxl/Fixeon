@@ -195,13 +195,22 @@ namespace Fixeon.Auth.Infraestructure.Repositories
         public async Task<Dictionary<string, List<string>>> GetRolesForUsers(IEnumerable<string> userIds)
         {
             var userRolesData = await _dataContext.UserRoles
-                .Where(ur => userIds.Contains(ur.UserId.ToString()))
-                .Join(_dataContext.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => new { ur.UserId, r.Name })
+                .Where(ur => userIds.Contains(ur.UserId))
+                .Join(
+                    _dataContext.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new {
+                        ur.UserId,
+                        r.Name
+                    })
                 .ToListAsync();
 
             return userRolesData
-                .GroupBy(ur => ur.UserId)
-                .ToDictionary(g =>g.Key.ToString(), g => g.Select(ur => ur.Name).ToList());
+                .GroupBy(x => x.UserId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.Name!).ToList());
         }
 
         public async Task<IdentityRole> GetRole(string roleName)
