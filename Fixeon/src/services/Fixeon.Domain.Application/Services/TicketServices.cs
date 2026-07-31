@@ -456,11 +456,17 @@ namespace Fixeon.Domain.Application.Services
 
                 var firstInteractionSLA = SLAs.FirstOrDefault(x => x.Type == (int)ESLAType.FirstInteraction && x.SLAPriority == ticket.Priority);
                 if (firstInteractionSLA != null)
-                    ticket.SetFirstInteractionDeadline(firstInteractionSLA.SLAInMinutes);
+                {
+                    if(!ticket.SLAInfo.FirstInteraction.Deadline.HasValue)
+                        ticket.SetFirstInteractionDeadline(firstInteractionSLA.SLAInMinutes);
+                }
 
                 var resolutionSLA = SLAs.FirstOrDefault(x => x.Type == (int)ESLAType.Resolution && x.SLAPriority == ticket.Priority);
                 if (resolutionSLA != null)
-                    ticket.SetResolutionDeadline(resolutionSLA.SLAInMinutes);
+                {
+                    if(!ticket.SLAInfo.Resolution.Deadline.HasValue)
+                        ticket.SetResolutionDeadline(resolutionSLA.SLAInMinutes);
+                }
             }
         }
     }

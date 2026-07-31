@@ -19,17 +19,23 @@ namespace Fixeon.Domain.Infraestructure.Mappings
                 .HasConstraintName("CompanyTags");
 
             builder.HasMany(t => t.Tickets)
-                .WithMany(t => t.Tags)
-                .UsingEntity<Dictionary<string, object>>(
-                    "TicketTags",
-                    j => j.HasOne<Ticket>()
-                    .WithMany()
-                    .HasForeignKey("TicketId"),
-
-                    j => j.HasOne<Tag>()
-                    .WithMany()
-                    .HasForeignKey("TagId")
-                );
+              .WithMany(t => t.Tags)
+              .UsingEntity<Dictionary<string, object>>(
+                  "tickettags",
+                  j => j.HasOne<Ticket>()
+                        .WithMany()
+                        .HasForeignKey("ticketid")
+                        .HasPrincipalKey(nameof(Ticket.Id)),
+                  j => j.HasOne<Tag>()
+                        .WithMany()
+                        .HasForeignKey("tagid")
+                        .HasPrincipalKey(nameof(Tag.Id)),
+                  j => {
+                      j.Property<Guid>("ticketid").HasColumnName("ticketid");
+                      j.Property<Guid>("tagid").HasColumnName("tagid");
+                      j.ToTable("tickettags");
+                  }
+              );
         }
     }
 }
