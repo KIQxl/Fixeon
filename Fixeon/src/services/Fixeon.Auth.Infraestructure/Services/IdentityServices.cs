@@ -296,6 +296,9 @@ namespace Fixeon.Auth.Infraestructure.Services
             if (user is null)
                 return new Response<LoginResponse>("Usuário não encontrado.");
 
+            if(!user.Active)
+                return new Response<LoginResponse>("Usuário está inativo.");
+
             var result = await _authRepository.Login(user, password);
 
             if (result.Succeeded)
