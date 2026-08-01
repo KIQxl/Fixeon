@@ -12,7 +12,7 @@
 
         public void Accomplish()
         {
-            if(!Accomplished.HasValue && Deadline.HasValue)
+            if(!Accomplished.HasValue)
                 Accomplished = DateTime.UtcNow;
         }
         public void SetDeadline(int deadlineInMinutes)
