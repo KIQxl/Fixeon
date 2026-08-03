@@ -14,7 +14,7 @@ namespace Fixeon.Auth.Infraestructure.Interfaces
         public Task<IdentityResult> AssociateRole(ApplicationUser user, string role);
         public Task<IdentityResult> AssociateRoles(ApplicationUser user, List<string> roles);
         public Task<IdentityResult> RemoveRoles(ApplicationUser user, List<string> roles);
-        public Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin, Guid? id, string? email, Guid? organization, string? username);
+        public Task<List<ApplicationUser>> GetAllUsers(Guid? id, string? email, Guid? organization, string? username);
         public Task<List<IdentityRole>> GetAllRoles();
         public Task<List<IdentityRole>> GetRolesByName(List<string> rolesName);
         public Task<ApplicationUser> GetUser(string email);

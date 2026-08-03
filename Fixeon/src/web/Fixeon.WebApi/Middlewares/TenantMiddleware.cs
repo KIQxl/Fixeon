@@ -1,5 +1,6 @@
 ﻿using Fixeon.Shared.Core.Interfaces;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Fixeon.WebApi.Middlewares
 {
@@ -24,7 +25,7 @@ namespace Fixeon.WebApi.Middlewares
 
             var organizationIdClaim = context.User.FindFirst("organizationId");
 
-            if(organizationIdClaim != null)
+            if (organizationIdClaim != null)
             {
                 Guid.TryParse(organizationIdClaim.Value, out var orgId);
 
@@ -45,6 +46,14 @@ namespace Fixeon.WebApi.Middlewares
                 tenantContext.UserId = userId;
                 tenantContext.UserEmail = userEmail;
             }
+
+            var roles = context.User.FindAll(ClaimTypes.Role)
+                        .Concat(context.User.FindAll("roles"))
+                        .Select(c => c.Value)
+                        .Distinct()
+                        .ToList();
+
+            tenantContext.Roles = roles;
 
             await _next(context);
         }

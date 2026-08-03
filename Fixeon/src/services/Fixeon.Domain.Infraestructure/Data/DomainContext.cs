@@ -9,6 +9,7 @@ namespace Fixeon.Domain.Infraestructure.Data
     {
         private readonly ITenantContextServices _tenantContext;
         public Guid _currentTenant => _tenantContext.TenantId;
+        public List<string> _currentRoles => _tenantContext.Roles;
         public DomainContext(DbContextOptions<DomainContext> opts, ITenantContextServices tenantContext)
             : base(opts)
         {
@@ -27,7 +28,9 @@ namespace Fixeon.Domain.Infraestructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            foreach(var property in modelBuilder.Model
+            bool isMasterAdmin = _tenantContext.Roles?.Contains("MasterAdmin") ?? false;
+
+            foreach (var property in modelBuilder.Model
                 .GetEntityTypes()
                 .SelectMany(
                     e => e.GetProperties()
@@ -35,16 +38,16 @@ namespace Fixeon.Domain.Infraestructure.Data
                         p => p.ClrType == typeof(string))))
 
             modelBuilder.Entity<Ticket>()
-                .HasQueryFilter(t => t.CompanyId == _currentTenant);
+                .HasQueryFilter(t => (_currentRoles != null && _currentRoles.Contains("MasterAdmin")) || t.CompanyId == _currentTenant);
 
             modelBuilder.Entity<Interaction>()
-                .HasQueryFilter(i => i.Ticket.CompanyId == _currentTenant);
+                .HasQueryFilter(i => (_currentRoles != null && _currentRoles.Contains("MasterAdmin")) || i.Ticket.CompanyId == _currentTenant);
 
             modelBuilder.Entity<Organization>()
-                .HasQueryFilter(u => u.CompanyId == _currentTenant);
+                .HasQueryFilter(u => (_currentRoles != null && _currentRoles.Contains("MasterAdmin")) || u.CompanyId == _currentTenant);
 
             modelBuilder.Entity<Tag>()
-                .HasQueryFilter(t => t.CompanyId == _currentTenant);
+                .HasQueryFilter(t => (_currentRoles != null && _currentRoles.Contains("MasterAdmin")) || t.CompanyId == _currentTenant);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DomainContext).Assembly);
         }

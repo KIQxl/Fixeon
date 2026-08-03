@@ -3,7 +3,6 @@ using Fixeon.Auth.Infraestructure.Entities;
 using Fixeon.Auth.Infraestructure.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Fixeon.Auth.Infraestructure.Repositories
 {
@@ -125,11 +124,8 @@ namespace Fixeon.Auth.Infraestructure.Repositories
             return token;
         }
 
-        public async Task<List<ApplicationUser>> GetAllUsers(bool masterAdmin, Guid? id, string? email, Guid? organization, string? username)
+        public async Task<List<ApplicationUser>> GetAllUsers(Guid? id, string? email, Guid? organization, string? username)
         {
-            if(masterAdmin)
-                return await _userManager.Users.IgnoreQueryFilters().AsNoTracking().ToListAsync();
-
             var query = _userManager.Users.AsQueryable();
 
             if (id.HasValue)

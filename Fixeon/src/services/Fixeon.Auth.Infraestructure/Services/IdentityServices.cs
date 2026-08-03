@@ -30,7 +30,7 @@ namespace Fixeon.Auth.Infraestructure.Services
         // GET
         public async Task<Response<List<ApplicationUserResponse>>> GetAllUsers(Guid? id, string? email, Guid? organization, string? username)
         {
-            var users = await _authRepository.GetAllUsers(false, id, email, organization, username);
+            var users = await _authRepository.GetAllUsers(id, email, organization, username);
 
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");
@@ -436,7 +436,7 @@ namespace Fixeon.Auth.Infraestructure.Services
 
         public async Task<Response<List<ApplicationUserResponse>>> MasterAdminGetAllUsers()
         {
-            var users = await _authRepository.GetAllUsers(true, null, null, null, null);
+            var users = await _authRepository.GetAllUsers(null, null, null, null);
 
             if (users is null)
                 return new Response<List<ApplicationUserResponse>>("Nenhum usuário encontrado.");

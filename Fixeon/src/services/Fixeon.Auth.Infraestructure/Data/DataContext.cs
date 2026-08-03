@@ -9,6 +9,7 @@ namespace Fixeon.Auth.Infraestructure.Data
     {
         private readonly ITenantContextServices _tenantContext;
         public Guid CurrentTenant => _tenantContext.TenantId;
+        public List<string> CurrentRoles => _tenantContext.Roles;
 
         public bool IgnoreTenantInterceptor { get; set; } = false;
         public DataContext(DbContextOptions<DataContext> opts, ITenantContextServices tenantContext)
@@ -23,8 +24,9 @@ namespace Fixeon.Auth.Infraestructure.Data
         {
             builder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
 
+
             builder.Entity<ApplicationUser>()
-                .HasQueryFilter(u => u.CompanyId == CurrentTenant);
+                .HasQueryFilter(u => (CurrentRoles != null && CurrentRoles.Contains("MasterAdmin")) || u.CompanyId == CurrentTenant);
 
             base.OnModelCreating(builder);
         }

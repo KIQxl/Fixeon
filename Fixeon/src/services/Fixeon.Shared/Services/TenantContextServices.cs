@@ -13,6 +13,7 @@ namespace Fixeon.Shared.Models
         public Guid? OrganizationId { get; set; }
         public Guid UserId { get; set; }
         public string UserEmail { get; set; }
+        public List<string> Roles { get; set; } = new List<string>();
 
         public async Task<CurrentUser> GetCurrentUser()
         {
@@ -21,7 +22,8 @@ namespace Fixeon.Shared.Models
                 TenantId = TenantId,
                 OrganizationId = OrganizationId.HasValue ? OrganizationId.Value : Guid.Empty,
                 UserId = UserId,
-                UserEmail = UserEmail
+                UserEmail = UserEmail,
+                Roles = Roles
             };
         }
     }
